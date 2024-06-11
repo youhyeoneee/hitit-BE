@@ -1,6 +1,7 @@
 package com.pda.user_service.controller;
 
 
+import com.pda.user_service.dto.LoginDto;
 import com.pda.user_service.dto.UserDto;
 import com.pda.user_service.jpa.User;
 import com.pda.user_service.service.UserService;
@@ -9,8 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import static com.pda.utils.api_utils.ApiUtils.error;
 import static com.pda.utils.api_utils.ApiUtils.success;
 
 @RestController
@@ -34,9 +37,15 @@ public class UserController {
     }
 
     @GetMapping("/login/kakao/code")
-    public String kakaoLogin(@RequestParam String code) {
+    public ApiUtils.ApiResult kakaoLogin(@RequestParam String code) {
         String token = userService.getAccessTokenFromKakao(code);
-        return userService.getUserInfo(token);
+
+        if (token == null) {
+            return error("로그인 실패", HttpStatus.BAD_REQUEST);
+        }
+
+        LoginDto loginDto = new LoginDto("로그인 성공", token);
+        return success(loginDto);
     }
 
 }

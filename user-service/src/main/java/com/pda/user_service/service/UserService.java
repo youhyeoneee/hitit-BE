@@ -6,6 +6,7 @@ import com.pda.user_service.dto.UserDto;
 import com.pda.user_service.jpa.User;
 import com.pda.user_service.jpa.UserRepository;
 import com.pda.utils.exception.DuplicatedEmailException;
+import com.pda.utils.exception.InvalidParameterException;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -83,7 +86,10 @@ public class UserService {
         User user = kakaoUserDTO.toEntity(accessToken);
 
         if (userRepository.findByEmail(user.getEmail()).isEmpty()) {
-            userRepository.save(user);
+            User savedUser = userRepository.save(user);
+            if (savedUser == null) {
+                return null;
+            }
             log.info("회원가입");
         }
         log.info("로그인");
