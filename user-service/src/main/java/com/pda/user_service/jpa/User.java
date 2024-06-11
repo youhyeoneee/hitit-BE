@@ -20,9 +20,9 @@ public class User {
     private String type;
     private String mydata;
 
-    public User(String name, String email, String password, String phone, String birthdate, String gender) {
-        this.name = name;
+    public User(String email, String name, String password, String phone, String birthdate, String gender) {
         this.email = email;
+        this.name = name;
         this.password = password;
         this.phone = phone;
         this.birthdate = birthdate;
