@@ -2,6 +2,7 @@ package com.pda.user_service.controller;
 
 
 import com.pda.user_service.dto.LoginDto;
+import com.pda.user_service.dto.LoginResponseDto;
 import com.pda.user_service.dto.UserDto;
 import com.pda.user_service.jpa.User;
 import com.pda.user_service.service.UserService;
@@ -36,6 +37,19 @@ public class UserController {
         return success("회원가입 성공");
     }
 
+    @PostMapping("/login")
+    public ApiUtils.ApiResult login(@RequestBody LoginDto loginDto) {
+
+        String token = userService.login(loginDto.getEmail(), loginDto.getPassword());
+
+        if (token == null) {
+            return error("로그인 실패", HttpStatus.BAD_REQUEST);
+        }
+
+        LoginResponseDto loginResponseDto = new LoginResponseDto("로그인 성공", token);
+        return success(loginResponseDto);
+    }
+
     @GetMapping("/login/kakao/code")
     public ApiUtils.ApiResult kakaoLogin(@RequestParam String code) {
         String token = userService.getAccessTokenFromKakao(code);
@@ -44,8 +58,8 @@ public class UserController {
             return error("로그인 실패", HttpStatus.BAD_REQUEST);
         }
 
-        LoginDto loginDto = new LoginDto("로그인 성공", token);
-        return success(loginDto);
+        LoginResponseDto loginResponseDto = new LoginResponseDto("로그인 성공", token);
+        return success(loginResponseDto);
     }
 
 }

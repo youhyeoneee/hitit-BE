@@ -6,7 +6,8 @@ import com.pda.user_service.dto.UserDto;
 import com.pda.user_service.jpa.User;
 import com.pda.user_service.jpa.UserRepository;
 import com.pda.utils.exception.DuplicatedEmailException;
-import com.pda.utils.exception.InvalidParameterException;
+import com.pda.utils.exception.login.NotCorrectPasswordException;
+import com.pda.utils.exception.login.NotFoundUserException;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -94,5 +96,23 @@ public class UserService {
         }
         log.info("로그인");
         return accessToken;
+    }
+
+    public String login(String email, String password) throws NotFoundUserException, NotCorrectPasswordException {
+        Optional<User> resultUser = userRepository.findByEmail(email);
+        if (resultUser.isEmpty()) {
+            log.error("User not found with email: " + email);
+            throw new NotFoundUserException("등록되지 않은 이메일입니다. 이메일을 확인해주세요.");
+        }
+
+        String resultUserPassword = resultUser.get().getPassword();
+        if (Objects.equals(resultUserPassword, password)) {
+            // TODO : 토큰 발급
+            String token = "";
+            return token;
+        }
+        else {
+            throw new NotCorrectPasswordException("비밀번호가 일치하지 않습니다.");
+        }
     }
 }
