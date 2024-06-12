@@ -39,7 +39,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ApiUtils.ApiResult login(@RequestBody LoginDto loginDto) {
+    public ApiUtils.ApiResult login(@Valid @RequestBody LoginDto loginDto) {
 
         String token = userService.login(loginDto.getEmail(), loginDto.getPassword());
 
