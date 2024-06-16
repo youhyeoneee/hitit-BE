@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public class UserDto {
@@ -15,6 +16,7 @@ public class UserDto {
     @NotBlank(message = "이름을 입력해주세요.")
     private String name;
     // TODO: 비밀번호 형식 있다면 추가하기
+    @Setter
     @NotBlank(message = "비밀번호를 입력해주세요.")
     private String password;
     @NotBlank(message = "전화번호를 입력해주세요.")

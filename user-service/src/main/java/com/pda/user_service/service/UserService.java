@@ -2,6 +2,7 @@ package com.pda.user_service.service;
 
 import com.pda.user_service.dto.KaKaoTokenDto;
 import com.pda.user_service.dto.KakaoUserDto;
+import com.pda.user_service.dto.LoginDto;
 import com.pda.user_service.dto.UserDto;
 import com.pda.user_service.jpa.User;
 import com.pda.user_service.jpa.UserRepository;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -28,6 +30,8 @@ import java.util.Optional;
 public class UserService {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Value("${kakao.client_id}")
     private String clientId;
@@ -39,6 +43,8 @@ public class UserService {
 
 
     public User signup(UserDto userDto) throws DuplicatedEmailException {
+        String encodedPassword = passwordEncoder.encode(userDto.getPassword());
+        userDto.setPassword(encodedPassword);
         User user = userDto.toEntity();
 
         if (userRepository.findByEmail(user.getEmail()).isEmpty()) {
@@ -98,18 +104,14 @@ public class UserService {
         return accessToken;
     }
 
-    public String login(String email, String password) throws NotFoundUserException, NotCorrectPasswordException {
-        Optional<User> resultUser = userRepository.findByEmail(email);
+    public User login(LoginDto loginDto)  throws NotFoundUserException, NotCorrectPasswordException {
+            Optional<User> resultUser = userRepository.findByEmail(loginDto.getEmail());
         if (resultUser.isEmpty()) {
-            log.error("User not found with email: " + email);
+            log.error("User not found with email: " + loginDto.getEmail());
             throw new NotFoundUserException("등록되지 않은 이메일입니다. 이메일을 확인해주세요.");
         }
-
-        String resultUserPassword = resultUser.get().getPassword();
-        if (Objects.equals(resultUserPassword, password)) {
-            // TODO : 토큰 발급
-            String token = "";
-            return token;
+        if (passwordEncoder.matches(loginDto.getPassword(),  resultUser.get().getPassword())) {
+            return resultUser.get();
         }
         else {
             throw new NotCorrectPasswordException("비밀번호가 일치하지 않습니다.");

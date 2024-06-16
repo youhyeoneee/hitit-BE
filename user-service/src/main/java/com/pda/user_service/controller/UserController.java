@@ -1,6 +1,7 @@
 package com.pda.user_service.controller;
 
 
+import com.pda.security.JwtTokenProvider;
 import com.pda.user_service.dto.LoginDto;
 import com.pda.user_service.dto.LoginResponseDto;
 import com.pda.user_service.dto.UserDto;
@@ -31,6 +32,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    JwtTokenProvider jwtTokenProvider;
+
 
     @PostMapping("/signup")
     public ApiUtils.ApiResult<String> signup(@Valid @RequestBody UserDto userDto) {
@@ -41,12 +45,13 @@ public class UserController {
     @PostMapping("/login")
     public ApiUtils.ApiResult login(@Valid @RequestBody LoginDto loginDto) {
 
-        String token = userService.login(loginDto.getEmail(), loginDto.getPassword());
+        User user = userService.login(loginDto);
 
-        if (token == null) {
+        if (user == null) {
             return error("로그인 실패", HttpStatus.BAD_REQUEST);
         }
 
+        String token = jwtTokenProvider.createToken(user.getUsername());
         LoginResponseDto loginResponseDto = new LoginResponseDto("로그인 성공", token);
         return success(loginResponseDto);
     }
