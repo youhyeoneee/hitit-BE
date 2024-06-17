@@ -3,7 +3,7 @@ package com.pda.user_service.service;
 import com.pda.user_service.dto.KaKaoTokenDto;
 import com.pda.user_service.dto.KakaoUserDto;
 import com.pda.user_service.dto.LoginDto;
-import com.pda.user_service.dto.UserDto;
+import com.pda.user_service.dto.SignupUserDto;
 import com.pda.user_service.jpa.User;
 import com.pda.user_service.jpa.UserRepository;
 import com.pda.utils.exception.DuplicatedEmailException;
@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -42,7 +41,7 @@ public class UserService {
 
 
 
-    public User signup(UserDto userDto) throws DuplicatedEmailException {
+    public User signup(SignupUserDto userDto) throws DuplicatedEmailException {
         String encodedPassword = passwordEncoder.encode(userDto.getPassword());
         userDto.setPassword(encodedPassword);
         User user = userDto.toEntity();
@@ -76,7 +75,7 @@ public class UserService {
         return kakaoTokenResponseDto.getAccessToken();
     }
 
-    public String getUserInfo(String accessToken) {
+    public User getUserInfo(String accessToken) {
         KakaoUserDto kakaoUserDTO = WebClient.create(KAUTH_USER_URL_HOST)
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -101,7 +100,7 @@ public class UserService {
             log.info("회원가입");
         }
         log.info("로그인");
-        return accessToken;
+        return user;
     }
 
     public User login(LoginDto loginDto)  throws NotFoundUserException, NotCorrectPasswordException {
