@@ -1,7 +1,6 @@
 package com.pda.user_service.jpa;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,6 +14,7 @@ import java.util.List;
 @Getter
 @Entity
 @NoArgsConstructor
+@Table(name = "users")
 public class User implements UserDetails  {
     @Id
     private int id;
