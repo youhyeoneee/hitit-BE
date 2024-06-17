@@ -34,6 +34,8 @@ public class UserService {
 
     @Value("${kakao.client_id}")
     private String clientId;
+    @Value("${kakao.client_secret}")
+    private String clientSecret;
     @Value("${kakao.KAUTH_TOKEN_URL_HOST}")
     private String KAUTH_TOKEN_URL_HOST;
     @Value("${kakao.KAUTH_USER_URL_HOST}")
@@ -56,6 +58,7 @@ public class UserService {
 
     public String getAccessTokenFromKakao(String code) {
         log.info(code);
+        log.info(clientSecret);
         KaKaoTokenDto kakaoTokenResponseDto = WebClient.create(KAUTH_TOKEN_URL_HOST).post()
                 .uri(uriBuilder -> uriBuilder
                         .scheme("https")
@@ -63,6 +66,7 @@ public class UserService {
                         .queryParam("grant_type", "authorization_code")
                         .queryParam("client_id", clientId)
                         .queryParam("code", code)
+                        .queryParam("client_secret", clientSecret)
                         .build(true))
                 .header(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())
                 .retrieve()
