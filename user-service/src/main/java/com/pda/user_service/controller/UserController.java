@@ -59,6 +59,7 @@ public class UserController {
     @GetMapping("/login/kakao/code")
     public ApiUtils.ApiResult kakaoLogin(@RequestParam String code) {
         String token = userService.getAccessTokenFromKakao(code);
+        userService.getUserInfo(token);
 
         if (token == null) {
             return error("로그인 실패", HttpStatus.BAD_REQUEST);
