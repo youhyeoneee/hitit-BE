@@ -8,7 +8,8 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
@@ -20,13 +21,27 @@ public class WebSecurityConfig {
     }
 
     @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins("http://localhost:5173")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
+            }
+        };
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf((csrfConfig) -> csrfConfig.disable() // .csrf().disable()
                 )
                 .authorizeHttpRequests((authorizeRequest ->
-                                authorizeRequest.requestMatchers("/").authenticated() // .anyRequest().authenticated()
-                                        .requestMatchers( "/api/users/signup", "api/users/login", "api/users/login/kakao/code").permitAll() //.antMatchers("/", "/home", "/join", "/login").permitAll()  // antMatchers : 여기는 인증안된 사람도 갈 수 있음
+                        authorizeRequest.requestMatchers("/").authenticated() // .anyRequest().authenticated()
+                                .requestMatchers( "/api/users/signup", "api/users/login", "api/users/login/kakao/code").permitAll() //.antMatchers("/", "/home", "/join", "/login").permitAll()  // antMatchers : 여기는 인증안된 사람도 갈 수 있음
 
                 ))
                 .formLogin((formLogin) -> formLogin.disable()) // formLogin.disable()
