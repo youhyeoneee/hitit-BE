@@ -1,13 +1,13 @@
-package com.pda.mydata_service;
+package com.pda.portfolio_service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication(scanBasePackages = "com.pda")
-public class MydataServiceApplication {
+public class PortfolioServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(MydataServiceApplication.class, args);
+		SpringApplication.run(PortfolioServiceApplication.class, args);
 	}
 
 }
