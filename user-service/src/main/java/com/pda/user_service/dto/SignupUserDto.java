@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-public class UserDto {
+public class SignupUserDto {
     @Email(message = "이메일 형식에 맞지 않습니다.")
     private String email;
     @NotBlank(message = "이름을 입력해주세요.")
