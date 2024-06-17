@@ -3,6 +3,7 @@ package com.pda.user_service.dto;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.pda.user_service.jpa.User;
+import com.pda.utils.api_utils.StringUtils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -47,6 +48,7 @@ public class KakaoUserDto {
 
     public User toEntity(String token) {
         String birthdate = kakaoAccount.birthyear + kakaoAccount.birthday;
-        return new User(kakaoAccount.email, kakaoAccount.name, token, kakaoAccount.phoneNumber, birthdate, kakaoAccount.gender);
+        String phone = StringUtils.formatPhone(kakaoAccount.phoneNumber);
+        return new User(kakaoAccount.email, kakaoAccount.name, token, phone, birthdate, kakaoAccount.gender);
     }
 }
