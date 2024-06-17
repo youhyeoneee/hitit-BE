@@ -49,13 +49,14 @@ public class JwtTokenProvider {
 
     // 토큰 생성
     public String createToken(String username) {
+        Claims claims = Jwts.claims().setSubject(username);
         Date now = new Date();
         log.info("createToken - username : " + username);
 
         // header에 들어갈 내용 및 서명을 하기 위한 SECRET_KEY
         // payload에 들어갈 내용
         return Jwts.builder()
-                .claim("email", username)
+                .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + tokenValidTime))
                 .signWith(key)
