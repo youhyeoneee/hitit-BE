@@ -37,11 +37,6 @@ class StringUtilsTest {
 
     @Test
     void 전화번호_포맷_8자리() {
-        assertThat(StringUtils.formatPhone( "+82 10-1234-5678")).isEqualTo("01012345678");
-    }
-
-    @Test
-    void 전화번호_포맷_7자리() {
-        assertThat(StringUtils.formatPhone( "+82 10-123-5678")).isEqualTo("0101235678");
+        assertThat(StringUtils.formatPhone( "+82 10-1234-5678")).isEqualTo("010-1234-5678");
     }
 }

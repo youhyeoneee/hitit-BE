@@ -28,6 +28,9 @@ public class StringUtils {
 
     public static String formatPhone(String phone) {
         String result = phone.replaceAll("[^0-9]", "");
-        return "0" + result.substring(2);
+        if (result.startsWith("82")) {
+            result = "0" + result.substring(2);
+        }
+        return result.replaceFirst("(\\d{3})(\\d{4})(\\d+)", "$1-$2-$3");
     }
 }
