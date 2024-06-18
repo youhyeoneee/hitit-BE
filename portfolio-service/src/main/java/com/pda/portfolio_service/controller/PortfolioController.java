@@ -1,5 +1,6 @@
 package com.pda.portfolio_service.controller;
 
+import com.pda.portfolio_service.dto.HititPortfoliosFundsResponseDto;
 import com.pda.portfolio_service.dto.HititPortfoliosResponseDto;
 import com.pda.portfolio_service.service.PortfolioService;
 import com.pda.utils.api_utils.ApiUtils;
