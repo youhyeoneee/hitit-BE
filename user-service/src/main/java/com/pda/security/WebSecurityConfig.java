@@ -41,7 +41,7 @@ public class WebSecurityConfig {
                 )
                 .authorizeHttpRequests((authorizeRequest ->
                         authorizeRequest.requestMatchers("/").authenticated() // .anyRequest().authenticated()
-                                .requestMatchers( "/api/users/signup", "api/users/login", "api/users/login/kakao/code").permitAll() //.antMatchers("/", "/home", "/join", "/login").permitAll()  // antMatchers : 여기는 인증안된 사람도 갈 수 있음
+                                .requestMatchers( "/api/users/signup", "api/users/login", "api/users/login/kakao").permitAll() //.antMatchers("/", "/home", "/join", "/login").permitAll()  // antMatchers : 여기는 인증안된 사람도 갈 수 있음
 
                 ))
                 .formLogin((formLogin) -> formLogin.disable()) // formLogin.disable()
