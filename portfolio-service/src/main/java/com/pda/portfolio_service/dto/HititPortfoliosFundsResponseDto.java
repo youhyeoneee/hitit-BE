@@ -7,8 +7,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public class HititPortfoliosFundsResponseDto {
     private String fund_code;
-    private String stock_name;
-    private String size;
-    private String style;
+    private Integer portfolio_id;
+    private String fund_name;
+    private String fund_type_detail;
+    private String company_name;
     private Float weight;
 }
