@@ -39,11 +39,10 @@ public class WebSecurityConfig {
         http
                 .csrf((csrfConfig) -> csrfConfig.disable() // .csrf().disable()
                 )
-                .authorizeHttpRequests((authorizeRequest ->
-                        authorizeRequest.requestMatchers("/").authenticated() // .anyRequest().authenticated()
-                                .requestMatchers( "/api/users/signup", "api/users/login", "api/users/login/kakao").permitAll() //.antMatchers("/", "/home", "/join", "/login").permitAll()  // antMatchers : 여기는 인증안된 사람도 갈 수 있음
-
-                ))
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                        .requestMatchers("/error", "/api/users/signup", "/api/users/login", "/api/users/login/kakao").permitAll()
+                        .anyRequest().authenticated()
+                )
                 .formLogin((formLogin) -> formLogin.disable()) // formLogin.disable()
                 .logout((logoutConfig) -> logoutConfig.permitAll()) //  .logout().permitAll()// 로그아웃 아무나 못하게
                 // 사용할 필터와 시기 지정해주기
