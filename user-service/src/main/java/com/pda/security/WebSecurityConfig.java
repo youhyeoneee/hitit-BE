@@ -40,7 +40,7 @@ public class WebSecurityConfig {
                 .csrf((csrfConfig) -> csrfConfig.disable() // .csrf().disable()
                 )
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/error", "/api/users/signup", "/api/users/login", "/api/users/login/kakao").permitAll()
+                        .requestMatchers("/api/portfolios/**", "/error", "/api/users/signup", "/api/users/login", "/api/users/login/kakao").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin((formLogin) -> formLogin.disable()) // formLogin.disable()
