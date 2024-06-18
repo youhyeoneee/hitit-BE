@@ -52,6 +52,7 @@ public class UserController {
             return error("로그인 실패", HttpStatus.BAD_REQUEST);
         }
 
+        log.info("email user log in : " + user.getUsername() + " - " + user.getEmail() );
         String token = jwtTokenProvider.createToken(user.getUsername());
         UserInfoDto userInfo = new UserInfoDto(user);
         LoginResponseDto loginResponseDto = new LoginResponseDto("로그인 성공", token, userInfo);
@@ -66,7 +67,7 @@ public class UserController {
         if (user == null) {
             return error("로그인 실패", HttpStatus.BAD_REQUEST);
         }
-        log.info("kakao user" + user.getId() + " - " + user.getUsername() + " - " + user.getEmail() );
+        log.info("kakao user log in : " + user.getUsername() + " - " + user.getEmail() );
         String token = jwtTokenProvider.createToken(user.getUsername());
         UserInfoDto userInfo = new UserInfoDto(user);
         LoginResponseDto loginResponseDto = new LoginResponseDto("로그인 성공", token, userInfo);
