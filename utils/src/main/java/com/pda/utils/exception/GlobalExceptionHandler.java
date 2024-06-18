@@ -2,6 +2,7 @@ package com.pda.utils.exception;
 
 
 
+import com.pda.utils.exception.investment_tests.NotFoundQuestionException;
 import com.pda.utils.exception.login.NotCorrectPasswordException;
 import com.pda.utils.exception.login.NotFoundUserException;
 import com.pda.utils.api_utils.ApiUtils;
@@ -40,7 +41,7 @@ public class GlobalExceptionHandler {
         return error(errorMessage, HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler({NotFoundUserException.class, NotCorrectPasswordException.class})
+    @ExceptionHandler({NotFoundUserException.class, NotCorrectPasswordException.class, NotFoundQuestionException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiUtils.ApiResult<String> handleBadRequestException(RuntimeException error) {
         String errorMessage = error.getMessage();
