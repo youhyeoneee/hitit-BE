@@ -58,15 +58,16 @@ public class UserController {
         return success(loginResponseDto);
     }
 
-    @GetMapping("/login/kakao/code")
+    @GetMapping("/login/kakao")
     public ApiUtils.ApiResult kakaoLogin(@RequestParam String code) {
-        String token = userService.getAccessTokenFromKakao(code);
-        User user = userService.getUserInfo(token);
+        String accessTokenFromKakao = userService.getAccessTokenFromKakao(code);
+        User user = userService.getUserInfo(accessTokenFromKakao);
 
-        if (token == null) {
+        if (user == null) {
             return error("로그인 실패", HttpStatus.BAD_REQUEST);
         }
-
+        log.info("kakao user" + user.getId() + " - " + user.getUsername() + " - " + user.getEmail() );
+        String token = jwtTokenProvider.createToken(user.getUsername());
         UserInfoDto userInfo = new UserInfoDto(user);
         LoginResponseDto loginResponseDto = new LoginResponseDto("로그인 성공", token, userInfo);
         return success(loginResponseDto);

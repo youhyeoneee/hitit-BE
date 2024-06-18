@@ -10,6 +10,7 @@ import com.pda.utils.exception.DuplicatedEmailException;
 import com.pda.utils.exception.login.NotCorrectPasswordException;
 import com.pda.utils.exception.login.NotFoundUserException;
 import io.netty.handler.codec.http.HttpHeaderValues;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -98,13 +99,11 @@ public class UserService {
 
         if (userRepository.findByEmail(user.getEmail()).isEmpty()) {
             User savedUser = userRepository.save(user);
-            if (savedUser == null) {
-                return null;
-            }
             log.info("회원가입");
         }
-        log.info("로그인");
-        return user;
+
+        Optional<User> resultUser = userRepository.findByEmail(user.getEmail());
+        return resultUser.orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
     }
 
     public User login(LoginDto loginDto)  throws NotFoundUserException, NotCorrectPasswordException {
