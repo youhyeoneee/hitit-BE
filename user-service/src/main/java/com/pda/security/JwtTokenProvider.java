@@ -16,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.util.StringUtils;
 
 import java.security.Key;
 import java.util.Base64;
@@ -65,13 +66,18 @@ public class JwtTokenProvider {
 
     // 헤더에서 토큰 얻기
     public String resolveToken(HttpServletRequest request) {
-        return request.getHeader("Authorization");
+        String bearerToken = request.getHeader("Authorization");
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
     }
 
 
     // 내가 만든 토큰인지 & username 기반으로 DB 에서 객체 가져오기
     public Authentication getAuthentication(String token) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(getUsername(token));
+        log.info("auth - " + userDetails.getUsername());
         return new UsernamePasswordAuthenticationToken(userDetails, "",
                 userDetails.getAuthorities());
     }
