@@ -1,10 +1,9 @@
 package com.pda.portfolio_service.service;
 
-import com.pda.portfolio_service.dto.HititResponseDto;
+import com.pda.portfolio_service.dto.HititPortfoliosResponseDto;
 import com.pda.portfolio_service.jpa.Portfolio;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import com.pda.portfolio_service.jpa.PortfolioRepository;
 
@@ -17,11 +16,11 @@ public class PortfolioService {
     @Autowired
     private PortfolioRepository portfolioRepository;
 
-    public List<HititResponseDto> getHititPortfolios() {
+    public List<HititPortfoliosResponseDto> getHititPortfolios() {
         List<Portfolio> portfolios = portfolioRepository.findAll();
 
         return portfolios.stream()
-                .map(portfolio -> new HititResponseDto(
+                .map(portfolio -> new HititPortfoliosResponseDto(
                         portfolio.getId(),
                         portfolio.getName(),
                         portfolio.getInvestmentType(),
