@@ -24,7 +24,7 @@ public class User implements UserDetails  {
     private String phone;
     private String birthdate;
     private String gender;
-    private String type;
+    private String investmentType;
     private String mydata;
 
     public User(String email, String name, String password, String phone, String birthdate, String gender) {
@@ -66,7 +66,7 @@ public class User implements UserDetails  {
         return true;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setInvestmentType(String investmentType) {
+        this.investmentType = investmentType;
     }
 }
