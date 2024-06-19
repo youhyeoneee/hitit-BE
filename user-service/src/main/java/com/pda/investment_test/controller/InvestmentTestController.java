@@ -55,7 +55,7 @@ public class InvestmentTestController {
 
         String investmentType = investmentTestService.getInvestmentType(total_score).getDescription();
         log.info("investmentType : " + investmentType);
-        userService.updateInvestmentType(userId, investmentType);
+        userService.updateInvestmentTypeAndScore(userId, investmentType, total_score);
         
         return success(investmentType);
     }

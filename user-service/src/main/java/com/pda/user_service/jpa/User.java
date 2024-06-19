@@ -25,6 +25,7 @@ public class User implements UserDetails  {
     private String birthdate;
     private String gender;
     private String investmentType;
+    private Integer investmentTestScore;
     private String mydata;
 
     public User(String email, String name, String password, String phone, String birthdate, String gender) {
@@ -68,5 +69,9 @@ public class User implements UserDetails  {
 
     public void setInvestmentType(String investmentType) {
         this.investmentType = investmentType;
+    }
+
+    public void setInvestmentTestScore(int investmentTestScore) {
+        this.investmentTestScore = investmentTestScore;
     }
 }
