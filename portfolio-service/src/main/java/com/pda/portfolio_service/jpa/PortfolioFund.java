@@ -23,4 +23,7 @@ public class PortfolioFund {
 
     @Column(name = "weight")
     private Float weight;
+
+    @Column(name = "return_3m")
+    private Float return3m;
 }
