@@ -2,7 +2,7 @@ package com.pda.user_service.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pda.user_service.jpa.User;
-import com.pda.utils.api_utils.StringUtils;
+import com.pda.utils.api_utils.CustomStringUtils;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -29,8 +29,8 @@ public class SignupUserDto {
     private String residentNumber;
 
     public User toEntity() {
-        String birthdate = StringUtils.getBirthDate(residentNumber);
-        String gender = StringUtils.getGender(residentNumber);
+        String birthdate = CustomStringUtils.getBirthDate(residentNumber);
+        String gender = CustomStringUtils.getGender(residentNumber);
         return new User(email, name, password, phone, birthdate, gender);
     }
 }

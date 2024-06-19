@@ -1,6 +1,8 @@
 package com.pda.security;
 
+import com.pda.utils.api_utils.CustomStringUtils;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -67,10 +69,7 @@ public class JwtTokenProvider {
     // 헤더에서 토큰 얻기
     public String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
+        return CustomStringUtils.getToken(bearerToken);
     }
 
 

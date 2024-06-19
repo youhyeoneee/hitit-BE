@@ -1,8 +1,10 @@
 package com.pda.utils.api_utils;
 
 
+import org.springframework.util.StringUtils;
+
 // TODO: 입력값 유효성 검사 + 예외 처리
-public class StringUtils {
+public class CustomStringUtils {
     public static String getGender(String residentNumber){
         String backDigit = residentNumber.split("-")[1];
         int genderCode = Integer.parseInt(backDigit);
@@ -33,4 +35,12 @@ public class StringUtils {
         }
         return result.replaceFirst("(\\d{3})(\\d{4})(\\d+)", "$1-$2-$3");
     }
+
+    public static String getToken(String bearerToken) {
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
+    }
+
 }
