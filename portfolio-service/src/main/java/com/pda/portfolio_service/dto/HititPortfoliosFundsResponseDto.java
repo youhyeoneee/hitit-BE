@@ -12,4 +12,5 @@ public class HititPortfoliosFundsResponseDto {
     private String fund_type_detail;
     private String company_name;
     private Float weight;
+    private Float return3m;
 }

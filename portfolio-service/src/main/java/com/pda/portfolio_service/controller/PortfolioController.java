@@ -24,7 +24,9 @@ public class PortfolioController {
 
     @GetMapping("/hitit")
     public ApiUtils.ApiResult<List<HititPortfoliosResponseDto>> getHititPortfolios() {
+        // 여기까지지의 데이터는 미리 정해진 데이터
         List<HititPortfoliosResponseDto> hititPortfoliosResponseDto = portfolioService.getHititPortfolios();
+        // 수익률의 경우에는 포트폴리오에 포함된 각 펀드의 수익률을 연산하여 Dto에 반환
         return success(hititPortfoliosResponseDto);
     }
 
