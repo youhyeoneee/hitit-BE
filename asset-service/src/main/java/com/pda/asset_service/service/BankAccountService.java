@@ -13,5 +13,5 @@ public interface BankAccountService {
 
     BankAccountDto convertToDto(BankAccount bankAccount);
 
-    List<MydataInfoDto> mydataLink(int userId, List<String> bankAccounts);
+    List<MydataInfoDto> linkMyDataAccount(int userId, List<String> bankAccounts);
 }

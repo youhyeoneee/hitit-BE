@@ -7,6 +7,6 @@ import com.pda.asset_service.dto.UserAccountInfoDto;
 import java.util.List;
 
 public interface AssetService {
-    List<MydataInfoDto> mydataLink(UserAccountInfoDto userAccountInfoDto);
+    List<MydataInfoDto> linkMydata(UserAccountInfoDto userAccountInfoDto);
 
 }

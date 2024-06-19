@@ -24,21 +24,13 @@ public class AssetServiceImpl implements AssetService{
     private final SecurityTransactionServiceImpl securityTransactionService;
 
     @Override
-    public List<MydataInfoDto> mydataLink(UserAccountInfoDto userAccountInfoDto) {
-
-
-        // controller에 { "userId": 1,"bankAccounts": ["국민은행", "신한은행"],"securityAccounts": ["신한투자증권"]} 형식으로 요청 온다
-        // service에서는 각 기관을 돌면서 데이터 있는 지 확인
-        // 있으면 mydataInfo에 있다고 저장
-        // responseDto에 담아줌....
+    public List<MydataInfoDto> linkMydata(UserAccountInfoDto userAccountInfoDto) {
 
         int userId = userAccountInfoDto.getUserId();
         log.info("userId = {}", userId);
 
-        List<MydataInfoDto> bankAccountsLinkInfo = bankAccountService.mydataLink(userId,  userAccountInfoDto.getBankAccounts());
+        List<MydataInfoDto> bankAccountsLinkInfo = bankAccountService.linkMyDataAccount(userId,  userAccountInfoDto.getBankAccounts());
         log.info("bankAccountsLinkInfo = {}", bankAccountsLinkInfo);
-
-
 
         return bankAccountsLinkInfo;
     }
