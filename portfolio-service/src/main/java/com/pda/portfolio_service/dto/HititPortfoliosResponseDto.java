@@ -12,5 +12,6 @@ public class HititPortfoliosResponseDto {
     private String summary;
     private Integer minimumSubscriptionFee;
     private Integer stockExposure;
+    private Float return3m;
 }
 
