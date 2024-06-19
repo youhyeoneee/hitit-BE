@@ -45,6 +45,7 @@ public class InvestmentTestController {
             int answer_no = resultDtos.get(i).getAnswer();
             int score = investmentTestService.getScore(question_no, answer_no);
             log.info(question_no + "번 질문 - " +  answer_no + "번 대답 : 점수 : " + score);
+            total_score += score;
         }
 
         log.info("total_score : " + total_score);
