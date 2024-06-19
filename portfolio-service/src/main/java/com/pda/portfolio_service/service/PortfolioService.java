@@ -46,7 +46,8 @@ public class PortfolioService {
                         portfolioFund.getFundName(),
                         portfolioFund.getFundTypeDetail(),
                         portfolioFund.getCompanyName(),
-                        portfolioFund.getWeight()))
+                        portfolioFund.getWeight(),
+                        portfolioFund.getReturn3m()))
                 .collect(Collectors.toList());
     }
 }
