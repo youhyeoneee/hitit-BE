@@ -66,7 +66,8 @@ public class PortfolioService {
                         portfolioFund.getCompanyName(),
                         portfolioFund.getWeight(),
                         portfolioFund.getReturn3m()))
-                .sorted(Comparator.comparingDouble(HititPortfoliosFundsResponseDto::getWeight).reversed())
+                .sorted(Comparator.comparingDouble(HititPortfoliosFundsResponseDto::getWeight).reversed()
+                        .thenComparing(HititPortfoliosFundsResponseDto::getFundName, Comparator.nullsLast(Comparator.naturalOrder())))
                 .collect(Collectors.toList());
     }
 }
