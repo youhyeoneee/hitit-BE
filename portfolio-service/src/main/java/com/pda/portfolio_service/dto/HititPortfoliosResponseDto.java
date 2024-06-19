@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class HititResponseDto {
+public class HititPortfoliosResponseDto {
     private int id;
     private String name;
     private String investmentType;
