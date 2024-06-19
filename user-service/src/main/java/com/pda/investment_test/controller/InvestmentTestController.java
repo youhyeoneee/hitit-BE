@@ -2,7 +2,6 @@ package com.pda.investment_test.controller;
 
 import com.pda.investment_test.dto.QuestionDto;
 import com.pda.investment_test.dto.ResultDto;
-import com.pda.investment_test.jpa.InvestmentType;
 import com.pda.investment_test.jpa.answer.Answer;
 import com.pda.investment_test.service.InvestmentTestService;
 import com.pda.security.JwtTokenProvider;
@@ -11,8 +10,6 @@ import com.pda.utils.api_utils.ApiUtils;
 import com.pda.utils.api_utils.CustomStringUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,7 +24,7 @@ public class InvestmentTestController {
 
     private InvestmentTestService investmentTestService;
     private JwtTokenProvider jwtTokenProvider;
-    private UserDetailsService userDetailsService;
+    private UserService userService;
 
     @GetMapping("/questions/{no}")
     public ApiUtils.ApiResult getQuestionById(@PathVariable int no) {
@@ -50,12 +47,16 @@ public class InvestmentTestController {
 
         log.info("total_score : " + total_score);
 
-        // TODO: 토큰 해독해서 유저 누구인지 알기
-        // TODO: 유저 DB에 타입 저장하기
+        // 유저 DB에 타입 저장하기
         log.info("bearerToken : " + bearerToken);
+        String token = CustomStringUtils.getToken(bearerToken);
+        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        log.info("user id : " + userId);
+
         String investmentType = investmentTestService.getInvestmentType(total_score).getDescription();
         log.info("investmentType : " + investmentType);
-
+        userService.updateInvestmentType(userId, investmentType);
+        
         return success(investmentType);
     }
 }

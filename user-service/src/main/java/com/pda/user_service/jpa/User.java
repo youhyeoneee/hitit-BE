@@ -66,4 +66,7 @@ public class User implements UserDetails  {
         return true;
     }
 
+    public void setType(String type) {
+        this.type = type;
+    }
 }
