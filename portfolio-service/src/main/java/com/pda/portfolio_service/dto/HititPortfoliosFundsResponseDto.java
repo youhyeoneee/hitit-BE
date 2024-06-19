@@ -6,11 +6,11 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class HititPortfoliosFundsResponseDto {
-    private String fund_code;
-    private Integer portfolio_id;
-    private String fund_name;
-    private String fund_type_detail;
-    private String company_name;
+    private String fundCode;
+    private Integer portfolioId;
+    private String fundName;
+    private String fundTypeDetail;
+    private String companyName;
     private Float weight;
     private Float return3m;
 }

@@ -10,8 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.pda.portfolio_service.jpa.PortfolioRepository;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Comparator;
 
 @Slf4j
 @Service
@@ -26,13 +29,28 @@ public class PortfolioService {
         List<Portfolio> portfolios = portfolioRepository.findAll();
 
         return portfolios.stream()
-                .map(portfolio -> new HititPortfoliosResponseDto(
-                        portfolio.getId(),
-                        portfolio.getName(),
-                        portfolio.getInvestmentType(),
-                        portfolio.getSummary(),
-                        portfolio.getMinimumSubscriptionFee(),
-                        portfolio.getStockExposure()))
+                .map(portfolio -> {
+                    // 각 포트폴리오의 id 값으로 해당 포트폴리오의 펀드 데이터를 가져옴
+                    List<PortfolioFund> fundProducts = portfolioFundRepository.findByIdPortfolioId(portfolio.getId());
+
+                    double totalReturn = fundProducts.stream()
+                            .mapToDouble(fund -> fund.getWeight() * fund.getReturn3m())
+                            .sum() / 100;
+
+                    float totalReturnFloat = BigDecimal.valueOf(totalReturn)
+                            .setScale(2, RoundingMode.HALF_UP)
+                            .floatValue();
+
+                    return new HititPortfoliosResponseDto(
+                            portfolio.getId(),
+                            portfolio.getName(),
+                            portfolio.getInvestmentType(),
+                            portfolio.getSummary(),
+                            portfolio.getMinimumSubscriptionFee(),
+                            portfolio.getStockExposure(),
+                            totalReturnFloat
+                    );
+                })
                 .collect(Collectors.toList());
     }
 
@@ -48,6 +66,8 @@ public class PortfolioService {
                         portfolioFund.getCompanyName(),
                         portfolioFund.getWeight(),
                         portfolioFund.getReturn3m()))
+                .sorted(Comparator.comparingDouble(HititPortfoliosFundsResponseDto::getWeight).reversed()
+                        .thenComparing(HititPortfoliosFundsResponseDto::getFundName, Comparator.nullsLast(Comparator.naturalOrder())))
                 .collect(Collectors.toList());
     }
 }
