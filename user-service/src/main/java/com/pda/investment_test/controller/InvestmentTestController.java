@@ -37,7 +37,7 @@ public class InvestmentTestController {
     }
 
     @PostMapping("/results")
-    public ApiUtils.ApiResult<String> getResults(@RequestBody List<ResultDto> resultDtos, @RequestHeader("Authorization") String bearerToken) {
+    public ApiUtils.ApiResult<String> saveResults(@RequestBody List<ResultDto> resultDtos, @RequestHeader("Authorization") String bearerToken) {
         // 토큰 -> user id
         log.info("bearerToken : " + bearerToken);
         String token = CustomStringUtils.getToken(bearerToken);
@@ -68,5 +68,19 @@ public class InvestmentTestController {
 
         return success(investmentType);
     }
-}
 
+    @GetMapping("/results")
+    public ApiUtils.ApiResult<List<String>> getResults(@RequestHeader("Authorization") String bearerToken) {
+        // 토큰 -> user id
+        log.info("bearerToken : " + bearerToken);
+        String token = CustomStringUtils.getToken(bearerToken);
+        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        log.info("user id : " + userId);
+
+
+
+        List<String> answers = investmentTestService.getResultsByUserId(userId);
+        return success(answers);
+    }
+
+}

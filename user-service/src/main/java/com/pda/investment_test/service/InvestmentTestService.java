@@ -10,8 +10,9 @@ import com.pda.investment_test.jpa.user_answer.UserAnswer;
 import com.pda.investment_test.jpa.user_answer.UserAnswerRepository;
 import com.pda.user_service.jpa.User;
 import com.pda.user_service.jpa.UserRepository;
-import com.pda.utils.exception.investment_tests.NotFoundQnAException;
-import com.pda.utils.exception.investment_tests.NotFoundQuestionException;
+import com.pda.utils.exception.investment_tests.AnswerNotFoundException;
+import com.pda.utils.exception.investment_tests.QuestionNotFoundException;
+import com.pda.utils.exception.investment_tests.UserAnswerNotFoundException;
 import com.pda.utils.exception.login.NotFoundUserException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -30,9 +32,9 @@ public class InvestmentTestService {
     private UserAnswerRepository userAnswerRepository;
     private UserRepository userRepository;
 
-    public String getQuestionById(int questionNo) throws NotFoundQuestionException {
+    public String getQuestionById(int questionNo) {
         Question question = questionRepository.findByNo(questionNo)
-                .orElseThrow(() -> new NotFoundQuestionException(questionNo));
+                .orElseThrow(() -> new QuestionNotFoundException(questionNo));
 
         return question.getContent();
     }
@@ -44,7 +46,7 @@ public class InvestmentTestService {
 
     public int getScore(int questionNo, int answerNo) {
         Answer answer = answerRepository.findByQuestionNoAndNo(questionNo, answerNo)
-                .orElseThrow(() -> new NotFoundQnAException(questionNo, answerNo));
+                .orElseThrow(() -> new AnswerNotFoundException(questionNo, answerNo));
         return answer.getScore();
     }
 
@@ -62,14 +64,14 @@ public class InvestmentTestService {
         }
     }
 
-    public String getAnswerContent(int questionNo, int answerNo) throws NotFoundQuestionException {
+    public String getAnswerContent(int questionNo, int answerNo)  {
         Answer answer = answerRepository.findByQuestionNoAndNo(questionNo, answerNo)
-                .orElseThrow(() -> new NotFoundQnAException(questionNo, answerNo));
+                .orElseThrow(() -> new AnswerNotFoundException(questionNo, answerNo));
 
         return answer.getContent();
     }
 
-    public UserAnswer saveUserAnswers(int userId, List<String> answers) throws NotFoundUserException {
+    public UserAnswer saveUserAnswers(int userId, List<String> answers) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundUserException(userId + "번 유저를 찾을 수 없습니다."));
@@ -89,5 +91,12 @@ public class InvestmentTestService {
 
             return userAnswer;
         }
+    }
+
+    public List<String> getResultsByUserId(int userId) {
+        UserAnswer userAnswer = userAnswerRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserAnswerNotFoundException(userId + "번 유저의 저장된 테스트 결과가 없습니다."));
+
+        return userAnswer.getAnswers();
     }
 }
