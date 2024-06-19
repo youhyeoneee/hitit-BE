@@ -9,7 +9,7 @@ import java.util.List;
 
 @Getter
 @AllArgsConstructor
-public class QuestionAndAnswerDto {
+public class QuestionDto {
     private String question;
     private List<Answer> answers;
 }
