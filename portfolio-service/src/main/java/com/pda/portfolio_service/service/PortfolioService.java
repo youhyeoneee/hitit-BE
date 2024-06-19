@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Comparator;
 
 @Slf4j
 @Service
@@ -65,6 +66,7 @@ public class PortfolioService {
                         portfolioFund.getCompanyName(),
                         portfolioFund.getWeight(),
                         portfolioFund.getReturn3m()))
+                .sorted(Comparator.comparingDouble(HititPortfoliosFundsResponseDto::getWeight).reversed())
                 .collect(Collectors.toList());
     }
 }
