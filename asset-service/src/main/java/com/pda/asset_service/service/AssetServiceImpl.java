@@ -74,8 +74,8 @@ public class AssetServiceImpl implements AssetService{
 
         // mq로 요청 필요...
 
-       User updatedUser =  updateMydataStatus(userId);
-       log.info("Mydata Link Updated User Info = {}", updatedUser);
+        User updatedUser =  updateMydataStatus(userId);
+        log.info("Mydata Link Updated User Info = {}", updatedUser);
         return allMydataLinkInfo;
     }
 

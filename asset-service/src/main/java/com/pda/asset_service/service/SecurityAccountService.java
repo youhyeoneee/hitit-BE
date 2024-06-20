@@ -12,4 +12,6 @@ public interface SecurityAccountService {
     SecurityAccountDto convertToDto(SecurityAccount securityAccount);
 
     List<MydataInfoDto> linkMyDataAccount(int userId, List<String> securityAccounts);
+
+    List<SecurityAccountDto> getSecurityAccounts(int userId);
 }

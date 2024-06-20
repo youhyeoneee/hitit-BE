@@ -3,6 +3,7 @@ package com.pda.asset_service.service;
 import com.pda.asset_service.dto.MydataInfoDto;
 import com.pda.asset_service.dto.PensionDto;
 import com.pda.asset_service.dto.PensionResponseDto;
+import com.pda.asset_service.dto.SecurityAccountDto;
 import com.pda.asset_service.feign.MydataServiceClient;
 import com.pda.asset_service.jpa.*;
 import lombok.AllArgsConstructor;
@@ -93,9 +94,26 @@ public class PensionServiceImpl implements PensionService{
                         pensionLinkInfo.add(mydataInfoDto);
                     }
                 }
+            }else{
+                log.info("요청된 연금 계좌 없음");
             }
         }
         return pensionLinkInfo;
+    }
+
+    @Override
+    public List<PensionDto> getPensions(int userId) {
+        List<Pension> pensions = pensionRepository.findByAssetUserId(userId).orElse(null);
+
+        List<PensionDto> pensionDtos = new ArrayList<>();
+        if (pensions != null) {
+            for (Pension pension : pensions) {
+                PensionDto pensionDto = convertToDto(pension);
+                log.info("find pension account = {}", pensionDto);
+                pensionDtos.add(pensionDto);
+            }
+        }
+        return pensionDtos;
     }
 
 }

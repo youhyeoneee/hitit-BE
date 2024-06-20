@@ -13,4 +13,6 @@ public interface CardService {
     CardDto convertToDto(Card card);
 
     List<MydataInfoDto> linkMyDataAccount(int userId, List<String> cards);
+
+    List<CardDto> getCards(int userId);
 }

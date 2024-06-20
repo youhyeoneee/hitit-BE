@@ -122,6 +122,7 @@ public class MydataServiceImpl implements MydataService{
 
     @Override
     public Optional<List<SecurityAccountDto>> getSecurityAccountsByUserIdAndSecurityName(int userId, String securityName) {
+        log.info("///////////////////////////////////////////////////");
         Optional<List<SecurityAccount>> securityAccounts = securityAccountRepository.findByMydataUser_IdAndSecurityName(userId, securityName);
         if (securityAccounts.isPresent()) {
             List<SecurityAccountDto> securityAccountDtos = securityAccounts.get().stream()
