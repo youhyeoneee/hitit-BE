@@ -8,7 +8,7 @@ import com.pda.user_service.jpa.User;
 import java.util.List;
 
 public interface AssetService {
-    List<MydataInfoDto> linkMydata(UserAccountInfoDto userAccountInfoDto);
+    List<MydataInfoDto> linkMydata(int userId, UserAccountInfoDto userAccountInfoDto);
 
     // 나중에 kafka로 변경 예정
     User updateMydataStatus(int userId);

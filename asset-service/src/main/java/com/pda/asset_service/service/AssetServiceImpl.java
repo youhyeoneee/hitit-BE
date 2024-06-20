@@ -35,10 +35,9 @@ public class AssetServiceImpl implements AssetService{
 
     @Override
     @Transactional
-    public List<MydataInfoDto> linkMydata(UserAccountInfoDto userAccountInfoDto) {
+    public List<MydataInfoDto> linkMydata(int userId, UserAccountInfoDto userAccountInfoDto) {
 
-        int userId = userAccountInfoDto.getUserId();
-        log.info("userId = {}", userId);
+
 
         List<MydataInfoDto> allMydataLinkInfo = new ArrayList<>();
 
