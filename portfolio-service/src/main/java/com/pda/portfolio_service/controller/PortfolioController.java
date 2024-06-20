@@ -1,10 +1,9 @@
 package com.pda.portfolio_service.controller;
 
-import com.pda.portfolio_service.dto.HititPortfoliosFundsResponseDto;
-import com.pda.portfolio_service.dto.HititPortfoliosFundsStocksAndBondsResponseDto;
-import com.pda.portfolio_service.dto.HititPortfoliosResponseDto;
+import com.pda.portfolio_service.dto.*;
 import com.pda.portfolio_service.service.PortfolioService;
 import com.pda.utils.api_utils.ApiUtils;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -55,6 +54,12 @@ public class PortfolioController {
         HititPortfoliosFundsStocksAndBondsResponseDto hititPortfoliosFundsStocksAndBondsResponseDto = portfolioService.getHititPortfoliosFundsStocksAndBonds(portfolio_id, fund_id);
 
         return success(hititPortfoliosFundsStocksAndBondsResponseDto);
+    }
+
+    @PostMapping("/user")
+    public ApiUtils.ApiResult getUserPortfolioFundAssets(@RequestBody UserPortfolioFundRequestDto userPortfolioFundRequestDto) {
+        PortfolioFundAssetResponseDto portfolioFundAssetResponseDto = portfolioService.getUserPortfolioFundAssets(userPortfolioFundRequestDto);
+        return success(portfolioFundAssetResponseDto);
     }
 
     // 나중에 util - Validator로 이동
