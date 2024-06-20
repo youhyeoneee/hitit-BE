@@ -83,6 +83,11 @@ public class PortfolioService {
         // private_portfolios_fund_products 테이블에서 portfolio_id에 해당하는 데이터 가져오기
         List<PortfolioFund> fundProducts = portfolioFundRepository.findByIdPortfolioId(portfolioId);
 
+        // 가져온 private_portfolios_fund_products 데이터를 정렬
+        fundProducts.sort(Comparator
+                .comparingDouble(PortfolioFund::getWeight).reversed()
+                .thenComparing(Comparator.comparing(PortfolioFund::getFundName, Comparator.nullsLast(Comparator.naturalOrder()))));
+
         // fundId 에러 처리
         if (fundId < 0 || fundId >= fundProducts.size()) {
             throw new IllegalArgumentException("유효하지 않은 fundId: " + fundId);
