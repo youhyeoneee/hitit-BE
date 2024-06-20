@@ -3,6 +3,7 @@ package com.pda.asset_service.service;
 import com.pda.asset_service.dto.CardDto;
 import com.pda.asset_service.dto.CardResponseDto;
 import com.pda.asset_service.dto.MydataInfoDto;
+import com.pda.asset_service.dto.SecurityAccountDto;
 import com.pda.asset_service.feign.MydataServiceClient;
 import com.pda.asset_service.jpa.*;
 import lombok.AllArgsConstructor;
@@ -83,7 +84,7 @@ public class CardServiceImpl implements CardService{
                                 card.getAssetUser().getId(),
                                 "cards",
                                 card.getCompanyName(),
-                                card.getAccountNo()
+                                card.getCardNo()
                         );
                         MydataInfoDto mydataInfoDto = MydataInfoDto.builder()
                                 .assetType(savedInfo.getAssetType())
@@ -96,9 +97,26 @@ public class CardServiceImpl implements CardService{
                         cardLinkInfo.add(mydataInfoDto);
                     }
                 }
+            }else {
+                log.info("요청된 카드 계좌 없음");
             }
         }
         return cardLinkInfo;
+    }
+
+    @Override
+    public List<CardDto> getCards(int userId) {
+        List<Card> cards = cardRepository.findByAssetUserId(userId).orElse(null);
+
+        List<CardDto> cardDtos = new ArrayList<>();
+        if (cards != null) {
+            for (Card card : cards) {
+                CardDto cardDto = convertToDto(card);
+                log.info("find card account = {}", cardDto);
+                cardDtos.add(cardDto);
+            }
+        }
+        return cardDtos;
     }
 
 }
