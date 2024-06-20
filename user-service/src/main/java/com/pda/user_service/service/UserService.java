@@ -128,4 +128,11 @@ public class UserService implements UserDetailsService {
         Optional<User> user = userRepository.findById(Integer.valueOf(username));
         return user.orElseThrow();
     }
+
+    public void updateInvestmentTypeAndScore(int userId, String investmentType, int investmentTestScore) throws UsernameNotFoundException {
+        User user = userRepository.findById(userId).orElseThrow();
+        user.setInvestmentType(investmentType);
+        user.setInvestmentTestScore(investmentTestScore);
+        userRepository.save(user);
+    }
 }

@@ -13,7 +13,7 @@ public class UserInfoDto {
     public UserInfoDto(User user) {
         this.name = user.getName();
         this.gender = user.getGender();
-        this.type = user.getType();
+        this.type = user.getInvestmentType();
         this.mydata = user.getMydata();
     }
 }
