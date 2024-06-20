@@ -1,5 +1,6 @@
 package com.pda.asset_service.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,12 +12,21 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BankAccountResponseDto {
+public class SecurityAccountDto {
+    @JsonProperty("account_no")
     private String accountNo;
-    private String bankName;
+
+    @JsonProperty("security_name")
+    private String securityName;
+
+    @JsonProperty("account_type")
     private String accountType;
-    private String name;
+
     private int balance;
+
+    @JsonProperty("created_at")
     private Date createdAt;
+
+    @JsonProperty("user_id")
     private int userId;
 }

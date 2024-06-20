@@ -18,6 +18,9 @@ public class MydataInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @Column(name = "user_id")
+    private int userId;
+
     @Column(name = "asset_type")
     private String assetType;
 

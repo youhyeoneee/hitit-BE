@@ -1,6 +1,6 @@
 package com.pda.mydata_service.controller;
 
-import com.pda.mydata_service.dto.BankAccountDto;
+import com.pda.mydata_service.dto.*;
 import com.pda.mydata_service.service.BankAccountServiceImpl;
 import com.pda.mydata_service.service.MydataServiceImpl;
 import com.pda.utils.api_utils.ApiUtils;
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Optional;
 
+
 @RestController
 @Slf4j
 @RequestMapping("/api/mydata")
@@ -21,21 +22,45 @@ import java.util.Optional;
 public class MydataController {
 
     private final MydataServiceImpl mydataService;
-    private final BankAccountServiceImpl bankAccountService;
 
-//    @GetMapping("/bank-account/")
-//    public ApiUtils.ApiResult<Optional<List<BankAccountDto>>> getBankAccountData(@RequestParam int userId ){
-//        return ApiUtils.success(mydataService.getAllBankAccounts(userId));
-//    }
+
     @GetMapping("/bank-account/{userId}/{bankName}")
     public Optional<List<BankAccountDto>> getBankAccountsByUserIdAndBankName(
             @PathVariable("userId") int userId,
             @PathVariable("bankName") String bankName) {
-
-        log.info("mydata controller");
-
         Optional<List<BankAccountDto>> bankAccounts = mydataService.getBankAccountsByUserIdAndBankName(userId, bankName);
-        log.info("mydata controller result = {}", bankAccounts);
         return bankAccounts;
+    }
+
+    @GetMapping("/loan/{userId}/{loanName}")
+    public Optional<List<LoanDto>> getLoansByUserIdAndCompanyName(
+            @PathVariable("userId") int userId,
+            @PathVariable("loanName") String companyName) {
+        Optional<List<LoanDto>> loans = mydataService.getLoansByUserIdAndCompanyName(userId, companyName);
+        return loans;
+    }
+
+    @GetMapping("/card/{userId}/{cardName}")
+    public Optional<List<CardDto>> getCardsByUserIdAndCompanyName(
+            @PathVariable("userId") int userId,
+            @PathVariable("cardName") String companyName) {
+        Optional<List<CardDto>> cards = mydataService.getCardsByUserIdAndCompanyName(userId, companyName);
+        return cards;
+    }
+
+    @GetMapping("/pension/{userId}/{pensionName}")
+    public Optional<List<PensionDto>> getPensionsByUserIdAndCompanyName(
+            @PathVariable("userId") int userId,
+            @PathVariable("pensionName") String companyName) {
+        Optional<List<PensionDto>> pensions = mydataService.getPensionsByUserIdAndCompanyName(userId, companyName);
+        return pensions;
+    }
+
+    @GetMapping("/security-account/{userId}/{securityName}")
+    public Optional<List<SecurityAccountDto>> getSecurityAccountsByUserIdAndSecurityName(
+            @PathVariable("userId") int userId,
+            @PathVariable("securityName") String securityName) {
+        Optional<List<SecurityAccountDto>> securityAccounts = mydataService.getSecurityAccountsByUserIdAndSecurityName(userId, securityName);
+        return securityAccounts;
     }
 }

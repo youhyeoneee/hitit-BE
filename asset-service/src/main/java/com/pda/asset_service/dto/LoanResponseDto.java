@@ -1,22 +1,27 @@
 package com.pda.asset_service.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BankAccountResponseDto {
+public class LoanResponseDto {
+    private String companyName;
+
+    private String loanType;
+
+    private int loanAmount;
+
+    private Double interestRate;
+
+    private int totalPayments;
+
     private String accountNo;
-    private String bankName;
-    private String accountType;
-    private String name;
-    private int balance;
-    private Date createdAt;
+
     private int userId;
 }
