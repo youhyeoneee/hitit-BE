@@ -1,8 +1,6 @@
 package com.pda.portfolio_service.service;
 
-import com.pda.portfolio_service.dto.HititPortfoliosFundsResponseDto;
-import com.pda.portfolio_service.dto.HititPortfoliosFundsStocksAndBondsResponseDto;
-import com.pda.portfolio_service.dto.HititPortfoliosResponseDto;
+import com.pda.portfolio_service.dto.*;
 import com.pda.portfolio_service.jpa.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +8,9 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.Comparator;
@@ -32,6 +32,9 @@ public class PortfolioService {
 
     @Autowired
     private PortfolioFundBondRepository portfolioFundBondRepository;
+
+    @Autowired
+    private UserPortfolioRepository userPortfolioRepository;
 
     public List<HititPortfoliosResponseDto> getHititPortfolios() {
         List<Portfolio> portfolios = portfolioRepository.findAll();
@@ -129,5 +132,60 @@ public class PortfolioService {
                 fundStockDtos,
                 fundBondDtos
         );
+    }
+
+    public PortfolioFundAssetResponseDto getUserPortfolioFundAssets(UserPortfolioFundRequestDto userPortfolioFundRequestDto) {
+        UserPortfolio user = userPortfolioFundRequestDto.convertToEntity();
+
+        // User의 Portfolio Id 가져오기
+        UserPortfolio portfolioUser
+                = userPortfolioRepository.findById(user.getId())
+                .orElseThrow(()
+                        -> new NoSuchElementException("유저가 존재하지 않습니다."));
+
+        // Portfolio Id를 통해 Portfolio 찾기
+        Portfolio portfolios = portfolioRepository.findById(portfolioUser.getPortfolio_id())
+                .orElseThrow(()
+                        -> new NoSuchElementException("유저에 해당하는 포트폴리오가 존재하지 않습니다."));
+
+        // portfolio_id로 fund 리스트 가져오기
+        List<PortfolioFund> fundProducts = portfolioFundRepository.findByIdPortfolioId(portfolios.getId());
+        int fundCount = fundProducts.size(); // 펀드 리스트의 길이
+
+        // 펀드 리스트에서 fund_code로 assets 가져오기
+        float totalStock = 0;
+        float totalStockForeign = 0;
+        float totalBond = 0;
+        float totalBondForeign = 0;
+        float totalInvestment = 0;
+        float totalEtc = 0;
+
+        for (PortfolioFund fund : fundProducts) {
+            String fundCode = fund.getId().getFundCode();
+            PortfolioFundAsset fundAsset = portfolioFundAssetRepository.findByFundCode(fundCode);
+
+            totalStock += fundAsset.getStock();
+            totalStockForeign += fundAsset.getStockForeign();
+            totalBond += fundAsset.getBond();
+            totalBondForeign += fundAsset.getBondForeign();
+            totalInvestment += fundAsset.getInvestment();
+            totalEtc += fundAsset.getEtc();
+        }
+
+        // 결과를 DTO로 반환
+        // DecimalFormat을 사용하여 소숫점 2자리까지만 표시
+        DecimalFormat df = new DecimalFormat("#.##");
+
+        // 결과를 DTO로 반환
+        PortfolioFundAssetResponseDto responseDto = new PortfolioFundAssetResponseDto(
+                Float.parseFloat(df.format(totalStock / fundCount)),
+                Float.parseFloat(df.format(totalStockForeign / fundCount)),
+                Float.parseFloat(df.format(totalBond / fundCount)),
+                Float.parseFloat(df.format(totalBondForeign / fundCount)),
+                Float.parseFloat(df.format(totalInvestment / fundCount)),
+                Float.parseFloat(df.format(totalEtc / fundCount))
+        );
+
+        return responseDto;
     }
 }
