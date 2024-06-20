@@ -3,6 +3,7 @@ package com.pda.asset_service.service;
 import com.pda.asset_service.dto.LoanDto;
 import com.pda.asset_service.dto.LoanResponseDto;
 import com.pda.asset_service.dto.MydataInfoDto;
+import com.pda.asset_service.dto.SecurityAccountDto;
 import com.pda.asset_service.feign.MydataServiceClient;
 import com.pda.asset_service.jpa.*;
 import lombok.AllArgsConstructor;
@@ -57,7 +58,7 @@ public class LoanServiceImpl implements LoanService{
         // 대출 정보 처리
 
         for (String loanName : loans) {
-            if( !loans.isEmpty()) {
+            if( !loanName.isEmpty()) {
                 log.info("userAccount = {}", loanName);
                 Optional<List<LoanResponseDto>> loanResponse = mydataServiceClient.getLoansByUserIdAndCompanyName(userId, loanName);
                 if (loanResponse.isPresent()) {
@@ -90,9 +91,26 @@ public class LoanServiceImpl implements LoanService{
                         loanLinkInfo.add(mydataInfoDto);
                     }
                 }
+            }else{
+                log.info("요청된 대출 계좌 없음");
             }
         }
         return loanLinkInfo;
+    }
+
+    @Override
+    public List<LoanDto> getLoans(int userId) {
+        List<Loan> Loans = loanRepository.findByAssetUserId(userId).orElse(null);
+
+        List<LoanDto> loanDtos = new ArrayList<>();
+        if (Loans != null) {
+            for (Loan loan : Loans) {
+                LoanDto loanDto = convertToDto(loan);
+                log.info("find security account = {}", loanDto);
+                loanDtos.add(loanDto);
+            }
+        }
+        return loanDtos;
     }
 
 

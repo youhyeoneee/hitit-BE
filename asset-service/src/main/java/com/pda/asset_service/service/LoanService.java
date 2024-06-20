@@ -14,4 +14,6 @@ public interface LoanService {
     LoanDto convertToDto(Loan loan);
 
     List<MydataInfoDto> linkMyDataAccount(int userId, List<String> loans);
+
+    List<LoanDto> getLoans(int userId);
 }
