@@ -13,4 +13,6 @@ public interface PensionService {
     PensionDto convertToDto(Pension pension);
 
     List<MydataInfoDto> linkMyDataAccount(int userId, List<String> pensions);
+
+    List<PensionDto> getPensions(int userId);
 }
