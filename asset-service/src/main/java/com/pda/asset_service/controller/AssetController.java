@@ -23,6 +23,7 @@ public class AssetController {
 
         List<MydataInfoDto> bankAccountsLinkInfo = assetService.linkMydata(userAccountInfoDto);
 
+
         return ApiUtils.success(bankAccountsLinkInfo);
     }
 }
