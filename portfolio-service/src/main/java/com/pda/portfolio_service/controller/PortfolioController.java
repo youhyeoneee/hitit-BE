@@ -67,6 +67,12 @@ public class PortfolioController {
         return success(portfolioFundAssetResponseDto);
     }
 
+
+    @GetMapping("/analyze-sentiment")
+    public String analyzeSentiment(@RequestParam String text) {
+        return portfolioService.analyzeSentiment(text);
+    }
+
     // 나중에 util - Validator로 이동
     public static boolean isNumber(int num) {
         return Pattern.matches("^[0-9]*$", Integer.toString(num));
