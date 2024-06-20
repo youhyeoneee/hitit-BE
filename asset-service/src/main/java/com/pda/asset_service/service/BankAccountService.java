@@ -16,4 +16,6 @@ public interface BankAccountService {
     List<MydataInfoDto> linkMyDataAccount(int userId, List<String> bankAccounts);
 
     List<BankAccountDto> getBankAccounts(int userId);
+
+    Integer getBankAccountsBalance(int userId);
 }

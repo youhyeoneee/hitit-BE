@@ -124,4 +124,17 @@ public class BankAccountServiceImpl implements BankAccountService{
         }
         return bankAccountDtos;
     }
+
+    @Override
+    public Integer getBankAccountsBalance(int userId) {
+        Integer bankAccountsTotalBalance = 0;
+        List<BankAccount> bankAccounts = bankAccountRepository.findByAssetUserId(userId).orElse(null);
+
+        if(bankAccounts != null){
+            for(BankAccount bankAccount : bankAccounts){
+                bankAccountsTotalBalance += bankAccount.getBalance();
+            }
+        }
+        return bankAccountsTotalBalance;
+    }
 }

@@ -94,6 +94,14 @@ public class AssetServiceImpl implements AssetService{
         return null;
     }
 
+    @Override
+    public Integer getTotalAssets(int userId) {
+        Integer bankAccountTotalBalance = bankAccountService.getBankAccountsBalance(userId);
+        log.info("bankAccountTotalBalance = {}",bankAccountTotalBalance);
+        Integer securityAccountTotalBalance = securityAccountService.getSecurityAccountsBalance(userId);
+        log.info("securityAccountTotalBalance = {}", securityAccountTotalBalance);
+        return bankAccountTotalBalance + securityAccountTotalBalance;
+    }
 
 
 }

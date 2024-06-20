@@ -112,5 +112,18 @@ public class SecurityAccountServiceImpl implements SecurityAccountService{
         return securityAccountDtos;
     }
 
+    @Override
+    public Integer getSecurityAccountsBalance(int userId) {
+        Integer securityAccountsTotalBalance = 0;
+        List<SecurityAccount> securityAccounts = securityAccountRepository.findByAssetUserId(userId).orElse(null);
+
+        if(securityAccounts != null){
+            for (SecurityAccount securityAccount : securityAccounts){
+                securityAccountsTotalBalance += securityAccount.getBalance();
+            }
+        }
+        return securityAccountsTotalBalance;
+    }
+
 
 }
