@@ -8,15 +8,15 @@ import java.io.Serializable;
 
 @Embeddable
 @Getter
-public class HititPortfoliosFundProductId implements Serializable {
+public class PortfolioFundId implements Serializable {
     private String fundCode;
     private Integer portfolioId;
 
     // 기본 생성자
-    public HititPortfoliosFundProductId() {}
+    public PortfolioFundId() {}
 
     // 매개변수 있는 생성자
-    public HititPortfoliosFundProductId(String fundCode, Integer portfolioId) {
+    public PortfolioFundId(String fundCode, Integer portfolioId) {
         this.fundCode = fundCode;
         this.portfolioId = portfolioId;
     }
@@ -27,7 +27,7 @@ public class HititPortfoliosFundProductId implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        HititPortfoliosFundProductId that = (HititPortfoliosFundProductId) o;
+        PortfolioFundId that = (PortfolioFundId) o;
         return fundCode.equals(that.fundCode) && portfolioId.equals(that.portfolioId);
     }
 

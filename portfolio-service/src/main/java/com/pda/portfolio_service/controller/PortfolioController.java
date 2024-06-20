@@ -1,6 +1,7 @@
 package com.pda.portfolio_service.controller;
 
 import com.pda.portfolio_service.dto.HititPortfoliosFundsResponseDto;
+import com.pda.portfolio_service.dto.HititPortfoliosFundsStocksAndBondsResponseDto;
 import com.pda.portfolio_service.dto.HititPortfoliosResponseDto;
 import com.pda.portfolio_service.service.PortfolioService;
 import com.pda.utils.api_utils.ApiUtils;
@@ -31,13 +32,29 @@ public class PortfolioController {
     }
 
     @GetMapping("/hitit/{portfolio_id}")
-    public ApiUtils.ApiResult getHititPortfoliosFund(@PathVariable("portfolio_id") Integer portfolio_id) {
+    public ApiUtils.ApiResult getHititPortfoliosFunds(@PathVariable("portfolio_id") Integer portfolio_id) {
         if(!isNumber(portfolio_id)){
             return error("포트폴리오 id가 전달되지 않음", HttpStatus.BAD_REQUEST);
         }
         List<HititPortfoliosFundsResponseDto> hititPortfoliosFundsResponseDto = portfolioService.getHititPortfoliosFunds(portfolio_id);
 
         return success(hititPortfoliosFundsResponseDto);
+    }
+
+    @GetMapping("/hitit/{portfolio_id}/{fund_id}")
+    public ApiUtils.ApiResult getHititPortfoliosFundsStocksAndBonds(@PathVariable("portfolio_id") Integer portfolio_id,
+                                                     @PathVariable("fund_id") Integer fund_id) {
+        if (portfolio_id == null) {
+            return error("포트폴리오 id가 전달되지 않음", HttpStatus.BAD_REQUEST);
+        }
+
+        if (fund_id == null) {
+            return error("펀드 id가 전달되지 않음", HttpStatus.BAD_REQUEST);
+        }
+
+        HititPortfoliosFundsStocksAndBondsResponseDto hititPortfoliosFundsStocksAndBondsResponseDto = portfolioService.getHititPortfoliosFundsStocksAndBonds(portfolio_id, fund_id);
+
+        return success(hititPortfoliosFundsStocksAndBondsResponseDto);
     }
 
     // 나중에 util - Validator로 이동
