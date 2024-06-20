@@ -8,17 +8,17 @@ import java.io.Serializable;
 
 @Embeddable
 @Getter
-public class PortfolioFundId implements Serializable {
+public class PortfolioFundBondId implements Serializable {
+    private String bondName;
     private String fundCode;
-    private Integer portfolioId;
 
     // 기본 생성자
-    public PortfolioFundId() {}
+    public PortfolioFundBondId() {}
 
     // 매개변수 있는 생성자
-    public PortfolioFundId(String fundCode, Integer portfolioId) {
+    public PortfolioFundBondId(String bondName, String fundCode) {
+        this.bondName = bondName;
         this.fundCode = fundCode;
-        this.portfolioId = portfolioId;
     }
 
 
@@ -27,12 +27,12 @@ public class PortfolioFundId implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        PortfolioFundId that = (PortfolioFundId) o;
-        return fundCode.equals(that.fundCode) && portfolioId.equals(that.portfolioId);
+        PortfolioFundBondId that = (PortfolioFundBondId) o;
+        return bondName.equals(that.bondName) && fundCode.equals(that.fundCode);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fundCode, portfolioId);
+        return Objects.hash(bondName, fundCode);
     }
 }

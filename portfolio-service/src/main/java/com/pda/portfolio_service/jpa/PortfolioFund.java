@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "private_portfolios_fund_products")
 public class PortfolioFund {
     @EmbeddedId
-    private HititPortfoliosFundProductId id;
+    private PortfolioFundId id;
 
     @Column(name = "fund_name")
     private String fundName;
