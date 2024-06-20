@@ -36,6 +36,7 @@ public class PensionServiceImpl implements PensionService{
                 .evaluationAmount(pensionResponseDto.getEvaluationAmount())
                 .expirationDate(pensionResponseDto.getExpirationDate())
                 .accountNo(pensionResponseDto.getAccountNo())
+                .retirementPensionClaimed(pensionResponseDto.getRetirementPensionClaimed())
                 .build();
     }
 
@@ -50,6 +51,7 @@ public class PensionServiceImpl implements PensionService{
                 .evaluationAmount(pension.getEvaluationAmount())
                 .expirationDate(pension.getExpirationDate())
                 .accountNo(pension.getAccountNo())
+                .retirementPensionClaimed(pension.getRetirementPensionClaimed())
                 .build();
     }
 

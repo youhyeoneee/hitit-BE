@@ -27,5 +27,7 @@ public class PensionDto {
 
     private String accountNo;
 
+    private Boolean retirementPensionClaimed;
+
     private int userId;
 }
