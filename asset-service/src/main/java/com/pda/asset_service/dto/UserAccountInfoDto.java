@@ -8,8 +8,8 @@ import java.util.List;
 
 @Getter
 public class UserAccountInfoDto {
-    @JsonProperty("user_id")
-    private int userId;
+//    @JsonProperty("user_id")
+//    private int userId;
 
     @JsonProperty("bank_accounts")
     private List<String> bankAccounts;
