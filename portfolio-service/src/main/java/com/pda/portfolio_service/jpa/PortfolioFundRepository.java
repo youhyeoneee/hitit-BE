@@ -3,6 +3,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface PortfolioFundRepository extends JpaRepository<PortfolioFund, HititPortfoliosFundProductId>{
+public interface PortfolioFundRepository extends JpaRepository<PortfolioFund, PortfolioFundId>{
     List<PortfolioFund> findByIdPortfolioId(Integer portfolioId);
 }
