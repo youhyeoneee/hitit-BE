@@ -3,6 +3,7 @@ package com.pda.asset_service.service;
 import com.pda.asset_service.dto.BankAccountDto;
 import com.pda.asset_service.dto.BankAccountResponseDto;
 import com.pda.asset_service.dto.MydataInfoDto;
+import com.pda.asset_service.dto.SecurityAccountDto;
 import com.pda.asset_service.feign.MydataServiceClient;
 import com.pda.asset_service.jpa.*;
 import lombok.AllArgsConstructor;
@@ -107,5 +108,20 @@ public class BankAccountServiceImpl implements BankAccountService{
 
         return bankAccountsLinkInfo;
 
+    }
+
+    @Override
+    public List<BankAccountDto> getBankAccounts(int userId) {
+        List<BankAccount> bankAccounts = bankAccountRepository.findByAssetUserId(userId).orElse(null);
+
+        List<BankAccountDto> bankAccountDtos = new ArrayList<>();
+        if (bankAccounts != null) {
+            for (BankAccount bankAccount : bankAccounts) {
+                BankAccountDto bankAccountDto = convertToDto(bankAccount);
+                log.info("find security account = {}", bankAccountDto);
+                bankAccountDtos.add(bankAccountDto);
+            }
+        }
+        return bankAccountDtos;
     }
 }
