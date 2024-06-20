@@ -1,9 +1,8 @@
 package com.pda.asset_service.dto;
 
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,11 +10,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MydataInfoDto {
-    private int id;
-    private int userId;
-    private String assetType;
+public class LoanResponseDto {
     private String companyName;
-    private String accountType;
+
+    private String loanType;
+
+    private int loanAmount;
+
+    private Double interestRate;
+
+    private int totalPayments;
+
     private String accountNo;
+
+    private int userId;
 }

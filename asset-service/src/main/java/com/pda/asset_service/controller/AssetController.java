@@ -21,7 +21,8 @@ public class AssetController {
     @PostMapping("/mydata-link")
     public ApiUtils.ApiResult<List<MydataInfoDto>> linkMydata(@RequestBody UserAccountInfoDto userAccountInfoDto){
 
-        List<MydataInfoDto> bankAccountsLinkInfo = assetService.mydataLink(userAccountInfoDto);
+        List<MydataInfoDto> bankAccountsLinkInfo = assetService.linkMydata(userAccountInfoDto);
+
 
         return ApiUtils.success(bankAccountsLinkInfo);
     }

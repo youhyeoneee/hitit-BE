@@ -1,7 +1,6 @@
 package com.pda.asset_service.feign;
 
-import com.pda.asset_service.dto.BankAccountDto;
-import com.pda.asset_service.dto.BankAccountResponseDto;
+import com.pda.asset_service.dto.*;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,5 +15,17 @@ public interface MydataServiceClient {
     List<BankAccountDto> getAllBankAccountData(@PathVariable("userId") int userId);
     @GetMapping("/api/mydata/bank-account/{userId}/{bankName}")
     Optional<List<BankAccountResponseDto>> getBankAccountsByUserIdAndBankName(@PathVariable("userId") int userId, @PathVariable("bankName") String bankName);
+
+    @GetMapping("/api/mydata/loan/{userId}/{companyName}")
+    Optional<List<LoanResponseDto>> getLoansByUserIdAndCompanyName(@PathVariable("userId") int userId, @PathVariable("companyName") String companyName);
+
+    @GetMapping("/api/mydata/card/{userId}/{companyName}")
+    Optional<List<CardResponseDto>> getCardsByUserIdAndCompanyName(@PathVariable("userId") int userId, @PathVariable("companyName") String companyName);
+
+    @GetMapping("/api/mydata/pension/{userId}/{companyName}")
+    Optional<List<PensionResponseDto>> getPensionsByUserIdAndCompanyName(@PathVariable("userId") int userId, @PathVariable("companyName") String companyName);
+
+    @GetMapping("/api/mydata/security-account/{userId}/{securityName}")
+    Optional<List<SecurityAccountResponseDto>> getSecurityAccountsByUserIdAndSecurityName(@PathVariable("userId") int userId, @PathVariable("securityName") String securityName);
 
 }

@@ -53,7 +53,7 @@ public class BankAccountServiceImpl implements BankAccountService{
     }
 
     @Override
-    public List<MydataInfoDto> mydataLink(int userId, List<String> bankAccounts) {
+    public List<MydataInfoDto> linkMyDataAccount(int userId, List<String> bankAccounts) {
 
         List<MydataInfoDto> bankAccountsLinkInfo = new ArrayList<>();
 
