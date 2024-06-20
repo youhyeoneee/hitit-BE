@@ -1,6 +1,5 @@
 package com.pda.asset_service.dto;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,3 +32,4 @@ public class BankAccountDto {
     @JsonProperty("user_id")
     private int userId;
 }
+

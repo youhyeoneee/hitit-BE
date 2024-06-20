@@ -18,8 +18,9 @@ import java.util.Optional;
 @Slf4j
 public class BankAccountServiceImpl implements BankAccountService{
 
-    private final AssetUserRepository assetUserRepository;
+
     private final BankAccountRepository bankAccountRepository;
+    private final AssetUserRepository assetUserRepository;
     private final MydataInfoRepository mydataInfoRepository;
     private final MydataServiceClient mydataServiceClient;
 
@@ -40,7 +41,6 @@ public class BankAccountServiceImpl implements BankAccountService{
 
     @Override
     public BankAccountDto convertToDto(BankAccount bankAccount) {
-        log.info("convertToDto합니다 = {}", bankAccount);
         return BankAccountDto.builder()
                 .accountNo(bankAccount.getAccountNo())
                 .bankName(bankAccount.getBankName())
@@ -58,40 +58,53 @@ public class BankAccountServiceImpl implements BankAccountService{
         List<MydataInfoDto> bankAccountsLinkInfo = new ArrayList<>();
 
         // 은행 계좌 정보 처리
-        for (String bankName : bankAccounts) {
-            log.info("userAccount = {}", bankName);
-            // 하나의 은행에 여러 계좌가 있으면 리스트로 여러 개가 온다..
-            Optional<List<BankAccountResponseDto>> bankAccountsResponse = mydataServiceClient.getBankAccountsByUserIdAndBankName(userId, bankName);
-            log.info("bankAccounts Response From Mydata-service = {}", bankAccountsResponse);
-            if (bankAccountsResponse.isPresent()) {
-                log.info("==========================================================================");
-                for (BankAccountResponseDto bankAccountDto : bankAccountsResponse.get()) {
-                    log.info("bank account convert Entity = {}", bankAccountDto);
-                    BankAccount bankAccount = convertToEntity(bankAccountDto);
-                    log.info("========================== = {}", bankAccount);
-                    bankAccountRepository.save(bankAccount);
-                    log.info("bank account Saved = {}", bankAccount);
 
-                    mydataInfoRepository.save(MydataInfo.builder()
-                            .assetType("bank_accounts")
-                            .companyName(bankAccount.getBankName())
-                            .accountType(bankAccount.getAccountType())
-                            .accountNo(bankAccount.getAccountNo())
-                            .build());
+            for (String bankName : bankAccounts) {
+                if (!bankName.isEmpty()) {
+                    log.info("userAccount = {}", bankName);
+                    // 하나의 은행에 여러 계좌가 있으면 리스트로 여러 개가 온다..
+                    Optional<List<BankAccountResponseDto>> bankAccountsResponse = mydataServiceClient.getBankAccountsByUserIdAndBankName(userId, bankName);
+                    log.info("bankAccounts Response From Mydata-service = {}", bankAccountsResponse);
+                    if (bankAccountsResponse.isPresent()) {
+                        log.info("==========================================================================");
+                        for (BankAccountResponseDto bankAccountDto : bankAccountsResponse.get()) {
+                            log.info("bank account convert Entity = {}", bankAccountDto);
+                            BankAccount bankAccount = convertToEntity(bankAccountDto);
+                            log.info("========================== = {}", bankAccount);
+                            bankAccountRepository.save(bankAccount);
+                            log.info("bank account Saved = {}", bankAccount);
 
-                    MydataInfo SavedInfo = mydataInfoRepository.findByAccountNo(bankAccount.getAccountNo());
-                    MydataInfoDto mydataInfoDto = MydataInfoDto.builder()
-                            .assetType(SavedInfo.getAssetType())
-                            .companyName(SavedInfo.getCompanyName())
-                            .accountType(SavedInfo.getAccountType())
-                            .accountNo(bankAccount.getAccountNo())
-                            .build();
+                            mydataInfoRepository.save(MydataInfo.builder()
+                                    .assetType("bank_accounts")
+                                    .userId(bankAccount.getAssetUser().getId())
+                                    .companyName(bankAccount.getBankName())
+                                    .accountType(bankAccount.getAccountType())
+                                    .accountNo(bankAccount.getAccountNo())
+                                    .build());
 
-                    bankAccountsLinkInfo.add(mydataInfoDto);
+                            MydataInfo savedInfo = mydataInfoRepository.findBankAccountByUserIdAndAssetTypeAndCompanyNameAndAccountNo(
+                                    bankAccount.getAssetUser().getId(),
+                                    "bank_accounts",
+                                    bankAccount.getBankName(),
+                                    bankAccount.getAccountNo()
+                            );
+                            MydataInfoDto mydataInfoDto = MydataInfoDto.builder()
+                                    .assetType(savedInfo.getAssetType())
+                                    .userId(savedInfo.getUserId())
+                                    .companyName(savedInfo.getCompanyName())
+                                    .accountType(savedInfo.getAccountType())
+                                    .accountNo(bankAccount.getAccountNo())
+                                    .build();
+
+                            bankAccountsLinkInfo.add(mydataInfoDto);
+                        }
+                    }
+                } else {
+                    log.info("요청된 은행 계좌 없음");
                 }
+
             }
 
-        }
         return bankAccountsLinkInfo;
 
     }
