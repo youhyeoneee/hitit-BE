@@ -14,4 +14,6 @@ public interface SecurityAccountService {
     List<MydataInfoDto> linkMyDataAccount(int userId, List<String> securityAccounts);
 
     List<SecurityAccountDto> getSecurityAccounts(int userId);
+
+    Integer getSecurityAccountsBalance(int userId);
 }
