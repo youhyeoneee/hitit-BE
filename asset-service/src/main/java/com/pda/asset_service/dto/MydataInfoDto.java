@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class MydataInfoDto {
     private int id;
+    private int userId;
     private String assetType;
     private String companyName;
     private String accountType;
