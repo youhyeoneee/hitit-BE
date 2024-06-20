@@ -34,6 +34,9 @@ public class PensionDto {
     @JsonProperty("account_no")
     private String accountNo;
 
+    @JsonProperty("retirement_pension_claimed")
+    private Boolean retirementPensionClaimed; // 퇴직 연금 청구 여부
+
     @JsonProperty("user_id")
     private int userId;
 }

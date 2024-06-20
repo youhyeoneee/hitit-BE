@@ -38,6 +38,9 @@ public class Pension {
     @Column(name = "expiration_date")
     private Date expirationDate;
 
+    @Column(name = "retirement_pension_claimed")
+    private Boolean retirementPensionClaimed;
+
     @Id
     @Column(name = "account_no")
     private String accountNo;
