@@ -54,7 +54,7 @@ public class SecurityAccountServiceImpl implements SecurityAccountService{
         // 증권 계좌 정보 처리
 
         for (String securityName : securityAccounts) {
-            if( !securityAccounts.isEmpty() ) {
+            if( !securityName.isEmpty() ) {
                 log.info("userAccount = {}", securityName);
                 Optional<List<SecurityAccountResponseDto>> securityAccountsResponse = mydataServiceClient.getSecurityAccountsByUserIdAndSecurityName(userId, securityName);
 //            log.info("securityAccounts Response From Mydata-service = {}", securityAccountsResponse);
@@ -89,9 +89,28 @@ public class SecurityAccountServiceImpl implements SecurityAccountService{
                         securityAccountsLinkInfo.add(mydataInfoDto);
                     }
                 }
+            }else{
+                log.info("요청된 증권 계좌 없음");
             }
         }
         return securityAccountsLinkInfo;
     }
+
+    @Override
+    public List<SecurityAccountDto> getSecurityAccounts(int userId) {
+
+        List<SecurityAccount> securityAccounts = securityAccountRepository.findByAssetUserId(userId).orElse(null);
+
+        List<SecurityAccountDto> securityAccountDtos = new ArrayList<>();
+        if (securityAccounts != null) {
+            for (SecurityAccount securityAccount : securityAccounts) {
+                SecurityAccountDto securityAccountDto = convertToDto(securityAccount);
+                log.info("find security account = {}", securityAccountDto);
+                securityAccountDtos.add(securityAccountDto);
+            }
+        }
+        return securityAccountDtos;
+    }
+
 
 }
