@@ -150,7 +150,7 @@ public class PortfolioService {
 
         // portfolio_id로 fund 리스트 가져오기
         List<PortfolioFund> fundProducts = portfolioFundRepository.findByIdPortfolioId(portfolios.getId());
-        int fundCount = fundProducts.size(); // 펀드 리스트의 길이
+//        int fundCount = fundProducts.size(); // 펀드 리스트의 길이
 
         // 펀드 리스트에서 fund_code로 assets 가져오기
         float totalStock = 0;
@@ -164,12 +164,14 @@ public class PortfolioService {
             String fundCode = fund.getId().getFundCode();
             PortfolioFundAsset fundAsset = portfolioFundAssetRepository.findByFundCode(fundCode);
 
-            totalStock += fundAsset.getStock();
-            totalStockForeign += fundAsset.getStockForeign();
-            totalBond += fundAsset.getBond();
-            totalBondForeign += fundAsset.getBondForeign();
-            totalInvestment += fundAsset.getInvestment();
-            totalEtc += fundAsset.getEtc();
+            float weight = fund.getWeight() / 100.0f;
+
+            totalStock += fundAsset.getStock() * weight;
+            totalStockForeign += fundAsset.getStockForeign() * weight;
+            totalBond += fundAsset.getBond() * weight;
+            totalBondForeign += fundAsset.getBondForeign() * weight;
+            totalInvestment += fundAsset.getInvestment() * weight;
+            totalEtc += fundAsset.getEtc() * weight;
         }
 
         // 결과를 DTO로 반환
@@ -178,12 +180,12 @@ public class PortfolioService {
 
         // 결과를 DTO로 반환
         PortfolioFundAssetResponseDto responseDto = new PortfolioFundAssetResponseDto(
-                Float.parseFloat(df.format(totalStock / fundCount)),
-                Float.parseFloat(df.format(totalStockForeign / fundCount)),
-                Float.parseFloat(df.format(totalBond / fundCount)),
-                Float.parseFloat(df.format(totalBondForeign / fundCount)),
-                Float.parseFloat(df.format(totalInvestment / fundCount)),
-                Float.parseFloat(df.format(totalEtc / fundCount))
+                Float.parseFloat(df.format(totalStock)),
+                Float.parseFloat(df.format(totalStockForeign)),
+                Float.parseFloat(df.format(totalBond)),
+                Float.parseFloat(df.format(totalBondForeign)),
+                Float.parseFloat(df.format(totalInvestment)),
+                Float.parseFloat(df.format(totalEtc))
         );
 
         return responseDto;
