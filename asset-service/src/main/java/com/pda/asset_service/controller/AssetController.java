@@ -86,4 +86,15 @@ public class AssetController {
         List<LoanDto> loans = loanService.getLoans(userId);
         return ApiUtils.success(loans);
     }
+
+    @GetMapping("/totalAssets")
+    public ApiUtils.ApiResult<Integer> getTotalAssets(@RequestHeader("Authorization") String bearerToken){
+        String token = CustomStringUtils.getToken(bearerToken);
+        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        log.info("user id : " + userId);
+
+        Integer totalAssets = assetService.getTotalAssets(userId);
+        log.info("totalAssets = {}", totalAssets);
+        return ApiUtils.success(totalAssets);
+    }
 }

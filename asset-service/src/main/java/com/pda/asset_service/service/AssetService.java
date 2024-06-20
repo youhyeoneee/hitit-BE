@@ -13,4 +13,5 @@ public interface AssetService {
     // 나중에 kafka로 변경 예정
     User updateMydataStatus(int userId);
 
+    Integer getTotalAssets(int userId);
 }
