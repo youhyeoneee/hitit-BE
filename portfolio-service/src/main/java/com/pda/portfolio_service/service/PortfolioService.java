@@ -134,12 +134,12 @@ public class PortfolioService {
         );
     }
 
-    public PortfolioFundAssetResponseDto getUserPortfolioFundAssets(UserPortfolioFundRequestDto userPortfolioFundRequestDto) {
-        UserPortfolio user = userPortfolioFundRequestDto.convertToEntity();
+    public PortfolioFundAssetResponseDto getUserPortfolioFundAssets(int userId) {
+//        UserPortfolio user = userPortfolioFundRequestDto.convertToEntity();
 
         // User의 Portfolio Id 가져오기
         UserPortfolio portfolioUser
-                = userPortfolioRepository.findById(user.getId())
+                = userPortfolioRepository.findById(userId)
                 .orElseThrow(()
                         -> new NoSuchElementException("유저가 존재하지 않습니다."));
 
