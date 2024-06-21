@@ -1,5 +1,6 @@
 package com.pda.mydata_service.jpa;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,6 +38,9 @@ public class Pension {
 
     @Column(name = "expiration_date")
     private Date expirationDate;
+
+    @Column(name = "retirement_pension_claimed")
+    private Boolean retirementPensionClaimed;
 
     @Id
     @Column(name = "account_no")

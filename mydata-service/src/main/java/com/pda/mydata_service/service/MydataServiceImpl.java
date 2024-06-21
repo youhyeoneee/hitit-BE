@@ -169,6 +169,7 @@ public class MydataServiceImpl implements MydataService{
                 .expirationDate(pension.getExpirationDate())
                 .accountNo(pension.getAccountNo())
                 .userId(pension.getMydataUser().getId())
+                .retirementPensionClaimed(pension.getRetirementPensionClaimed())
                 .build();
     }
 
