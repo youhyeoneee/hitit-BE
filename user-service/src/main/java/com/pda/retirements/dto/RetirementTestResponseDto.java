@@ -4,12 +4,14 @@ import com.pda.retirements.jpa.RetirementType;
 import com.pda.utils.api_utils.CustomStringUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 
 @Getter
+@Setter
 public class RetirementTestResponseDto {
     private ArrayList<String> type;
     private ArrayList<String> monthlyLivingExpenses;
@@ -17,6 +19,8 @@ public class RetirementTestResponseDto {
     private String expectedNationalPension;
     private String totalRealEstateValue;
     private String careerEffortScore;
+    private int assetLife;
+    private int lifeExpectancy;
 
     public RetirementTestResponseDto(RetirementType retirementType, int monthlyLivingExpenses,  int totalFinancialAssets,
                                     int expectedNationalPension, int totalRealEstateValue, int careerEffortScore) {
