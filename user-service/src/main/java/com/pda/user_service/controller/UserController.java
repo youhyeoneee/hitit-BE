@@ -2,13 +2,11 @@ package com.pda.user_service.controller;
 
 
 import com.pda.security.JwtTokenProvider;
-import com.pda.user_service.dto.LoginDto;
-import com.pda.user_service.dto.LoginResponseDto;
-import com.pda.user_service.dto.UserInfoDto;
-import com.pda.user_service.dto.SignupUserDto;
+import com.pda.user_service.dto.*;
 import com.pda.user_service.jpa.User;
 import com.pda.user_service.service.UserService;
 import com.pda.utils.api_utils.ApiUtils;
+import com.pda.utils.api_utils.CustomStringUtils;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +33,20 @@ public class UserController {
     private UserService userService;
     @Autowired
     JwtTokenProvider jwtTokenProvider;
+    
 
+    @PatchMapping()
+    public ApiUtils.ApiResult updateUser(@RequestBody UserUpdateRequestDto userUpdateRequestDto, @RequestHeader("Authorization") String bearerToken) {
+        // 토큰 -> user id
+        log.info("bearerToken : " + bearerToken);
+        String token = CustomStringUtils.getToken(bearerToken);
+        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        log.info("user id : " + userId);
+
+        User updatedUser = userService.updateUser(userId, userUpdateRequestDto);
+        UserInfoDto userInfo = new UserInfoDto(updatedUser);
+        return success(userInfo);
+    }
 
     @PostMapping("/signup")
     public ApiUtils.ApiResult<String> signup(@Valid @RequestBody SignupUserDto userDto) {
