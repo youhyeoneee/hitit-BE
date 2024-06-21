@@ -31,7 +31,14 @@ public class RetirementController {
 
         // 유형 판단
         RetirementType retirementType = retirementService.getRetirementType(score);
-        RetirementTestResponseDto testResponseDto = new RetirementTestResponseDto(retirementType);
+        RetirementTestResponseDto testResponseDto = new RetirementTestResponseDto(
+                retirementType,
+                testRequestDto.getMonthlyLivingExpenses(),
+                testRequestDto.getTotalFinancialAssets(),
+                testRequestDto.getExpectedNationalPension(),
+                testRequestDto.getTotalRealEstateValue(),
+                testRequestDto.getCareerEffortScore()
+                );
         return success(testResponseDto);
     }
 
