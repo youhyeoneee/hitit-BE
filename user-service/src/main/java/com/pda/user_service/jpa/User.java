@@ -29,6 +29,7 @@ public class User implements UserDetails  {
     private String investmentType;
     private Integer investmentTestScore;
     private String mydata;
+    private Boolean portfolio;
 
     public User(String email, String name, String password, String phone, String birthdate, String gender) {
         this.email = email;
