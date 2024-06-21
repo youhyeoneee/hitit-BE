@@ -56,4 +56,14 @@ class CustomStringUtilsTest {
     void 화폐포맷_4자리() {
         assertThat(CustomStringUtils.formatMoney(1483)).isEqualTo("1,483");
     }
+
+    @Test
+    void 생년월일로_만나이계산() {
+        assertThat(CustomStringUtils.calculateAge("20000311")).isEqualTo(24);
+    }
+
+    @Test
+    void 생년월일로_만나이계산2() {
+        assertThat(CustomStringUtils.calculateAge("19940621")).isEqualTo(30);
+    }
 }
