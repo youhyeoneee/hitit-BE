@@ -1,6 +1,7 @@
 package com.pda.portfolio_service.service;
 
 import com.pda.portfolio_service.dto.*;
+import com.pda.portfolio_service.feign.PortfolioServiceClient;
 import com.pda.portfolio_service.jpa.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,11 +10,9 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.Comparator;
+
 
 @Slf4j
 @Service
@@ -35,6 +34,9 @@ public class PortfolioService {
 
     @Autowired
     private UserPortfolioRepository userPortfolioRepository;
+
+    @Autowired
+    private PortfolioServiceClient portfolioServiceClient;
 
     public List<HititPortfoliosResponseDto> getHititPortfolios() {
         List<Portfolio> portfolios = portfolioRepository.findAll();
@@ -134,12 +136,12 @@ public class PortfolioService {
         );
     }
 
-    public PortfolioFundAssetResponseDto getUserPortfolioFundAssets(int userId) {
-//        UserPortfolio user = userPortfolioFundRequestDto.convertToEntity();
+    public PortfolioFundAssetResponseDto getUserPortfolioFundAssets(UserPortfolioFundRequestDto userPortfolioFundRequestDto) {
+        UserPortfolio user = userPortfolioFundRequestDto.convertToEntity();
 
         // User의 Portfolio Id 가져오기
         UserPortfolio portfolioUser
-                = userPortfolioRepository.findById(userId)
+                = userPortfolioRepository.findById(user.getId())
                 .orElseThrow(()
                         -> new NoSuchElementException("유저가 존재하지 않습니다."));
 
@@ -189,5 +191,13 @@ public class PortfolioService {
         );
 
         return responseDto;
+    }
+
+
+    public String analyzeSentiment(String text) {
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("text", text);
+
+        return portfolioServiceClient.getSentiment("application/json", requestBody);
     }
 }
