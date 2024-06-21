@@ -4,6 +4,7 @@ import com.pda.portfolio_service.dto.*;
 import com.pda.portfolio_service.service.PortfolioService;
 import com.pda.security.JwtTokenProvider;
 import com.pda.utils.api_utils.ApiUtils;
+import com.pda.utils.api_utils.CustomStringUtils;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,8 @@ import static com.pda.utils.api_utils.ApiUtils.success;
 public class PortfolioController {
     @Autowired
     private PortfolioService portfolioService;
+
+    private final JwtTokenProvider jwtTokenProvider;
 
     @GetMapping("/hitit")
     public ApiUtils.ApiResult<List<HititPortfoliosResponseDto>> getHititPortfolios() {
@@ -61,12 +64,21 @@ public class PortfolioController {
         return success(hititPortfoliosFundsStocksAndBondsResponseDto);
     }
 
+//    @PostMapping("/user")
+//    public ApiUtils.ApiResult getUserPortfolioFundAssets(@RequestBody UserPortfolioFundRequestDto userPortfolioFundRequestDto) {
+//        PortfolioFundAssetResponseDto portfolioFundAssetResponseDto = portfolioService.getUserPortfolioFundAssets(userPortfolioFundRequestDto);
+//        return success(portfolioFundAssetResponseDto);
+//    }
+
     @PostMapping("/user")
-    public ApiUtils.ApiResult getUserPortfolioFundAssets(@RequestBody UserPortfolioFundRequestDto userPortfolioFundRequestDto) {
-        PortfolioFundAssetResponseDto portfolioFundAssetResponseDto = portfolioService.getUserPortfolioFundAssets(userPortfolioFundRequestDto);
+    public ApiUtils.ApiResult getUserPortfolioFundAssets(@RequestHeader("Authorization") String bearerToken) {
+        String token = CustomStringUtils.getToken(bearerToken);
+        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        log.info("user id : " + userId);
+
+        PortfolioFundAssetResponseDto portfolioFundAssetResponseDto = portfolioService.getUserPortfolioFundAssets(userId);
         return success(portfolioFundAssetResponseDto);
     }
-
 
     @GetMapping("/analyze-sentiment")
     public String analyzeSentiment(@RequestParam String text) {
