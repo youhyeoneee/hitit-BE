@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 
-@FeignClient(name = "flaskClient", url = "http://172.31.16.127:8080/sentiment:8080/sentiment")
+@FeignClient(name = "flaskClient", url = "http://127.0.0.1:5000/sentiment")
 public interface PortfolioServiceClient {
 
     @PostMapping
-    String getSentiment(@RequestHeader("Content-Type") String contentType, @RequestBody Map<String, Object> data);
+    String getSentiment(@RequestHeader("Accept") String contentType, @RequestBody Map<String, Object> data);
 }

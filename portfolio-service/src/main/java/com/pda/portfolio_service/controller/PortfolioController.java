@@ -80,8 +80,8 @@ public class PortfolioController {
         return success(portfolioFundAssetResponseDto);
     }
 
-    @GetMapping("/analyze-sentiment")
-    public String analyzeSentiment(@RequestParam String text) {
+    @GetMapping("/analyze-sentiment/{text}")
+    public String analyzeSentiment(@PathVariable("text") String text) {
         return portfolioService.analyzeSentiment(text);
     }
 
