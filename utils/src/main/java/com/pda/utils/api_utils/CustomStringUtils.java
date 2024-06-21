@@ -3,6 +3,8 @@ package com.pda.utils.api_utils;
 
 import org.springframework.util.StringUtils;
 
+import java.text.DecimalFormat;
+
 // TODO: 입력값 유효성 검사 + 예외 처리
 public class CustomStringUtils {
     public static String getGender(String residentNumber){
@@ -41,6 +43,11 @@ public class CustomStringUtils {
             return bearerToken.substring(7);
         }
         return null;
+    }
+
+    public static String formatMoney(int money) {
+        DecimalFormat decimalFormat = new DecimalFormat();
+        return decimalFormat.format(money);
     }
 
 }
