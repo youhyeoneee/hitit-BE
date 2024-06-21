@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 
-@FeignClient(name = "flaskClient", url = "http://172.31.13.91:8080/sentiment:8080/sentiment")
+@FeignClient(name = "flaskClient", url = "http://172.31.16.127:8080/sentiment:8080/sentiment")
 public interface PortfolioServiceClient {
 
     @PostMapping
