@@ -59,21 +59,18 @@ project(':user-service'){
 project(':mydata-service'){
 	dependencies {
 		implementation project(':utils')
-		implementation project(':user-service')
 	}
 }
 
 project(':portfolio-service'){
 	dependencies {
 		implementation project(':utils')
-		implementation project(':user-service')
 	}
 }
 
 project(':asset-service'){
 	dependencies {
 		implementation project(':utils')
-		implementation project(':user-service')
 	}
 }
 
