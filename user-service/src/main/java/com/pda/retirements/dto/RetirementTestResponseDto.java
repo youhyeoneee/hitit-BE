@@ -1,8 +1,9 @@
 package com.pda.retirements.dto;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.pda.retirements.jpa.RetirementType;
 import com.pda.utils.api_utils.CustomStringUtils;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,6 +13,7 @@ import java.util.Arrays;
 
 @Getter
 @Setter
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class RetirementTestResponseDto {
     private ArrayList<String> type;
     private ArrayList<String> monthlyLivingExpenses;
