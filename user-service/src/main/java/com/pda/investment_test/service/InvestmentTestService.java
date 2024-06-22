@@ -14,6 +14,7 @@ import com.pda.utils.exception.investment_tests.AnswerNotFoundException;
 import com.pda.utils.exception.investment_tests.QuestionNotFoundException;
 import com.pda.utils.exception.investment_tests.UserAnswerNotFoundException;
 import com.pda.utils.exception.login.NotFoundUserException;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -71,6 +72,7 @@ public class InvestmentTestService {
         return answer.getContent();
     }
 
+    @Transactional
     public UserAnswer saveUserAnswers(int userId, List<String> answers) {
 
         User user = userRepository.findById(userId)

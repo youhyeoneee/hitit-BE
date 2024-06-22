@@ -11,6 +11,7 @@ import com.pda.user_service.jpa.User;
 import com.pda.user_service.jpa.UserRepository;
 import com.pda.utils.exception.investment_tests.UserAnswerNotFoundException;
 import com.pda.utils.exception.login.NotFoundUserException;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -224,7 +225,7 @@ public class RetirementService {
         return (low + high) / 2;
     }
 
-
+    @Transactional
     public RetirementTestResult saveResult(int userId, RetirementTestResponseDto testResponseDto) {
 
         User user = userRepository.findById(userId)
