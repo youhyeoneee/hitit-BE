@@ -1,9 +1,6 @@
 package com.pda.user_service.service;
 
-import com.pda.user_service.dto.KaKaoTokenDto;
-import com.pda.user_service.dto.KakaoUserDto;
-import com.pda.user_service.dto.LoginDto;
-import com.pda.user_service.dto.SignupUserDto;
+import com.pda.user_service.dto.*;
 import com.pda.user_service.jpa.User;
 import com.pda.user_service.jpa.UserRepository;
 import com.pda.utils.exception.DuplicatedEmailException;
@@ -11,6 +8,7 @@ import com.pda.utils.exception.login.NotCorrectPasswordException;
 import com.pda.utils.exception.login.NotFoundUserException;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,6 +45,7 @@ public class UserService implements UserDetailsService {
 
 
 
+    @Transactional
     public User signup(SignupUserDto userDto) throws DuplicatedEmailException {
         String encodedPassword = passwordEncoder.encode(userDto.getPassword());
         userDto.setPassword(encodedPassword);
@@ -83,6 +82,7 @@ public class UserService implements UserDetailsService {
         return kakaoTokenResponseDto.getAccessToken();
     }
 
+    @Transactional
     public User getUserInfo(String accessToken) {
         KakaoUserDto kakaoUserDTO = WebClient.create(KAUTH_USER_URL_HOST)
                 .get()
@@ -126,11 +126,12 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> user = userRepository.findById(Integer.valueOf(username));
-        return user.orElseThrow();
+        return user.orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
     }
 
-    public void updateInvestmentTypeAndScore(int userId, String investmentType, int investmentTestScore) {
-        User user = findUserById(userId);
+    @Transactional
+    public void updateInvestmentTypeAndScore(int userId, String investmentType, int investmentTestScore) throws UsernameNotFoundException {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
         user.setInvestmentType(investmentType);
         user.setInvestmentTestScore(investmentTestScore);
         userRepository.save(user);
@@ -138,5 +139,45 @@ public class UserService implements UserDetailsService {
 
     public User findUserById(int userId) throws NotFoundUserException {
         return userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("사용자가 존재하지 않습니다."));
+    }
+
+    public User updateUser(int userId, UserUpdateRequestDto dto) throws UsernameNotFoundException {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("사용자가 존재하지 않습니다."));
+
+        if (dto.getEmail() != null) {
+            user.setEmail(dto.getEmail());
+        }
+        if (dto.getName() != null) {
+            user.setName(dto.getName());
+        }
+        if (dto.getPassword() != null) {
+            user.setPassword(dto.getPassword());
+        }
+        if (dto.getPhone() != null) {
+            user.setPhone(dto.getPhone());
+        }
+        if (dto.getBirthdate() != null) {
+            user.setBirthdate(dto.getBirthdate());
+        }
+        if (dto.getGender() != null) {
+            user.setGender(dto.getGender());
+        }
+        if (dto.getInvestmentType() != null) {
+            user.setInvestmentType(dto.getInvestmentType());
+        }
+        if (dto.getInvestmentTestScore() != null) {
+            user.setInvestmentTestScore(dto.getInvestmentTestScore());
+        }
+        if (dto.getMydata() != null) {
+            user.setMydata(dto.getMydata());
+        }
+        if (dto.getPortfolio() != null) {
+            user.setPortfolio(dto.getPortfolio());
+        }
+
+        userRepository.save(user);
+
+        User savedUser = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+        return savedUser;
     }
 }
