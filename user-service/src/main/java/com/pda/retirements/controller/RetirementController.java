@@ -2,6 +2,7 @@ package com.pda.retirements.controller;
 
 import com.pda.retirements.dto.RetirementTestRequestDto;
 import com.pda.retirements.dto.RetirementTestResponseDto;
+import com.pda.retirements.jpa.RetirementTestResult;
 import com.pda.retirements.jpa.RetirementType;
 import com.pda.retirements.service.RetirementService;
 import com.pda.security.JwtTokenProvider;
@@ -67,7 +68,22 @@ public class RetirementController {
         int optimalMonthlyLivingExpenses = (int) ((retirementService.findOptimalMonthlyLivingExpenses(age, testRequestDto.getRetirementAge(),
                         testRequestDto.getMonthlyLivingExpenses(), testRequestDto.getTotalFinancialAssets(), testRequestDto.getExpectedInvestmentReturn())) / 10_000);
         testResponseDto.setOptimalMonthlyLivingExpenses(optimalMonthlyLivingExpenses);
+
+        // DB에 결과 저장
+        retirementService.saveResult(userId, testResponseDto);
         return success(testResponseDto);
+    }
+
+    @GetMapping("/test/results")
+    public ApiUtils.ApiResult getTestResults(@RequestHeader("Authorization") String bearerToken) {
+        // 토큰 -> user id
+        log.info("bearerToken : " + bearerToken);
+        String token = CustomStringUtils.getToken(bearerToken);
+        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        log.info("user id : " + userId);
+
+        RetirementTestResult result = retirementService.getResult(userId);
+        return success(result);
     }
 
 

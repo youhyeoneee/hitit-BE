@@ -1,17 +1,33 @@
 package com.pda.retirements.service;
 
+import com.pda.investment_test.jpa.user_answer.UserAnswer;
 import com.pda.retirements.dto.RetirementTestRequestDto;
+import com.pda.retirements.dto.RetirementTestResponseDto;
 import com.pda.retirements.jpa.Gender;
+import com.pda.retirements.jpa.RetirementTestResult;
+import com.pda.retirements.jpa.RetirementTestResultRepository;
 import com.pda.retirements.jpa.RetirementType;
+import com.pda.user_service.jpa.User;
+import com.pda.user_service.jpa.UserRepository;
+import com.pda.utils.exception.investment_tests.UserAnswerNotFoundException;
+import com.pda.utils.exception.login.NotFoundUserException;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class RetirementService {
+
+    private UserRepository userRepository;
+    private RetirementTestResultRepository retirementTestResultRepository;
 
     // 노후준비종합진단 - 재무준비 여건 및 인식
     // 예상 은퇴 연령, 소득활동 지속 노력, 노후 예상 생활비
@@ -209,4 +225,30 @@ public class RetirementService {
     }
 
 
+    public RetirementTestResult saveResult(int userId, RetirementTestResponseDto testResponseDto) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundUserException(userId + "번 유저를 찾을 수 없습니다."));
+
+        Optional<RetirementTestResult> savedResult = retirementTestResultRepository.findByUserId(userId);
+
+        if (savedResult.isEmpty()) {
+            RetirementTestResult result = new RetirementTestResult(userId, testResponseDto);
+            retirementTestResultRepository.save(result);
+
+            return result;
+        } else {
+            RetirementTestResult result = savedResult.get();
+            result.setResults(testResponseDto);
+            result.setUpdatedAt(LocalDateTime.now());
+            retirementTestResultRepository.save(result);
+
+            return result;
+        }
+    }
+
+    public RetirementTestResult getResult(int userId) throws UserAnswerNotFoundException {
+        return retirementTestResultRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserAnswerNotFoundException(userId + "번 유저의 저장된 테스트 결과가 없습니다."));
+    }
 }
