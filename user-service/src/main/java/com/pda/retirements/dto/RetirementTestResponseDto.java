@@ -23,6 +23,7 @@ public class RetirementTestResponseDto {
     private String careerEffortScore;
     private int assetLife;
     private int lifeExpectancy;
+    private int optimalMonthlyLivingExpenses;
 
     public RetirementTestResponseDto(RetirementType retirementType, int monthlyLivingExpenses,  int totalFinancialAssets,
                                     int expectedNationalPension, int totalRealEstateValue, int careerEffortScore) {

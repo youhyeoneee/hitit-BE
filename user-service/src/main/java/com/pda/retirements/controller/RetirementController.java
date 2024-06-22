@@ -64,6 +64,9 @@ public class RetirementController {
         int assetLife = retirementService.getAssetLife(remains);
         testResponseDto.setAssetLife(assetLife);
 
+        int optimalMonthlyLivingExpenses = (int) ((retirementService.findOptimalMonthlyLivingExpenses(age, testRequestDto.getRetirementAge(),
+                        testRequestDto.getMonthlyLivingExpenses(), testRequestDto.getTotalFinancialAssets(), testRequestDto.getExpectedInvestmentReturn())) / 10_000);
+        testResponseDto.setOptimalMonthlyLivingExpenses(optimalMonthlyLivingExpenses);
         return success(testResponseDto);
     }
 

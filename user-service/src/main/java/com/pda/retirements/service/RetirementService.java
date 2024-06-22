@@ -186,4 +186,27 @@ public class RetirementService {
         return 100;
     }
 
+
+    public double findOptimalMonthlyLivingExpenses(int startAge, int retirementAge, double monthlyLivingExpenses,
+                                                   double totalFinancialAssets, double expectedInvestmentReturn) {
+        double low = 0;
+        double high = monthlyLivingExpenses * 10_000;
+        double tolerance = 1; // 허용 오차 (원하는 정확도에 따라 조정 가능)
+
+        while (high - low > tolerance) {
+            double mid = (low + high) / 2;
+            Map<Integer, Long> remains = calculateRemains(startAge, retirementAge, mid, totalFinancialAssets, expectedInvestmentReturn);
+            int assetLife = getAssetLife(remains);
+
+            if (assetLife > retirementAge) {
+                high = mid; // 생활비를 낮추어야 함
+            } else {
+                low = mid; // 생활비를 높여야 함
+            }
+        }
+
+        return (low + high) / 2;
+    }
+
+
 }
