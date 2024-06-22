@@ -31,7 +31,7 @@ public class SecurityAccount {
     @Column(name = "created_at")
     private Date createdAt;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private AssetUser assetUser;
+    @Column(name = "user_id")
+    private int userId;
+
 }

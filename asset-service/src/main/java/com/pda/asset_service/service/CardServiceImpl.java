@@ -20,12 +20,10 @@ import java.util.Optional;
 public class CardServiceImpl implements CardService{
 
     private final CardRepository cardRepository;
-    private final AssetUserRepository assetUserRepository;
     private final MydataInfoRepository mydataInfoRepository;
     private final MydataServiceClient mydataServiceClient;
     @Override
     public Card convertToEntity(CardResponseDto cardResponseDto) {
-        AssetUser assetUser = assetUserRepository.findById(cardResponseDto.getUserId()).orElseThrow();
         return Card.builder()
                 .cardNo(cardResponseDto.getCardNo())
                 .companyName(cardResponseDto.getCompanyName())
@@ -34,7 +32,7 @@ public class CardServiceImpl implements CardService{
                 .createdAt(cardResponseDto.getCreatedAt())
                 .expiredAt(cardResponseDto.getExpiredAt())
                 .accountNo(cardResponseDto.getAccountNo())
-                .assetUser(assetUser)
+                .userId(cardResponseDto.getUserId())
                 .build();
     }
 
@@ -48,7 +46,7 @@ public class CardServiceImpl implements CardService{
                 .createdAt(card.getCreatedAt())
                 .expiredAt(card.getExpiredAt())
                 .accountNo(card.getAccountNo())
-                .userId(card.getAssetUser().getId())
+                .userId(card.getUserId())
                 .build();
     }
 
@@ -74,14 +72,14 @@ public class CardServiceImpl implements CardService{
 
                         mydataInfoRepository.save(MydataInfo.builder()
                                 .assetType("cards")
-                                .userId(card.getAssetUser().getId())
+                                .userId(userId)
                                 .companyName(card.getCompanyName())
                                 .accountType(card.getCardType())
                                 .accountNo(card.getCardNo())
                                 .build());
 
                         MydataInfo savedInfo = mydataInfoRepository.findCardByUserIdAndAssetTypeAndCompanyNameAndAccountNo(
-                                card.getAssetUser().getId(),
+                                card.getUserId(),
                                 "cards",
                                 card.getCompanyName(),
                                 card.getCardNo()
@@ -106,7 +104,7 @@ public class CardServiceImpl implements CardService{
 
     @Override
     public List<CardDto> getCards(int userId) {
-        List<Card> cards = cardRepository.findByAssetUserId(userId).orElse(null);
+        List<Card> cards = cardRepository.findByUserId(userId).orElse(null);
 
         List<CardDto> cardDtos = new ArrayList<>();
         if (cards != null) {

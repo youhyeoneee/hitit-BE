@@ -12,7 +12,6 @@ public interface MydataInfoRepository extends JpaRepository<MydataInfo, Integer>
     MydataInfo findByAccountNo(String accountNo);
     MydataInfo findBankAccountByUserIdAndAssetTypeAndCompanyNameAndAccountNo(int id, String bankAccounts, String bankName, String accountNo);
 
-
     MydataInfo findLoanByUserIdAndAssetTypeAndCompanyNameAndAccountNo(int id, String loans, String companyName, String accountNo);
 
     MydataInfo findPensionByUserIdAndAssetTypeAndCompanyNameAndAccountNo(int id, String pensions, String companyName, String accountNo);

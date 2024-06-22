@@ -7,6 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface PensionRepository extends JpaRepository<Pension, String> {
-    Optional<List<Pension>> findByAssetUserId(int userId);
+public interface PensionRepository extends JpaRepository<Pension, PensionId> {
+    Optional<List<Pension>> findByUserId(int userId);
 }

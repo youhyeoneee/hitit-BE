@@ -33,7 +33,6 @@ public class Loan {
     @Column(name = "account_no")
     private String accountNo;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private AssetUser assetUser;
+    @Column(name = "user_id")
+    private int userId;
 }

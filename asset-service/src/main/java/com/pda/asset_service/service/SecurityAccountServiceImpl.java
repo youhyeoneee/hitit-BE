@@ -19,19 +19,17 @@ import java.util.Optional;
 public class SecurityAccountServiceImpl implements SecurityAccountService{
 
     private final SecurityAccountRepository securityAccountRepository;
-    private final AssetUserRepository assetUserRepository;
     private final MydataInfoRepository mydataInfoRepository;
     private final MydataServiceClient mydataServiceClient;
     @Override
     public SecurityAccount convertToEntity(SecurityAccountResponseDto securityAccountResponseDto) {
-        AssetUser assetUser = assetUserRepository.findById(securityAccountResponseDto.getUserId()).orElseThrow();
         return SecurityAccount.builder()
                 .accountNo(securityAccountResponseDto.getAccountNo())
                 .securityName(securityAccountResponseDto.getSecurityName())
                 .accountType(securityAccountResponseDto.getAccountType())
                 .balance(securityAccountResponseDto.getBalance())
                 .createdAt(securityAccountResponseDto.getCreatedAt())
-                .assetUser(assetUser)
+                .userId(securityAccountResponseDto.getUserId())
                 .build();
     }
 
@@ -43,7 +41,7 @@ public class SecurityAccountServiceImpl implements SecurityAccountService{
                 .accountType(securityAccount.getAccountType())
                 .balance(securityAccount.getBalance())
                 .createdAt(securityAccount.getCreatedAt())
-                .userId(securityAccount.getAssetUser().getId())
+                .userId(securityAccount.getUserId())
                 .build();
     }
 
@@ -66,14 +64,14 @@ public class SecurityAccountServiceImpl implements SecurityAccountService{
 
                         mydataInfoRepository.save(MydataInfo.builder()
                                 .assetType("security_accounts")
-                                .userId(securityAccount.getAssetUser().getId())
+                                .userId(userId)
                                 .companyName(securityAccount.getSecurityName())
                                 .accountType(securityAccount.getAccountType())
                                 .accountNo(securityAccount.getAccountNo())
                                 .build());
 
                         MydataInfo savedInfo = mydataInfoRepository.findSecurityByUserIdAndAssetTypeAndCompanyNameAndAccountNo(
-                                securityAccount.getAssetUser().getId(),
+                                securityAccount.getUserId(),
                                 "security_accounts",
                                 securityAccount.getSecurityName(),
                                 securityAccount.getAccountNo()
@@ -99,7 +97,7 @@ public class SecurityAccountServiceImpl implements SecurityAccountService{
     @Override
     public List<SecurityAccountDto> getSecurityAccounts(int userId) {
 
-        List<SecurityAccount> securityAccounts = securityAccountRepository.findByAssetUserId(userId).orElse(null);
+        List<SecurityAccount> securityAccounts = securityAccountRepository.findByUserId(userId).orElse(null);
 
         List<SecurityAccountDto> securityAccountDtos = new ArrayList<>();
         if (securityAccounts != null) {
@@ -115,7 +113,7 @@ public class SecurityAccountServiceImpl implements SecurityAccountService{
     @Override
     public Integer getSecurityAccountsBalance(int userId) {
         Integer securityAccountsTotalBalance = 0;
-        List<SecurityAccount> securityAccounts = securityAccountRepository.findByAssetUserId(userId).orElse(null);
+        List<SecurityAccount> securityAccounts = securityAccountRepository.findByUserId(userId).orElse(null);
 
         if(securityAccounts != null){
             for (SecurityAccount securityAccount : securityAccounts){
