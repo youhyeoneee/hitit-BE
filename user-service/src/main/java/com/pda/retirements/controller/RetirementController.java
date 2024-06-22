@@ -13,6 +13,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 import static com.pda.utils.api_utils.ApiUtils.success;
 
 @RestController
@@ -55,7 +57,13 @@ public class RetirementController {
         int lifeExpectancy = retirementService.calculateLifeExpectancy(age, gender);
         testResponseDto.setLifeExpectancy(lifeExpectancy);
 
-        
+        // 현재 나이, 은퇴 나이, 월 생활비, 금융 자산, 예상 투자 수익률
+        Map<Integer, Long> remains = retirementService.calculateRemains(age, testRequestDto.getRetirementAge(),
+                testRequestDto.getMonthlyLivingExpenses(), testRequestDto.getTotalFinancialAssets(), testRequestDto.getExpectedInvestmentReturn());
+
+        int assetLife = retirementService.getAssetLife(remains);
+        testResponseDto.setAssetLife(assetLife);
+
         return success(testResponseDto);
     }
 

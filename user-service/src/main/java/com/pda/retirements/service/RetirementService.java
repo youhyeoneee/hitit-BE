@@ -3,9 +3,14 @@ package com.pda.retirements.service;
 import com.pda.retirements.dto.RetirementTestRequestDto;
 import com.pda.retirements.jpa.Gender;
 import com.pda.retirements.jpa.RetirementType;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
+@Slf4j
 public class RetirementService {
 
     // 노후준비종합진단 - 재무준비 여건 및 인식
@@ -138,6 +143,47 @@ public class RetirementService {
         } else {
             throw new IllegalArgumentException("유효하지 않은 나이입니다. 나이는 0보다 같거나 커야합니다.");
         }
+    }
+
+    public Map<Integer, Long> calculateRemains(int startAge, int retirementAge, double monthlyLivingExpenses,
+                                                     double totalFinancialAssets, double expectedInvestmentReturn) {
+        Map<Integer, Long> remains = new HashMap<>();
+        double annualInvestmentReturn = expectedInvestmentReturn / 100;
+        double annualExpense = monthlyLivingExpenses * 12 * 10_000; // 만 단위
+        Long wealth = (long) totalFinancialAssets * 100_000_000; // 억 단위
+
+        log.info("Start age: " + startAge + ", Retirement age: " + retirementAge + ", Wealth: " + wealth);
+
+        // 은퇴 나이 이전
+        for (int age = startAge; age < retirementAge; age++) {
+            long roundedValue = (long) Math.ceil(wealth * annualInvestmentReturn);
+            wealth += roundedValue;
+            log.info("Age " + age + " : " + wealth);
+            remains.put(age, wealth);
+        }
+
+        // 은퇴 나이 이후
+        for (int age = retirementAge; age <= 100; age++) {
+            wealth += (long) Math.ceil(wealth * annualInvestmentReturn);
+            wealth -= (int) annualExpense;
+            log.info("Age " + age + " : " + wealth);
+            remains.put(age, wealth);
+            if (wealth <= 0) {
+                break;
+            }
+        }
+
+        return remains;
+    }
+
+    public int getAssetLife(Map<Integer, Long> remains) {
+        for (Map.Entry<Integer, Long> entry : remains.entrySet()) {
+            log.info(entry.getKey() + " : " + entry.getValue());
+            if (entry.getValue() <= 0) {
+                return entry.getKey();
+            }
+        }
+        return 100;
     }
 
 }
