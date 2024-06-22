@@ -137,9 +137,12 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
-    @Transactional
+    public User findUserById(int userId) throws NotFoundUserException {
+        return userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("사용자가 존재하지 않습니다."));
+    }
+
     public User updateUser(int userId, UserUpdateRequestDto dto) throws UsernameNotFoundException {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+        User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("사용자가 존재하지 않습니다."));
 
         if (dto.getEmail() != null) {
             user.setEmail(dto.getEmail());
