@@ -1,7 +1,7 @@
 package com.pda.user_service.controller;
 
 
-import com.pda.security.JwtTokenProvider;
+import com.pda.utils.security.JwtTokenProvider;
 import com.pda.user_service.dto.*;
 import com.pda.user_service.jpa.User;
 import com.pda.user_service.service.UserService;

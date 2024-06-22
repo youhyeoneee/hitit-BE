@@ -5,7 +5,7 @@ import com.pda.investment_test.dto.ResultDto;
 import com.pda.investment_test.jpa.answer.Answer;
 import com.pda.investment_test.jpa.user_answer.UserAnswer;
 import com.pda.investment_test.service.InvestmentTestService;
-import com.pda.security.JwtTokenProvider;
+import com.pda.utils.security.JwtTokenProvider;
 import com.pda.user_service.service.UserService;
 import com.pda.utils.api_utils.ApiUtils;
 import com.pda.utils.api_utils.CustomStringUtils;

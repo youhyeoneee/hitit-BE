@@ -1,4 +1,4 @@
-package com.pda.security;
+package com.pda.utils.security;
 
 import com.pda.utils.api_utils.CustomStringUtils;
 import io.jsonwebtoken.Claims;
