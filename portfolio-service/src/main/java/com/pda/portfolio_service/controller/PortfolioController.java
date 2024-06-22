@@ -85,6 +85,11 @@ public class PortfolioController {
         return portfolioService.analyzeSentiment(text);
     }
 
+    @GetMapping("/mydata/{user_id}")
+    public String getMyDataPortfolio(@PathVariable("user_id") Integer userId) {
+        return portfolioService.getMyDataPortfolio(userId);
+    }
+
     // 나중에 util - Validator로 이동
     public static boolean isNumber(int num) {
         return Pattern.matches("^[0-9]*$", Integer.toString(num));
