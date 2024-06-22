@@ -1,7 +1,8 @@
 package com.pda.portfolio_service.service;
 
 import com.pda.portfolio_service.dto.*;
-import com.pda.portfolio_service.feign.PortfolioServiceClient;
+import com.pda.portfolio_service.feign.MyDataPortfolioServiceClient;
+import com.pda.portfolio_service.feign.FlaskTestServiceClient;
 import com.pda.portfolio_service.jpa.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,10 @@ public class PortfolioService {
     private UserPortfolioRepository userPortfolioRepository;
 
     @Autowired
-    private PortfolioServiceClient portfolioServiceClient;
+    private FlaskTestServiceClient flaskTestServiceClient;
+
+    @Autowired
+    private MyDataPortfolioServiceClient myDataPortfolioServiceClient;
 
     public List<HititPortfoliosResponseDto> getHititPortfolios() {
         List<Portfolio> portfolios = portfolioRepository.findAll();
@@ -198,6 +202,14 @@ public class PortfolioService {
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("text", text);
 
-        return portfolioServiceClient.getSentiment("application/json", requestBody);
+        return flaskTestServiceClient.getSentiment("application/json", requestBody);
+    }
+
+
+    public String getMyDataPortfolio(Integer userId) {
+        Map<String, Integer> queryParams = new HashMap<>();
+        queryParams.put("user_id", userId);
+
+        return myDataPortfolioServiceClient.getMyDataPortfolio("application/json", queryParams);
     }
 }
