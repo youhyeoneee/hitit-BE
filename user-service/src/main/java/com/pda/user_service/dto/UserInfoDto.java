@@ -9,11 +9,13 @@ public class UserInfoDto {
     String gender;
     String type;
     String mydata;
+    Boolean portfolio;
 
     public UserInfoDto(User user) {
         this.name = user.getName();
         this.gender = user.getGender();
         this.type = user.getInvestmentType();
         this.mydata = user.getMydata();
+        this.portfolio = user.getPortfolio();
     }
 }

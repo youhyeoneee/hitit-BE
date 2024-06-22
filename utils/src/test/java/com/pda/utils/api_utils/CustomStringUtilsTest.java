@@ -46,4 +46,24 @@ class CustomStringUtilsTest {
         String bearerToken = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwiaWF0IjoxNzE4NzY3MDc2LCJleHAiOjE3MTg3Njg4NzZ9.9izDaaeTfD1C1i7e9gXvuchR6cG-9tAR3SmufoymdTc";
         assertThat(CustomStringUtils.getToken(bearerToken)).isEqualTo("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwiaWF0IjoxNzE4NzY3MDc2LCJleHAiOjE3MTg3Njg4NzZ9.9izDaaeTfD1C1i7e9gXvuchR6cG-9tAR3SmufoymdTc");
     }
+
+    @Test
+    void 화폐포맷_3자리() {
+        assertThat(CustomStringUtils.formatMoney(483)).isEqualTo("483");
+    }
+
+    @Test
+    void 화폐포맷_4자리() {
+        assertThat(CustomStringUtils.formatMoney(1483)).isEqualTo("1,483");
+    }
+
+    @Test
+    void 생년월일로_만나이계산() {
+        assertThat(CustomStringUtils.calculateAge("20000311")).isEqualTo(24);
+    }
+
+    @Test
+    void 생년월일로_만나이계산2() {
+        assertThat(CustomStringUtils.calculateAge("19940621")).isEqualTo(30);
+    }
 }
