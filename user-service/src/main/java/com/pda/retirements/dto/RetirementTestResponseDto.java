@@ -89,13 +89,13 @@ public class RetirementTestResponseDto {
 
         if (monthlyLivingExpenses > expectedMonthlyRetirementExpenses) {
             result.add("여유");
-            result.add(formattedAverageExpenses + "만원보다 " + formattedDifference + "만원 많아요.");
+            result.add(formattedAverageExpenses + "만원보다 " + formattedDifference + "만원 많음");
         } else if (monthlyLivingExpenses == expectedMonthlyRetirementExpenses) {
             result.add("적정");
-            result.add(formattedAverageExpenses + "만원과 같아요.");
+            result.add(formattedAverageExpenses + "만원과 같음");
         } else {
             result.add("부족");
-            result.add(formattedAverageExpenses + "만원보다 " + formattedDifference + "만원 적어요.");
+            result.add(formattedAverageExpenses + "만원보다 " + formattedDifference + "만원 적음");
         }
         return result;
     }
