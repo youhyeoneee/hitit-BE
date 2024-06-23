@@ -1,5 +1,7 @@
 package com.pda.retirements.jpa;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.pda.retirements.dto.RetirementTestResponseDto;
 import com.pda.utils.api_utils.StringListConverter;
 import jakarta.persistence.Convert;
