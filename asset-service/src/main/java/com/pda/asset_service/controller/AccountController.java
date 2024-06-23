@@ -67,7 +67,7 @@ public class AccountController {
         int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
         log.info("user id : " + userId);
 
-        AccountDto accountDto = accountService.createAccount(userId);
+        AccountDto accountDto = accountService.createAccount(userId, accountCreateDto);
         return ApiUtils.success(accountDto);
     }
 

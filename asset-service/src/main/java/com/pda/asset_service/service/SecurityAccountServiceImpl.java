@@ -136,7 +136,7 @@ public class SecurityAccountServiceImpl implements SecurityAccountService{
                     .accountType(securityAccount.getAccountType())
                     .balance(securityAccount.getBalance())
                     .securityName(securityAccount.getSecurityName())
-                    .userId(securityAccount.getUserId())
+                    .userId(userId)
                     .createdAt(securityAccount.getCreatedAt())
                     .build();
         }else{
