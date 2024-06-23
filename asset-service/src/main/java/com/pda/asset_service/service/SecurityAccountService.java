@@ -18,4 +18,6 @@ public interface SecurityAccountService {
     List<SecurityAccountDto> getSecurityAccounts(int userId);
 
     Integer getSecurityAccountsBalance(int userId);
+
+    SecurityAccountDto getSecurityAccountShinhanDC(int userId);
 }

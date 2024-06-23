@@ -127,5 +127,22 @@ public class SecurityAccountServiceImpl implements SecurityAccountService{
         return securityAccountsTotalBalance;
     }
 
+    @Override
+    public SecurityAccountDto getSecurityAccountShinhanDC(int userId) {
+        SecurityAccount securityAccount = securityAccountRepository.findByUserIdAndSecurityNameAndAccountType(userId, "신한투자증권", "DC").orElse(null);
+        if(securityAccount != null){
+            return SecurityAccountDto.builder()
+                    .accountNo(securityAccount.getAccountNo())
+                    .accountType(securityAccount.getAccountType())
+                    .balance(securityAccount.getBalance())
+                    .securityName(securityAccount.getSecurityName())
+                    .userId(securityAccount.getUserId())
+                    .createdAt(securityAccount.getCreatedAt())
+                    .build();
+        }else{
+            return null;
+        }
+    }
+
 
 }
