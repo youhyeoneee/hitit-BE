@@ -18,4 +18,6 @@ public interface PensionService {
     List<MydataInfoDto> linkMyDataAccount(int userId, List<String> pensions);
 
     List<PensionDto> getPensions(int userId);
+
+//    List<PensionDto> getUnclaimedRetirementAccounts(int userId);
 }

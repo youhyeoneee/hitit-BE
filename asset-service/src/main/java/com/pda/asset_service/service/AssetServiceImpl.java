@@ -3,6 +3,7 @@ package com.pda.asset_service.service;
 
 
 import com.pda.asset_service.dto.MydataInfoDto;
+import com.pda.asset_service.dto.PensionDto;
 import com.pda.asset_service.dto.UserAccountInfoDto;
 import com.pda.asset_service.jpa.MydataInfoRepository;
 import jakarta.transaction.Transactional;
@@ -83,6 +84,12 @@ public class AssetServiceImpl implements AssetService{
         log.info("securityAccountTotalBalance = {}", securityAccountTotalBalance);
         return bankAccountTotalBalance + securityAccountTotalBalance;
     }
+
+//    @Override
+//    public List<PensionDto> getUnclaimedRetirementAccounts(int userId) {
+//        List<PensionDto> unclaimedRetirementAccounts = pensionService.getUnclaimedRetirementAccounts(userId);
+//        return unclaimedRetirementAccounts;
+//    }
 
 
 }

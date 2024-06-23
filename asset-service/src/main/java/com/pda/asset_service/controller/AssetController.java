@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.pda.utils.api_utils.ApiUtils.success;
+
 @RestController
 @Slf4j
 @RequestMapping("/api/assets")
@@ -33,7 +35,7 @@ public class AssetController {
         log.info("user id : " + userId);
 
         List<MydataInfoDto> bankAccountsLinkInfo = assetService.linkMydata(userId, userAccountInfoDto);
-        return ApiUtils.success(bankAccountsLinkInfo);
+        return success(bankAccountsLinkInfo);
     }
 
     @GetMapping("/bank-accounts")
@@ -43,7 +45,7 @@ public class AssetController {
         log.info("user id : " + userId);
 
         List<BankAccountDto> bankAccounts = bankAccountService.getBankAccounts(userId);
-        return ApiUtils.success(bankAccounts);
+        return success(bankAccounts);
     }
 
     @GetMapping("/security-accounts")
@@ -53,7 +55,7 @@ public class AssetController {
         log.info("user id : " + userId);
 
         List<SecurityAccountDto> securityAccounts = securityAccountService.getSecurityAccounts(userId);
-        return ApiUtils.success(securityAccounts);
+        return success(securityAccounts);
     }
 
     @GetMapping("/cards")
@@ -63,7 +65,7 @@ public class AssetController {
         log.info("user id : " + userId);
 
         List<CardDto> cards = cardService.getCards(userId);
-        return ApiUtils.success(cards);
+        return success(cards);
     }
 
     @GetMapping("/pensions")
@@ -73,7 +75,7 @@ public class AssetController {
         log.info("user id : " + userId);
 
         List<PensionDto>  pensions = pensionService.getPensions(userId);
-        return ApiUtils.success(pensions);
+        return success(pensions);
     }
 
     @GetMapping("/loans")
@@ -83,7 +85,7 @@ public class AssetController {
         log.info("user id : " + userId);
 
         List<LoanDto> loans = loanService.getLoans(userId);
-        return ApiUtils.success(loans);
+        return success(loans);
     }
 
     @GetMapping("/totalAssets")
@@ -94,6 +96,16 @@ public class AssetController {
 
         Integer totalAssets = assetService.getTotalAssets(userId);
         log.info("totalAssets = {}", totalAssets);
-        return ApiUtils.success(totalAssets);
+        return success(totalAssets);
     }
+
+//    @GetMapping("/retirement-pension-claim")
+//    public ApiUtils.ApiResult<List<PensionDto>> getUnclaimedRetirementAccounts(@RequestHeader("Authorization") String bearerToken){
+//        String token = CustomStringUtils.getToken(bearerToken);
+//        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+//        log.info("user id : " + userId);
+//
+//        List<PensionDto> unclaimedRetirementAccounts = assetService.getUnclaimedRetirementAccounts(userId);
+//        return success(unclaimedRetirementAccounts);
+//    }
 }

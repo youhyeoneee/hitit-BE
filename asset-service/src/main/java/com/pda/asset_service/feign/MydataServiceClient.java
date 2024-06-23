@@ -28,4 +28,6 @@ public interface MydataServiceClient {
     @GetMapping("/api/mydata/security-account/{userId}/{securityName}")
     Optional<List<SecurityAccountResponseDto>> getSecurityAccountsByUserIdAndSecurityName(@PathVariable("userId") int userId, @PathVariable("securityName") String securityName);
 
+    @GetMapping("/api/mydata/pension/unclaimed-retirement-accounts/{userId}")
+    Optional<List<PensionResponseDto>> findByUserIdAndRetirementPensionClaimed(int userId);
 }
