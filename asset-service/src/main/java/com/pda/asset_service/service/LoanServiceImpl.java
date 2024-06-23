@@ -1,11 +1,14 @@
 package com.pda.asset_service.service;
 
+
 import com.pda.asset_service.dto.LoanDto;
 import com.pda.asset_service.dto.LoanResponseDto;
 import com.pda.asset_service.dto.MydataInfoDto;
-import com.pda.asset_service.dto.SecurityAccountDto;
 import com.pda.asset_service.feign.MydataServiceClient;
-import com.pda.asset_service.jpa.*;
+import com.pda.asset_service.jpa.Loan;
+import com.pda.asset_service.jpa.LoanRepository;
+import com.pda.asset_service.jpa.MydataInfo;
+import com.pda.asset_service.jpa.MydataInfoRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,13 +23,11 @@ import java.util.Optional;
 public class LoanServiceImpl implements LoanService{
 
     private final LoanRepository loanRepository;
-    private final AssetUserRepository assetUserRepository;
     private final MydataInfoRepository mydataInfoRepository;
     private final MydataServiceClient mydataServiceClient;
 
     @Override
     public Loan convertToEntity(LoanResponseDto loanResponseDto) {
-        AssetUser user = assetUserRepository.findById(loanResponseDto.getUserId()).orElseThrow();
         return Loan.builder()
                 .companyName(loanResponseDto.getCompanyName())
                 .loanType(loanResponseDto.getLoanType())
@@ -34,7 +35,7 @@ public class LoanServiceImpl implements LoanService{
                 .interestRate(loanResponseDto.getInterestRate())
                 .totalPayments(loanResponseDto.getTotalPayments())
                 .accountNo(loanResponseDto.getAccountNo())
-                .assetUser(user)
+                .userId(loanResponseDto.getUserId())
                 .build();
     }
 
@@ -47,7 +48,7 @@ public class LoanServiceImpl implements LoanService{
                 .interestRate(loan.getInterestRate())
                 .totalPayments(loan.getTotalPayments())
                 .accountNo(loan.getAccountNo())
-                .userId(loan.getAssetUser().getId())
+                .userId(loan.getUserId())
                 .build();
     }
 
@@ -68,14 +69,14 @@ public class LoanServiceImpl implements LoanService{
 
                         mydataInfoRepository.save(MydataInfo.builder()
                                 .assetType("loans")
-                                .userId(loan.getAssetUser().getId())
+                                .userId(userId)
                                 .companyName(loan.getCompanyName())
                                 .accountType(loan.getLoanType())
                                 .accountNo(loan.getAccountNo())
                                 .build());
 
                         MydataInfo savedInfo = mydataInfoRepository.findLoanByUserIdAndAssetTypeAndCompanyNameAndAccountNo(
-                                loan.getAssetUser().getId(),
+                                loan.getUserId(),
                                 "loans",
                                 loan.getCompanyName(),
                                 loan.getAccountNo()
@@ -100,7 +101,7 @@ public class LoanServiceImpl implements LoanService{
 
     @Override
     public List<LoanDto> getLoans(int userId) {
-        List<Loan> Loans = loanRepository.findByAssetUserId(userId).orElse(null);
+        List<Loan> Loans = loanRepository.findByUserId(userId).orElse(null);
 
         List<LoanDto> loanDtos = new ArrayList<>();
         if (Loans != null) {

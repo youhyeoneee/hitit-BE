@@ -1,7 +1,6 @@
 package com.pda.asset_service.controller;
 
 import com.pda.asset_service.dto.*;
-import com.pda.asset_service.jpa.SecurityAccount;
 import com.pda.asset_service.service.*;
 import com.pda.security.JwtTokenProvider;
 import com.pda.utils.api_utils.ApiUtils;

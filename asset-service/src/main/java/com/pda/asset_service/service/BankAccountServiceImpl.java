@@ -1,9 +1,7 @@
 package com.pda.asset_service.service;
 
-import com.pda.asset_service.dto.BankAccountDto;
-import com.pda.asset_service.dto.BankAccountResponseDto;
-import com.pda.asset_service.dto.MydataInfoDto;
-import com.pda.asset_service.dto.SecurityAccountDto;
+
+import com.pda.asset_service.dto.*;
 import com.pda.asset_service.feign.MydataServiceClient;
 import com.pda.asset_service.jpa.*;
 import lombok.AllArgsConstructor;
@@ -21,14 +19,12 @@ public class BankAccountServiceImpl implements BankAccountService{
 
 
     private final BankAccountRepository bankAccountRepository;
-    private final AssetUserRepository assetUserRepository;
     private final MydataInfoRepository mydataInfoRepository;
     private final MydataServiceClient mydataServiceClient;
 
     @Override
     public BankAccount convertToEntity(BankAccountResponseDto bankAccountDto) {
         log.info("BankAccountServiceImpl User Id = {}", bankAccountDto.getUserId());
-        AssetUser user = assetUserRepository.findById(bankAccountDto.getUserId()).orElseThrow();
         return BankAccount.builder()
                 .accountNo(bankAccountDto.getAccountNo())
                 .bankName(bankAccountDto.getBankName())
@@ -36,7 +32,7 @@ public class BankAccountServiceImpl implements BankAccountService{
                 .name(bankAccountDto.getName())
                 .balance(bankAccountDto.getBalance())
                 .createdAt(bankAccountDto.getCreatedAt())
-                .assetUser(user)
+                .userId(bankAccountDto.getUserId())
                 .build();
     }
 
@@ -49,7 +45,7 @@ public class BankAccountServiceImpl implements BankAccountService{
                 .name(bankAccount.getName())
                 .balance(bankAccount.getBalance())
                 .createdAt(bankAccount.getCreatedAt())
-                .userId(bankAccount.getAssetUser().getId())
+                .userId(bankAccount.getUserId())
                 .build();
     }
 
@@ -77,14 +73,14 @@ public class BankAccountServiceImpl implements BankAccountService{
 
                             mydataInfoRepository.save(MydataInfo.builder()
                                     .assetType("bank_accounts")
-                                    .userId(bankAccount.getAssetUser().getId())
+                                    .userId(userId)
                                     .companyName(bankAccount.getBankName())
                                     .accountType(bankAccount.getAccountType())
                                     .accountNo(bankAccount.getAccountNo())
                                     .build());
 
                             MydataInfo savedInfo = mydataInfoRepository.findBankAccountByUserIdAndAssetTypeAndCompanyNameAndAccountNo(
-                                    bankAccount.getAssetUser().getId(),
+                                    bankAccount.getUserId(),
                                     "bank_accounts",
                                     bankAccount.getBankName(),
                                     bankAccount.getAccountNo()
@@ -112,7 +108,7 @@ public class BankAccountServiceImpl implements BankAccountService{
 
     @Override
     public List<BankAccountDto> getBankAccounts(int userId) {
-        List<BankAccount> bankAccounts = bankAccountRepository.findByAssetUserId(userId).orElse(null);
+        List<BankAccount> bankAccounts = bankAccountRepository.findByUserId(userId).orElse(null);
 
         List<BankAccountDto> bankAccountDtos = new ArrayList<>();
         if (bankAccounts != null) {
@@ -128,7 +124,7 @@ public class BankAccountServiceImpl implements BankAccountService{
     @Override
     public Integer getBankAccountsBalance(int userId) {
         Integer bankAccountsTotalBalance = 0;
-        List<BankAccount> bankAccounts = bankAccountRepository.findByAssetUserId(userId).orElse(null);
+        List<BankAccount> bankAccounts = bankAccountRepository.findByUserId(userId).orElse(null);
 
         if(bankAccounts != null){
             for(BankAccount bankAccount : bankAccounts){

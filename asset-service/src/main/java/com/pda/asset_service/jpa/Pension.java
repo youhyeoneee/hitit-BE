@@ -1,11 +1,15 @@
 package com.pda.asset_service.jpa;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity
@@ -14,20 +18,19 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 @Table(name = "pensions")
-public class Pension {
+public class Pension implements Serializable {
 
-    @Column(name = "company_name")
-    private String companyName;
-
-    @Column(name = "pension_name")
-    private String pensionName;
+    @EmbeddedId
+    private PensionId pensionId;
 
     @Column(name = "pension_type")
     private String pensionType;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private AssetUser assetUser;
+    @Column(name = "company_name")
+    private String companyName;
+
+    @Column(name = "user_id")
+    private int userId;
 
     @Column(name = "interest_rate")
     private Double interestRate;
@@ -40,8 +43,5 @@ public class Pension {
 
     @Column(name = "retirement_pension_claimed")
     private Boolean retirementPensionClaimed;
-
-    @Id
-    @Column(name = "account_no")
-    private String accountNo;
 }
+

@@ -1,10 +1,14 @@
 package com.pda.asset_service.service;
 
+
 import com.pda.asset_service.dto.MydataInfoDto;
 import com.pda.asset_service.dto.SecurityAccountDto;
 import com.pda.asset_service.dto.SecurityAccountResponseDto;
 import com.pda.asset_service.feign.MydataServiceClient;
-import com.pda.asset_service.jpa.*;
+import com.pda.asset_service.jpa.MydataInfo;
+import com.pda.asset_service.jpa.MydataInfoRepository;
+import com.pda.asset_service.jpa.SecurityAccount;
+import com.pda.asset_service.jpa.SecurityAccountRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,19 +23,17 @@ import java.util.Optional;
 public class SecurityAccountServiceImpl implements SecurityAccountService{
 
     private final SecurityAccountRepository securityAccountRepository;
-    private final AssetUserRepository assetUserRepository;
     private final MydataInfoRepository mydataInfoRepository;
     private final MydataServiceClient mydataServiceClient;
     @Override
     public SecurityAccount convertToEntity(SecurityAccountResponseDto securityAccountResponseDto) {
-        AssetUser assetUser = assetUserRepository.findById(securityAccountResponseDto.getUserId()).orElseThrow();
         return SecurityAccount.builder()
                 .accountNo(securityAccountResponseDto.getAccountNo())
                 .securityName(securityAccountResponseDto.getSecurityName())
                 .accountType(securityAccountResponseDto.getAccountType())
                 .balance(securityAccountResponseDto.getBalance())
                 .createdAt(securityAccountResponseDto.getCreatedAt())
-                .assetUser(assetUser)
+                .userId(securityAccountResponseDto.getUserId())
                 .build();
     }
 
@@ -43,7 +45,7 @@ public class SecurityAccountServiceImpl implements SecurityAccountService{
                 .accountType(securityAccount.getAccountType())
                 .balance(securityAccount.getBalance())
                 .createdAt(securityAccount.getCreatedAt())
-                .userId(securityAccount.getAssetUser().getId())
+                .userId(securityAccount.getUserId())
                 .build();
     }
 
@@ -66,14 +68,14 @@ public class SecurityAccountServiceImpl implements SecurityAccountService{
 
                         mydataInfoRepository.save(MydataInfo.builder()
                                 .assetType("security_accounts")
-                                .userId(securityAccount.getAssetUser().getId())
+                                .userId(userId)
                                 .companyName(securityAccount.getSecurityName())
                                 .accountType(securityAccount.getAccountType())
                                 .accountNo(securityAccount.getAccountNo())
                                 .build());
 
                         MydataInfo savedInfo = mydataInfoRepository.findSecurityByUserIdAndAssetTypeAndCompanyNameAndAccountNo(
-                                securityAccount.getAssetUser().getId(),
+                                securityAccount.getUserId(),
                                 "security_accounts",
                                 securityAccount.getSecurityName(),
                                 securityAccount.getAccountNo()
@@ -99,7 +101,7 @@ public class SecurityAccountServiceImpl implements SecurityAccountService{
     @Override
     public List<SecurityAccountDto> getSecurityAccounts(int userId) {
 
-        List<SecurityAccount> securityAccounts = securityAccountRepository.findByAssetUserId(userId).orElse(null);
+        List<SecurityAccount> securityAccounts = securityAccountRepository.findByUserId(userId).orElse(null);
 
         List<SecurityAccountDto> securityAccountDtos = new ArrayList<>();
         if (securityAccounts != null) {
@@ -115,7 +117,7 @@ public class SecurityAccountServiceImpl implements SecurityAccountService{
     @Override
     public Integer getSecurityAccountsBalance(int userId) {
         Integer securityAccountsTotalBalance = 0;
-        List<SecurityAccount> securityAccounts = securityAccountRepository.findByAssetUserId(userId).orElse(null);
+        List<SecurityAccount> securityAccounts = securityAccountRepository.findByUserId(userId).orElse(null);
 
         if(securityAccounts != null){
             for (SecurityAccount securityAccount : securityAccounts){
@@ -123,6 +125,23 @@ public class SecurityAccountServiceImpl implements SecurityAccountService{
             }
         }
         return securityAccountsTotalBalance;
+    }
+
+    @Override
+    public SecurityAccountDto getSecurityAccountShinhanDC(int userId) {
+        SecurityAccount securityAccount = securityAccountRepository.findByUserIdAndSecurityNameAndAccountType(userId, "신한투자증권", "DC").orElse(null);
+        if(securityAccount != null){
+            return SecurityAccountDto.builder()
+                    .accountNo(securityAccount.getAccountNo())
+                    .accountType(securityAccount.getAccountType())
+                    .balance(securityAccount.getBalance())
+                    .securityName(securityAccount.getSecurityName())
+                    .userId(userId)
+                    .createdAt(securityAccount.getCreatedAt())
+                    .build();
+        }else{
+            return null;
+        }
     }
 
 
