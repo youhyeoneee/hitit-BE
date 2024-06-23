@@ -30,6 +30,7 @@ public class RetirementTestResult {
     private List<String> type;
     @Convert(converter = StringListConverter.class)
     private List<String> monthlyLivingExpenses;
+    private String totalFinancialAssets;
     private String expectedNationalPension;
     private String totalRealEstateValue;
     private String careerEffortScore;
@@ -57,6 +58,7 @@ public class RetirementTestResult {
         this.assetLife = testResponseDto.getAssetLife();
         this.lifeExpectancy = testResponseDto.getLifeExpectancy();
         this.optimalMonthlyLivingExpenses = testResponseDto.getOptimalMonthlyLivingExpenses();
+        this.totalFinancialAssets = testResponseDto.getTotalFinancialAssets();
     }
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
