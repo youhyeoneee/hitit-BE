@@ -41,7 +41,7 @@ public class WebSecurityConfig {
                 )
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/api/assets/**", "/api/mydata/**", "/api/portfolios/**", "/error", "/api/users/signup", "/api/users/login", "/api/users/login/kakao",
-                                "/api/investment_tests/questions/**")
+                                "/api/investment_tests/questions/**", "/send/**")
                         .permitAll()
                         .anyRequest().authenticated()
                 )
