@@ -27,7 +27,7 @@ public class RetirementTestResponseDto {
 
     public RetirementTestResponseDto(RetirementType retirementType, int monthlyLivingExpenses,  int totalFinancialAssets,
                                     int expectedNationalPension, int totalRealEstateValue, int careerEffortScore) {
-        this.type = new ArrayList<>(Arrays.asList(retirementType.getName(), retirementType.getDescription()));
+        this.type = new ArrayList<>(Arrays.asList(String.valueOf(retirementType.getLevel()), retirementType.getName(), retirementType.getDescription()));
         this.monthlyLivingExpenses = getMonthlyLivingExpensesResult(monthlyLivingExpenses);
         this.totalFinancialAssets = getTotalFinancialAssetsResult(totalFinancialAssets);
         this.expectedNationalPension = getExpectedNationalPensionResult(expectedNationalPension);
