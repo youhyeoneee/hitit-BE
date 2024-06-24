@@ -1,14 +1,18 @@
 package com.pda.notification.controller;
 
 
-import com.pda.utils.rabbitmq.dto.NotificationDto;
+import com.pda.notification.jpa.Notification;
+import com.pda.utils.api_utils.ApiUtils;
 import com.pda.notification.service.NotificationService;
 import com.pda.utils.security.JwtTokenProvider;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.util.List;
+
+import static com.pda.utils.api_utils.ApiUtils.success;
 
 @RestController
 @AllArgsConstructor
@@ -24,5 +28,12 @@ public class NotificationController {
 //        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("subscribe user : " + userId);
         return notificationService.createEmitter(userId);
+    }
+
+    @GetMapping()
+    public ApiUtils.ApiResult getNotifications(@RequestHeader("Authorization") String bearerToken) {
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
+        List<Notification> notifications = notificationService.findAllNotificationByUserId(userId);
+        return success(notifications);
     }
 }

@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -66,5 +67,9 @@ public class NotificationService {
         } else {
             log.info("emitter " + notification.getUserId()  + " is null");
         }
+    }
+
+    public List<Notification> findAllNotificationByUserId(int userId) {
+        return notificationRepository.findAllByUserId(userId);
     }
 }
