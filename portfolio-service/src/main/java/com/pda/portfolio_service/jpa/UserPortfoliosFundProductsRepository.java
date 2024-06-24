@@ -7,4 +7,6 @@ public interface UserPortfoliosFundProductsRepository extends JpaRepository<User
     List<UserPortfoliosFundProducts> findByIdPortfolioId(Integer portfolioId);
 
     UserPortfoliosFundProducts findByIdPortfolioIdAndIdFundCode(Integer portfolioId, String fundCode);
+
+    void deleteByIdPortfolioId(Integer id);
 }
