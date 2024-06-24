@@ -1,5 +1,6 @@
 package com.pda.asset_service.jpa;
 
+
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;

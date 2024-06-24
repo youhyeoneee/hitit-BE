@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +29,7 @@ import static com.pda.utils.api_utils.ApiUtils.success;
 @Slf4j
 @AllArgsConstructor
 @RequestMapping("/api/portfolios")
+@PropertySource(value = {"env.properties"})
 public class PortfolioController {
     @Autowired
     private PortfolioService portfolioService;
