@@ -6,6 +6,7 @@ import com.pda.mydata_service.service.MydataServiceImpl;
 import com.pda.utils.api_utils.ApiUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,7 @@ import java.util.Optional;
 @Slf4j
 @RequestMapping("/api/mydata")
 @AllArgsConstructor
+@PropertySource(value = {"env.properties"})
 public class MydataController {
 
     private final MydataServiceImpl mydataService;
