@@ -1,6 +1,5 @@
-package com.pda.user_service.security;
+package com.pda.auth.security;
 
-import com.pda.utils.security.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;

@@ -5,7 +5,7 @@ import com.pda.retirements.dto.RetirementTestResponseDto;
 import com.pda.retirements.jpa.RetirementTestResult;
 import com.pda.retirements.jpa.RetirementType;
 import com.pda.retirements.service.RetirementService;
-import com.pda.utils.security.JwtTokenProvider;
+import com.pda.auth.security.JwtTokenProvider;
 import com.pda.user_service.jpa.User;
 import com.pda.user_service.service.UserService;
 import com.pda.utils.api_utils.ApiUtils;

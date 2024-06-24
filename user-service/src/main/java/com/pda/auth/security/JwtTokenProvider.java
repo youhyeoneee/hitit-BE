@@ -1,4 +1,4 @@
-package com.pda.utils.security;
+package com.pda.auth.security;
 
 import com.pda.utils.api_utils.CustomStringUtils;
 import io.jsonwebtoken.Claims;
@@ -83,7 +83,7 @@ public class JwtTokenProvider {
 
 
     // 토큰에서 username 가져오기
-    public String getUsername(String token) {
+    public String getUsername(String token) throws IllegalArgumentException {
         return Jwts.parserBuilder().setSigningKey(key).build()
                 .parseClaimsJws(token).getBody().getSubject();
     }
