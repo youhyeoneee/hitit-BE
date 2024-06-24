@@ -109,5 +109,12 @@ public class AssetController {
         return success(unclaimedRetirementAccounts);
     }
 
+    // portfolio openFeign mapping
+    // 보유 주식
+//    @GetMapping("/security-stocks")
+//    public
+    // 총자산
+    // 거래내역
+
 
 }

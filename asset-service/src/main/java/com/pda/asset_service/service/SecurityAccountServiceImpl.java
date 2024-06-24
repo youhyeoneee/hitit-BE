@@ -127,6 +127,7 @@ public class SecurityAccountServiceImpl implements SecurityAccountService{
 
     public void linkSecurityStocks(String accountNo){
         Optional<List<SecurityStockResponseDto>> linkedSecurityStocks  = mydataServiceClient.getSecurityStocks(accountNo);
+        log.info("linkSecurityStocks = {}", String.valueOf(linkedSecurityStocks));
         if(linkedSecurityStocks.isPresent()){
             for(SecurityStockResponseDto securityStock : linkedSecurityStocks.get()){
                 SecurityAccount securityAccount = securityAccountRepository.findByAccountNo(accountNo);

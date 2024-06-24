@@ -150,10 +150,8 @@ public class MydataServiceImpl implements MydataService{
 
     @Override
     public Optional<List<SecurityTransactionDto>> getSecurityTransactions(String accountNo) {
-        log.info("getSSSSSSSSSSSSSSSSSSSSSSSSS");
         Optional<List<SecurityTransaction>> securityTransactions = securityTransactionRepository.findBySecurityAccount_AccountNo(accountNo);
         if (securityTransactions.isPresent()) {
-            log.info("========얘네찾음 = {}", securityTransactions.get());
             List<SecurityTransactionDto> securityTransactionDtos = securityTransactions.get().stream()
                     .map(this::convertToDto)
                     .toList();
@@ -165,8 +163,21 @@ public class MydataServiceImpl implements MydataService{
 
     @Override
     public Optional<List<SecurityStockDto>> getSecurityStocks(String accountNo) {
-        return Optional.empty();
+        Optional<List<SecurityStock>> securityStocks = securityStockRepository.findByAccountNo(accountNo);
+        if (securityStocks.isPresent()) {
+            List<SecurityStockDto> securityStockDtos = securityStocks.get().stream()
+                    .map(this::convertToDto)
+                    .toList();
+            return Optional.of(securityStockDtos);
+        } else {
+            return Optional.empty();
+        }
     }
+
+
+
+
+
 
     private LoanDto convertToDto(Loan loan) {
         return LoanDto.builder()
@@ -220,8 +231,8 @@ public class MydataServiceImpl implements MydataService{
 
     private SecurityStockDto convertToDto(SecurityStock securityStock) {
         return SecurityStockDto.builder()
-                .accountNo(securityStock.getId().getSecurityAccount().getAccountNo())
-                .stockCode(securityStock.getId().getStockCode())
+                .accountNo(securityStock.getAccountNo())
+                .stockCode(securityStock.getStockCode())
                 .build();
     }
 
