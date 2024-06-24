@@ -2,14 +2,11 @@ package com.pda.portfolio_service.controller;
 
 import com.pda.portfolio_service.dto.*;
 import com.pda.portfolio_service.dto_test.MyDataTestDto;
-import com.pda.portfolio_service.feign.MyDataFlaskLevelTestResponseDto;
 import com.pda.portfolio_service.feign.MyDataFlaskResponseDto;
-import com.pda.portfolio_service.feign.OptimizeResponseDto;
 import com.pda.portfolio_service.service.PortfolioService;
 import com.pda.security.JwtTokenProvider;
 import com.pda.utils.api_utils.ApiUtils;
 import com.pda.utils.api_utils.CustomStringUtils;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,20 +107,30 @@ public class PortfolioController {
 //    user_portfolios 테이블에서 해당 user_id가 존재하는지 확인
 //    유저가 존재한다면, 포트폴리오를 바꾸겠습니까? 응답
 //    유저가 존재하지 않는다면 포트폴리오를 변경
-//    @PostMapping("/select/{portfolio_id}")
-//    public ApiUtils.ApiResult selectHitItPortfolio(@RequestHeader("Authorization") String bearerToken, @PathVariable("portfolio_id") Integer portfolio_id) {
-//        String token = CustomStringUtils.getToken(bearerToken);
-//        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
-//        log.info("user id : " + userId);
-//
-//        boolean exists = portfolioService.checkUserPortfolioExists(userId);
-//        if (exists) {
-//            return success( "포트폴리오를 바꾸겠습니까?");
-//        } else {
-//            portfolioService.changeUserPortfolio(userId, portfolio_id);
-//            return success("포트폴리오가 변경되었습니다.");
-//        }
-//    }
+    @PostMapping("/select/{portfolio_id}")
+    public ApiUtils.ApiResult selectHitItPortfolio(@RequestHeader("Authorization") String bearerToken, @PathVariable("portfolio_id") Integer portfolio_id) {
+        String token = CustomStringUtils.getToken(bearerToken);
+        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        log.info("user id : " + userId);
+
+        boolean exists = portfolioService.checkUserPortfolioExists(userId);
+        if (exists) {
+            return success( "포트폴리오를 바꾸겠습니까?");
+        } else {
+            portfolioService.selectUserPortfolio(userId, portfolio_id);
+            return success("포트폴리오가 변경되었습니다.");
+        }
+    }
+
+    @PostMapping("/change/{portfolio_id}")
+    public ApiUtils.ApiResult changeHitItPortfolio(@RequestHeader("Authorization") String bearerToken, @PathVariable("portfolio_id") Integer portfolio_id) {
+        String token = CustomStringUtils.getToken(bearerToken);
+        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        log.info("user id : " + userId);
+
+        portfolioService.changeUserPortfolio(userId, portfolio_id);
+        return success("포트폴리오가 변경되었습니다.");
+    }
 
 
     @GetMapping("/mydata")
