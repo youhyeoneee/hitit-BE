@@ -76,7 +76,6 @@ public class RetirementController {
     public ApiUtils.ApiResult getTestResults(@RequestHeader("Authorization") String bearerToken) {
         // 토큰 -> user id
         log.info("bearerToken : " + bearerToken);
-        String token = CustomStringUtils.getToken(bearerToken);
         int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 

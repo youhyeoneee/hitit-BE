@@ -2,14 +2,11 @@ package com.pda.portfolio_service.controller;
 
 import com.pda.portfolio_service.dto.*;
 import com.pda.portfolio_service.dto_test.MyDataTestDto;
-import com.pda.portfolio_service.feign.MyDataFlaskLevelTestResponseDto;
 import com.pda.portfolio_service.feign.MyDataFlaskResponseDto;
-import com.pda.portfolio_service.feign.OptimizeResponseDto;
 import com.pda.portfolio_service.service.PortfolioService;
-import com.pda.security.JwtTokenProvider;
 import com.pda.utils.api_utils.ApiUtils;
 import com.pda.utils.api_utils.CustomStringUtils;
-import jakarta.validation.Valid;
+import com.pda.utils.security.JwtTokenProvider;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,8 +74,7 @@ public class PortfolioController {
     //// 4. 자산 - 내 포트폴리오 조회
     @GetMapping("/user")
     public ApiUtils.ApiResult getUserPortfolioFundAssets(@RequestHeader("Authorization") String bearerToken) {
-        String token = CustomStringUtils.getToken(bearerToken);
-        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
         PortfolioFundAssetResponseDto portfolioFundAssetResponseDto = portfolioService.getUserPortfolioFundAssets(userId);
@@ -88,8 +84,7 @@ public class PortfolioController {
     //// 5. 자산 - 내 포트폴리오 내 펀드 조회
     @GetMapping("/userfunds")
     public ApiUtils.ApiResult getUserPortfolioFundProducts(@RequestHeader("Authorization") String bearerToken) {
-        String token = CustomStringUtils.getToken(bearerToken);
-        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
         List<HititPortfoliosFundsResponseDto> portfolioFundAssetResponseDto = portfolioService.getUserPortfolioFundProducts(userId);
@@ -99,8 +94,7 @@ public class PortfolioController {
     //// 6. 자산 - 내 포트폴리오 내 펀드 내 주식, 채권 조회
     @GetMapping("/userfunds/detail/{fund_id}")
     public ApiUtils.ApiResult getUserPortfolioFundStocksAndBonds(@RequestHeader("Authorization") String bearerToken, @PathVariable("fund_id") Integer fund_id) {
-        String token = CustomStringUtils.getToken(bearerToken);
-        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
         HititPortfoliosFundsStocksAndBondsResponseDto portfolioFundAssetResponseDto = portfolioService.getUserPortfolioFundStocksAndBonds(userId, fund_id);
@@ -130,8 +124,7 @@ public class PortfolioController {
 
     @GetMapping("/mydata")
     public ApiUtils.ApiResult<MyDataFlaskResponseDto> getMyDataPortfolios(@RequestHeader("Authorization") String bearerToken) {
-        String token = CustomStringUtils.getToken(bearerToken);
-        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
         MyDataFlaskResponseDto myDataPortfoliosResponseDto = portfolioService.getMyDataPortfolios(userId);
@@ -147,6 +140,7 @@ public class PortfolioController {
 
     @GetMapping("/rebal/getweight")
     public ApiUtils.ApiResult<OptimizeResponseCamelCaseDto> optimizePortfolio() {
+
         return success(portfolioService.optimizePortfolio());
     }
 

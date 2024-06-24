@@ -54,7 +54,6 @@ public class AccountController {
     // DC 퇴직연금 신한투자증권 계좌가 있는지 조회
     @GetMapping("/account/shinhan")
     public ApiUtils.ApiResult<SecurityAccountDto> checkAccountShinhan(@RequestHeader("Authorization") String bearerToken){
-        String token = CustomStringUtils.getToken(bearerToken);
         int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
@@ -65,7 +64,6 @@ public class AccountController {
 //     계좌 개설
     @PostMapping("/account")
     public ApiUtils.ApiResult<AccountDto> createAccount(@RequestHeader("Authorization") String bearerToken, @RequestBody AccountCreateDto accountCreateDto){
-        String token = CustomStringUtils.getToken(bearerToken);
         int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
@@ -76,7 +74,6 @@ public class AccountController {
 //     내 계좌 조회
     @GetMapping("/account")
     public ApiUtils.ApiResult<AccountDto> getAccount(@RequestHeader("Authorization") String bearerToken){
-        String token = CustomStringUtils.getToken(bearerToken);
         int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
