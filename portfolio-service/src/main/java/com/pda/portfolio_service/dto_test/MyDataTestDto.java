@@ -14,7 +14,6 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class MyDataTestDto {
 
     private String name;
@@ -30,7 +29,6 @@ public class MyDataTestDto {
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor
-    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class FundDto {
 
         private String fundCode;
