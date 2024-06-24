@@ -29,6 +29,7 @@ public class MyDataTestDto {
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor
+
     public static class FundDto {
 
         private String fundCode;
