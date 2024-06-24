@@ -112,6 +112,7 @@ public class SecurityAccountServiceImpl implements SecurityAccountService{
                         .txDatetime(securityTransaction.getTxDatetime())
                                 .txType(securityTransaction.getTxType())
                                 .txAmount(securityTransaction.getTxAmount())
+                                .txQty(securityTransaction.getTxQty())
                                 .balAfterTx(securityTransaction.getBalAfterTx())
                                 .securityAccount(securityAccount)
                                 .stockCode(securityTransaction.getStockCode())
