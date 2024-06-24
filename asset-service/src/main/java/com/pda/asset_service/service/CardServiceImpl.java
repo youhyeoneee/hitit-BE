@@ -89,7 +89,7 @@ public class CardServiceImpl implements CardService{
                         );
                         MydataInfoDto mydataInfoDto = MydataInfoDto.builder()
                                 .assetType(savedInfo.getAssetType())
-                                .userId(savedInfo.getUserId())
+                                .userId(userId)
                                 .companyName(savedInfo.getCompanyName())
                                 .accountType(savedInfo.getAccountType())
                                 .accountNo(card.getCardNo())

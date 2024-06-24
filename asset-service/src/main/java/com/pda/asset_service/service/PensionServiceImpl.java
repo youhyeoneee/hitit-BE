@@ -118,7 +118,7 @@ public class PensionServiceImpl implements PensionService{
 
     @Override
     public List<PensionDto> getUnclaimedRetirementAccounts(int userId) {
-        List<PensionResponseDto> unclaimedRetirementAccounts = mydataServiceClient.findByUserIdAndRetirementPensionClaimed(userId).orElse(null);
+        List<PensionResponseDto> unclaimedRetirementAccounts = mydataServiceClient.getUnclaimedRetirementAccounts(userId).orElse(null);
 
         List<PensionDto> unclaimedRetirementAccountDtos = new ArrayList<>();
         if (unclaimedRetirementAccounts != null) {
@@ -131,6 +131,7 @@ public class PensionServiceImpl implements PensionService{
                         .interestRate(unclaimedRetirementAccount.getInterestRate())
                         .evaluationAmount(unclaimedRetirementAccount.getEvaluationAmount())
                         .expirationDate(unclaimedRetirementAccount.getExpirationDate())
+                        .userId(userId)
                         .retirementPensionClaimed(unclaimedRetirementAccount.getRetirementPensionClaimed())
                         .build();
                 log.info("find pension account = {}", pensionDto);

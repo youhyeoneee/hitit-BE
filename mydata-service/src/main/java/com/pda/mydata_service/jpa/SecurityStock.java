@@ -1,6 +1,8 @@
-package com.pda.asset_service.jpa;
+package com.pda.mydata_service.jpa;
 
-import jakarta.persistence.*;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

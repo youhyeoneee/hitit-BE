@@ -12,4 +12,6 @@ public interface PensionRepository extends JpaRepository<Pension, String> {
     Optional<List<Pension>> findByMydataUser_Id(int userId);
 
     Optional<List<Pension>> findByMydataUser_IdAndCompanyName(int userId, String companyName);
+
+    Optional<List<Pension>> findByMydataUser_IdAndRetirementPensionClaimed(int userId, int isRetirementPensionClaimed);
 }

@@ -63,4 +63,25 @@ public class MydataController {
         Optional<List<SecurityAccountDto>> securityAccounts = mydataService.getSecurityAccountsByUserIdAndSecurityName(userId, securityName);
         return securityAccounts;
     }
+
+    @GetMapping("/pension/unclaimed-retirement-accounts/{userId}")
+    public Optional<List<PensionDto>> getUnclaimedRetirementAccounts(@PathVariable("userId") int userId){
+        Optional<List<PensionDto>> unclaimedRetirementAccounts = mydataService.getUnclaimedRetirementAccounts(userId);
+        return unclaimedRetirementAccounts;
+    }
+
+    // 증권 거래 내역
+    @GetMapping("/security-transactions/{accountNo}")
+    public Optional<List<SecurityTransactionDto>> getSecurityTransactions(@PathVariable("accountNo") String accountNo){
+        log.info("ACCOUNTNO + {}", accountNo);
+        Optional<List<SecurityTransactionDto>> securityTransactions = mydataService.getSecurityTransactions(accountNo);
+        return securityTransactions;
+    }
+
+    // 보유 주식
+    @GetMapping("/security-stocks/{accountNo}")
+    public Optional<List<SecurityStockDto>> getSecurityStocks(@PathVariable("accountNo") String accountNo){
+        Optional<List<SecurityStockDto>> securityStocks = mydataService.getSecurityStocks(accountNo);
+        return securityStocks;
+    }
 }

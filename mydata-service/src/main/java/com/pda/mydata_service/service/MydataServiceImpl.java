@@ -23,6 +23,8 @@ public class MydataServiceImpl implements MydataService{
     private final SecurityAccountRepository securityAccountRepository;
     private final LoanRepository loanRepository;
     private final PensionRepository pensionRepository;
+    private final SecurityTransactionRepository securityTransactionRepository;
+    private final SecurityStockRepository securityStockRepository;
 
     @Override
     public BankAccount convertToEntity(BankAccountDto bankAccountDto) {
@@ -122,7 +124,6 @@ public class MydataServiceImpl implements MydataService{
 
     @Override
     public Optional<List<SecurityAccountDto>> getSecurityAccountsByUserIdAndSecurityName(int userId, String securityName) {
-        log.info("///////////////////////////////////////////////////");
         Optional<List<SecurityAccount>> securityAccounts = securityAccountRepository.findByMydataUser_IdAndSecurityName(userId, securityName);
         if (securityAccounts.isPresent()) {
             List<SecurityAccountDto> securityAccountDtos = securityAccounts.get().stream()
@@ -132,6 +133,39 @@ public class MydataServiceImpl implements MydataService{
         } else {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Optional<List<PensionDto>> getUnclaimedRetirementAccounts(int userId) {
+        Optional<List<Pension>> unclaimedRetirementAccounts = pensionRepository.findByMydataUser_IdAndRetirementPensionClaimed(userId, 0);
+        if (unclaimedRetirementAccounts.isPresent()) {
+            List<PensionDto> unclaimedRetirementAccountDtos = unclaimedRetirementAccounts.get().stream()
+                    .map(this::convertToDto)
+                    .toList();
+            return Optional.of(unclaimedRetirementAccountDtos);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<List<SecurityTransactionDto>> getSecurityTransactions(String accountNo) {
+        log.info("getSSSSSSSSSSSSSSSSSSSSSSSSS");
+        Optional<List<SecurityTransaction>> securityTransactions = securityTransactionRepository.findBySecurityAccount_AccountNo(accountNo);
+        if (securityTransactions.isPresent()) {
+            log.info("========얘네찾음 = {}", securityTransactions.get());
+            List<SecurityTransactionDto> securityTransactionDtos = securityTransactions.get().stream()
+                    .map(this::convertToDto)
+                    .toList();
+            return Optional.of(securityTransactionDtos);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<List<SecurityStockDto>> getSecurityStocks(String accountNo) {
+        return Optional.empty();
     }
 
     private LoanDto convertToDto(Loan loan) {
@@ -183,6 +217,28 @@ public class MydataServiceImpl implements MydataService{
                 .userId(securityAccount.getMydataUser().getId())
                 .build();
     }
+
+    private SecurityStockDto convertToDto(SecurityStock securityStock) {
+        return SecurityStockDto.builder()
+                .accountNo(securityStock.getId().getSecurityAccount().getAccountNo())
+                .stockCode(securityStock.getId().getStockCode())
+                .build();
+    }
+
+    private SecurityTransactionDto convertToDto(SecurityTransaction securityTransaction) {
+        return SecurityTransactionDto.builder()
+                .id(securityTransaction.getId())
+                .txDatetime(securityTransaction.getTxDatetime())
+                .txType(securityTransaction.getTxType())
+                .txAmount(securityTransaction.getTxAmount())
+                .balAfterTx(securityTransaction.getBalAfterTx())
+                .txQty(securityTransaction.getTxQty())
+                .accountNo(securityTransaction.getSecurityAccount().getAccountNo())
+                .stockCode(securityTransaction.getStockCode())
+                .build();
+    }
+
+
 
 
 }

@@ -1,8 +1,7 @@
-package com.pda.asset_service.jpa;
+package com.pda.mydata_service.jpa;
 
 
 import jakarta.persistence.*;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

@@ -40,7 +40,7 @@ public class Pension {
     private Date expirationDate;
 
     @Column(name = "retirement_pension_claimed")
-    private Boolean retirementPensionClaimed;
+    private Integer retirementPensionClaimed;
 
     @Id
     @Column(name = "account_no")

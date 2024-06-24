@@ -1,9 +1,7 @@
 package com.pda.asset_service.service;
 
 
-import com.pda.asset_service.dto.MydataInfoDto;
-import com.pda.asset_service.dto.SecurityAccountDto;
-import com.pda.asset_service.dto.SecurityAccountResponseDto;
+import com.pda.asset_service.dto.*;
 import com.pda.asset_service.feign.MydataServiceClient;
 import com.pda.asset_service.jpa.*;
 import lombok.AllArgsConstructor;
@@ -89,6 +87,7 @@ public class SecurityAccountServiceImpl implements SecurityAccountService{
 
                         securityAccountsLinkInfo.add(mydataInfoDto);
 
+                        // 거래내역, 보유주식 데이터 가져오기
                         linkSecurityTransactions(securityAccount.getAccountNo());
                         linkSecurityStocks(securityAccount.getAccountNo());
                     }
@@ -101,29 +100,48 @@ public class SecurityAccountServiceImpl implements SecurityAccountService{
     }
 
 
-    public List<SecurityTransaction> linkSecurityTransactions(String accountNo){
-        Optional<List<SecurityTransaction>> linkedSecurityTransactions = mydataServiceClient.getSecurityTransactions(accountNo);
+    public void linkSecurityTransactions(String accountNo){
+        log.info("GGGGGGGGGGGGGGOOOOOOOOOOOOOOOOOOOOOOO = {}", accountNo);
+        Optional<List<SecurityTransactionResponseDto>> linkedSecurityTransactions = mydataServiceClient.getSecurityTransactions(accountNo);
         if(linkedSecurityTransactions.isPresent()){
-            for(SecurityTransaction securityTransaction : linkedSecurityTransactions.get()){
-                securityTransactionRepository.save(securityTransaction);
+            for(SecurityTransactionResponseDto securityTransaction : linkedSecurityTransactions.get()){
+                SecurityAccount securityAccount = securityAccountRepository.findByAccountNo(accountNo);
+                securityTransactionRepository.save(SecurityTransaction.builder()
+                        .id(securityTransaction.getId())
+
+                        .txDatetime(securityTransaction.getTxDatetime())
+                                .txType(securityTransaction.getTxType())
+                                .txAmount(securityTransaction.getTxAmount())
+                                .balAfterTx(securityTransaction.getBalAfterTx())
+                                .securityAccount(securityAccount)
+                                .stockCode(securityTransaction.getStockCode())
+                        .build());
             }
         }else {
             log.info("해당 계좌 거래 내역 없음");
         }
-        return linkedSecurityTransactions.orElse(null);
+//        return linkedSecurityTransactions.orElse(null);
     }
 
 
-    public List<SecurityStock> linkSecurityStocks(String accountNo){
-        Optional<List<SecurityStock>> linkedSecurityStocks  = mydataServiceClient.getSecurityStocks(accountNo);
+    public void linkSecurityStocks(String accountNo){
+        Optional<List<SecurityStockResponseDto>> linkedSecurityStocks  = mydataServiceClient.getSecurityStocks(accountNo);
         if(linkedSecurityStocks.isPresent()){
-            for(SecurityStock securityStock : linkedSecurityStocks.get()){
-                securityStockRepository.save(securityStock);
+            for(SecurityStockResponseDto securityStock : linkedSecurityStocks.get()){
+                SecurityAccount securityAccount = securityAccountRepository.findByAccountNo(accountNo);
+
+                SecurityStock newSecurityStock = SecurityStock.builder()
+                                .id(SecurityStockId.builder()
+                                .securityAccount(securityAccount)
+                                .stockCode(securityStock.getStockCode())
+                                .build())
+                                .build();
+                securityStockRepository.save(newSecurityStock);
             }
         }else {
             log.info("해당 계좌 보유 주식 없음");
         }
-        return linkedSecurityStocks.orElse(null);
+//        return linkedSecurityStocks.orElse(null);
     }
 
     @Override

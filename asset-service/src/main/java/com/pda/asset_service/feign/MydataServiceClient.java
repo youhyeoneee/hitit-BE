@@ -33,16 +33,14 @@ public interface MydataServiceClient {
 
     // 미청구 퇴직 연금
     @GetMapping("/api/mydata/pension/unclaimed-retirement-accounts/{userId}")
-    Optional<List<PensionResponseDto>> findByUserIdAndRetirementPensionClaimed(int userId);
-
-    @GetMapping("/api/mydata/security-transactions/{accountNo}")
-    Optional<List<SecurityTransaction>> getSecurityTransactions(String accountNo);
-
-    @GetMapping("/api/mydata/security-stocks/{accountNo}")
-    Optional<List<SecurityStock>> getSecurityStocks(String accountNo);
-
-    // 보유 주식
-
+    Optional<List<PensionResponseDto>> getUnclaimedRetirementAccounts(@PathVariable("userId") int userId);
 
     // 증권 거래 내역
+    @GetMapping("/api/mydata/security-transactions/{accountNo}")
+    Optional<List<SecurityTransactionResponseDto>> getSecurityTransactions(@PathVariable("accountNo") String accountNo);
+
+    // 보유 주식
+    @GetMapping("/api/mydata/security-stocks/{accountNo}")
+    Optional<List<SecurityStockResponseDto>> getSecurityStocks(@PathVariable("accountNo") String accountNo);
+
 }
