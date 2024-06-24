@@ -1,4 +1,4 @@
-package com.pda.auth.security;
+package com.pda.utils.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -27,7 +27,6 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
         if(token != null) {
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
-            log.info(authentication.toString());
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 

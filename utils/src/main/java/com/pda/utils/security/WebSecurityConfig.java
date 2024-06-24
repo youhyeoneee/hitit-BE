@@ -1,4 +1,4 @@
-package com.pda.auth.security;
+package com.pda.utils.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,6 +8,7 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -40,8 +41,9 @@ public class WebSecurityConfig {
                 .csrf((csrfConfig) -> csrfConfig.disable() // .csrf().disable()
                 )
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/api/assets/**", "/api/mydata/**", "/api/portfolios/**", "/error", 
-                        "/api/users/signup", "/api/users/login", "/api/users/login/kakao",
+                        // TODO: mydata, portfolio 링크 정리
+                        .requestMatchers("/error", "/api/mydata/**", "/api/portfolio/**",
+                        "/api/users/signup", "/api/users/login", "/api/users/login/kakao", "api/users/validate/**",
                                 "/api/investment_tests/questions/**", "/send/**")
                         .permitAll()
                         .anyRequest().authenticated()
