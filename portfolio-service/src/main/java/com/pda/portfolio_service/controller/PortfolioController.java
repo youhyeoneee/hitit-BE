@@ -71,11 +71,6 @@ public class PortfolioController {
         return success(hititPortfoliosFundsStocksAndBondsResponseDto);
     }
 
-//    @PostMapping("/user")
-//    public ApiUtils.ApiResult getUserPortfolioFundAssets(@RequestBody UserPortfolioFundRequestDto userPortfolioFundRequestDto) {
-//        PortfolioFundAssetResponseDto portfolioFundAssetResponseDto = portfolioService.getUserPortfolioFundAssets(userPortfolioFundRequestDto);
-//        return success(portfolioFundAssetResponseDto);
-//    }
 
     //// 4. 자산 - 내 포트폴리오 조회
     @GetMapping("/user")
@@ -110,6 +105,26 @@ public class PortfolioController {
         return success(portfolioFundAssetResponseDto);
     }
 
+    //// 7. 자체서비스 - 포트폴리오 선택하기
+//    사용자가 포트폴리오 선택하기 버튼을 클릭해
+//    user_portfolios 테이블에서 해당 user_id가 존재하는지 확인
+//    유저가 존재한다면, 포트폴리오를 바꾸겠습니까? 응답
+//    유저가 존재하지 않는다면 포트폴리오를 변경
+//    @PostMapping("/select/{portfolio_id}")
+//    public ApiUtils.ApiResult selectHitItPortfolio(@RequestHeader("Authorization") String bearerToken, @PathVariable("portfolio_id") Integer portfolio_id) {
+//        String token = CustomStringUtils.getToken(bearerToken);
+//        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+//        log.info("user id : " + userId);
+//
+//        boolean exists = portfolioService.checkUserPortfolioExists(userId);
+//        if (exists) {
+//            return success( "포트폴리오를 바꾸겠습니까?");
+//        } else {
+//            portfolioService.changeUserPortfolio(userId, portfolio_id);
+//            return success("포트폴리오가 변경되었습니다.");
+//        }
+//    }
+
 
     @GetMapping("/mydata")
     public ApiUtils.ApiResult<MyDataFlaskResponseDto> getMyDataPortfolios(@RequestHeader("Authorization") String bearerToken) {
@@ -117,8 +132,6 @@ public class PortfolioController {
         int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
         log.info("user id : " + userId);
 
-//        List<MyDataPortfoliosResponseDto> myDataPortfoliosResponseDto = portfolioService.getMyDataPortfolios(userId);
-//        return success(myDataPortfoliosResponseDto);
         MyDataFlaskResponseDto myDataPortfoliosResponseDto = portfolioService.getMyDataPortfolios(userId);
         return success(myDataPortfoliosResponseDto);
     }
@@ -136,17 +149,6 @@ public class PortfolioController {
     }
 
 
-//    public ApiUtils.ApiResult getMyDataPortfoliosLevelTest(@RequestBody MyDataFlaskLevelTest myDataFlaskLevelTest) {
-////        1. user_select에 user_id가 있는지 조회
-////                1.1 있으면 "해당 유저가 선택한 포트폴리오가 존재한다." 반환
-////                1.2 없으면 전달받은 포트폴리오 정보를 저장
-////
-//
-////        List<MyDataPortfoliosResponseDto> myDataPortfoliosResponseDto = portfolioService.getMyDataPortfolios(userId);
-////        return success(myDataPortfoliosResponseDto);
-//        MyDataFlaskLevelTestResponseDto myDataFlaskLevelTestResponseDto = portfolioService.getMyDataPortfoliosLevelTest(myDataFlaskLevelTest);
-//        return success(myDataFlaskLevelTestResponseDto);
-//    }
 
     //// Test: Spring - Flask 연동 테스트
     @GetMapping("/analyze-sentiment/{text}")

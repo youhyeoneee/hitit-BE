@@ -33,8 +33,6 @@ public class PortfolioService {
     @Autowired
     private PortfolioFundBondRepository portfolioFundBondRepository;
 
-    @Autowired
-    private UserPortfolioRepository userPortfolioRepository;
 
     @Autowired
     private FundStocksRepository fundStocksRepository;
@@ -308,6 +306,25 @@ public class PortfolioService {
                 fundBondDtos
         );
     }
+
+    //// 7. 비회원 - 포트폴리오 선택하기
+//    사용자가 포트폴리오 선택하기 버튼을 클릭해
+//    user_portfolios 테이블에서 해당 user_id가 존재하는지 확인
+//    유저가 존재한다면, 포트폴리오를 바꾸겠습니까? 응답
+//    유저가 존재하지 않는다면 포트폴리오를 변경
+
+    // 전달 받은 유저가 포트폴리오를 가지고 있는지 조회
+    public boolean checkUserPortfolioExists(Integer userId) {
+        return userPortfoliosRepository.existsByUserId(userId);
+    }
+
+    // 유저에 포트폴리오 삽입
+//    public void changeUserPortfolio(Integer userId, Integer portfolio_id) {
+//        1. portfolio_id로 private_portfolios의 id로 행 조회
+//        2. portfolio_id로 private_portfolios_fund_products의 portfolio_id에 해당 하는 행들 전부 조회
+//        3. 1번에서 조회한 행 user_portfolios에 조회한 행(id 제외) + userId 저장(auto_increment)
+//        4.
+//    }
 
 
     public MyDataFlaskResponseDto getMyDataPortfolios(Integer userId) {
