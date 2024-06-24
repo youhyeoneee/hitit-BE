@@ -40,9 +40,9 @@ public class WebSecurityConfig {
                 .csrf((csrfConfig) -> csrfConfig.disable() // .csrf().disable()
                 )
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/api/assets/**", "/api/portfolios/**", "/error", "/api/users/signup",
-                                "/api/users/login", "/api/users/login/kakao",
-                                "/api/investment_tests/questions/**")
+                        .requestMatchers("/api/assets/**", "/api/mydata/**", "/api/portfolios/**", "/error", 
+                        "/api/users/signup", "/api/users/login", "/api/users/login/kakao",
+                                "/api/investment_tests/questions/**", "/send/**")
                         .permitAll()
                         .anyRequest().authenticated()
                 )

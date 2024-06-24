@@ -1,6 +1,5 @@
 package com.pda.asset_service.jpa;
 
-import com.pda.asset_service.dto.MydataInfoDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

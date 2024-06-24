@@ -1,5 +1,7 @@
 package com.pda.retirements.jpa;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.pda.retirements.dto.RetirementTestResponseDto;
 import com.pda.utils.api_utils.StringListConverter;
 import jakarta.persistence.Convert;
@@ -18,6 +20,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @Entity
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @Table(name = "retirement_test_results")
 public class RetirementTestResult {
     @Id
@@ -27,6 +30,7 @@ public class RetirementTestResult {
     private List<String> type;
     @Convert(converter = StringListConverter.class)
     private List<String> monthlyLivingExpenses;
+    private String totalFinancialAssets;
     private String expectedNationalPension;
     private String totalRealEstateValue;
     private String careerEffortScore;
@@ -54,6 +58,7 @@ public class RetirementTestResult {
         this.assetLife = testResponseDto.getAssetLife();
         this.lifeExpectancy = testResponseDto.getLifeExpectancy();
         this.optimalMonthlyLivingExpenses = testResponseDto.getOptimalMonthlyLivingExpenses();
+        this.totalFinancialAssets = testResponseDto.getTotalFinancialAssets();
     }
 
     public void setUpdatedAt(LocalDateTime updatedAt) {

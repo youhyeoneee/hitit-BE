@@ -1,11 +1,9 @@
 package com.pda.asset_service.service;
 
-import com.pda.asset_service.dto.BankAccountDto;
+
+
 import com.pda.asset_service.dto.MydataInfoDto;
 import com.pda.asset_service.dto.UserAccountInfoDto;
-import com.pda.asset_service.feign.MydataServiceClient;
-import com.pda.asset_service.jpa.BankAccountRepository;
-import com.pda.asset_service.jpa.MydataInfo;
 import com.pda.asset_service.jpa.MydataInfoRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;

@@ -1,15 +1,13 @@
 package com.pda.asset_service.jpa;
 
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
-
 @Repository
-public interface BankAccountRepository extends JpaRepository<BankAccount, String> {
+public interface AccountRepository extends JpaRepository<Account, Integer> {
+    Optional<Account> findByAccountNo(String accountNo);
 
-    Optional<List<BankAccount>> findByUserId(int userId);
+    Optional<Account> findByUserId(int userId);
 }

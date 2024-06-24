@@ -1,11 +1,14 @@
 package com.pda.asset_service.service;
 
+
 import com.pda.asset_service.dto.LoanDto;
 import com.pda.asset_service.dto.LoanResponseDto;
 import com.pda.asset_service.dto.MydataInfoDto;
-import com.pda.asset_service.dto.SecurityAccountDto;
 import com.pda.asset_service.feign.MydataServiceClient;
-import com.pda.asset_service.jpa.*;
+import com.pda.asset_service.jpa.Loan;
+import com.pda.asset_service.jpa.LoanRepository;
+import com.pda.asset_service.jpa.MydataInfo;
+import com.pda.asset_service.jpa.MydataInfoRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

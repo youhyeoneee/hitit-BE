@@ -1,11 +1,14 @@
 package com.pda.asset_service.service;
 
+
 import com.pda.asset_service.dto.CardDto;
 import com.pda.asset_service.dto.CardResponseDto;
 import com.pda.asset_service.dto.MydataInfoDto;
-import com.pda.asset_service.dto.SecurityAccountDto;
 import com.pda.asset_service.feign.MydataServiceClient;
-import com.pda.asset_service.jpa.*;
+import com.pda.asset_service.jpa.Card;
+import com.pda.asset_service.jpa.CardRepository;
+import com.pda.asset_service.jpa.MydataInfo;
+import com.pda.asset_service.jpa.MydataInfoRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

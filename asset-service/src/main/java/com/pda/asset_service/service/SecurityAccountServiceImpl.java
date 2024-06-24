@@ -1,10 +1,14 @@
 package com.pda.asset_service.service;
 
+
 import com.pda.asset_service.dto.MydataInfoDto;
 import com.pda.asset_service.dto.SecurityAccountDto;
 import com.pda.asset_service.dto.SecurityAccountResponseDto;
 import com.pda.asset_service.feign.MydataServiceClient;
-import com.pda.asset_service.jpa.*;
+import com.pda.asset_service.jpa.MydataInfo;
+import com.pda.asset_service.jpa.MydataInfoRepository;
+import com.pda.asset_service.jpa.SecurityAccount;
+import com.pda.asset_service.jpa.SecurityAccountRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -121,6 +125,23 @@ public class SecurityAccountServiceImpl implements SecurityAccountService{
             }
         }
         return securityAccountsTotalBalance;
+    }
+
+    @Override
+    public SecurityAccountDto getSecurityAccountShinhanDC(int userId) {
+        SecurityAccount securityAccount = securityAccountRepository.findByUserIdAndSecurityNameAndAccountType(userId, "신한투자증권", "DC").orElse(null);
+        if(securityAccount != null){
+            return SecurityAccountDto.builder()
+                    .accountNo(securityAccount.getAccountNo())
+                    .accountType(securityAccount.getAccountType())
+                    .balance(securityAccount.getBalance())
+                    .securityName(securityAccount.getSecurityName())
+                    .userId(userId)
+                    .createdAt(securityAccount.getCreatedAt())
+                    .build();
+        }else{
+            return null;
+        }
     }
 
 
