@@ -1,6 +1,8 @@
 package com.pda.asset_service.feign;
 
 import com.pda.asset_service.dto.*;
+import com.pda.asset_service.jpa.SecurityStock;
+import com.pda.asset_service.jpa.SecurityTransaction;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,7 +31,18 @@ public interface MydataServiceClient {
     Optional<List<SecurityAccountResponseDto>> getSecurityAccountsByUserIdAndSecurityName(@PathVariable("userId") int userId, @PathVariable("securityName") String securityName);
 
 
-    //
+    // 미청구 퇴직 연금
     @GetMapping("/api/mydata/pension/unclaimed-retirement-accounts/{userId}")
     Optional<List<PensionResponseDto>> findByUserIdAndRetirementPensionClaimed(int userId);
+
+    @GetMapping("/api/mydata/security-transactions/{accountNo}")
+    Optional<List<SecurityTransaction>> getSecurityTransactions(String accountNo);
+
+    @GetMapping("/api/mydata/security-stocks/{accountNo}")
+    Optional<List<SecurityStock>> getSecurityStocks(String accountNo);
+
+    // 보유 주식
+
+
+    // 증권 거래 내역
 }

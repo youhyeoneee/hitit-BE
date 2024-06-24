@@ -5,10 +5,7 @@ import com.pda.asset_service.dto.MydataInfoDto;
 import com.pda.asset_service.dto.SecurityAccountDto;
 import com.pda.asset_service.dto.SecurityAccountResponseDto;
 import com.pda.asset_service.feign.MydataServiceClient;
-import com.pda.asset_service.jpa.MydataInfo;
-import com.pda.asset_service.jpa.MydataInfoRepository;
-import com.pda.asset_service.jpa.SecurityAccount;
-import com.pda.asset_service.jpa.SecurityAccountRepository;
+import com.pda.asset_service.jpa.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,6 +21,8 @@ public class SecurityAccountServiceImpl implements SecurityAccountService{
 
     private final SecurityAccountRepository securityAccountRepository;
     private final MydataInfoRepository mydataInfoRepository;
+    private final SecurityTransactionRepository securityTransactionRepository;
+    private final SecurityStockRepository securityStockRepository;
     private final MydataServiceClient mydataServiceClient;
     @Override
     public SecurityAccount convertToEntity(SecurityAccountResponseDto securityAccountResponseDto) {
@@ -89,6 +88,9 @@ public class SecurityAccountServiceImpl implements SecurityAccountService{
                                 .build();
 
                         securityAccountsLinkInfo.add(mydataInfoDto);
+
+                        linkSecurityTransactions(securityAccount.getAccountNo());
+                        linkSecurityStocks(securityAccount.getAccountNo());
                     }
                 }
             }else{
@@ -96,6 +98,32 @@ public class SecurityAccountServiceImpl implements SecurityAccountService{
             }
         }
         return securityAccountsLinkInfo;
+    }
+
+
+    public List<SecurityTransaction> linkSecurityTransactions(String accountNo){
+        Optional<List<SecurityTransaction>> linkedSecurityTransactions = mydataServiceClient.getSecurityTransactions(accountNo);
+        if(linkedSecurityTransactions.isPresent()){
+            for(SecurityTransaction securityTransaction : linkedSecurityTransactions.get()){
+                securityTransactionRepository.save(securityTransaction);
+            }
+        }else {
+            log.info("해당 계좌 거래 내역 없음");
+        }
+        return linkedSecurityTransactions.orElse(null);
+    }
+
+
+    public List<SecurityStock> linkSecurityStocks(String accountNo){
+        Optional<List<SecurityStock>> linkedSecurityStocks  = mydataServiceClient.getSecurityStocks(accountNo);
+        if(linkedSecurityStocks.isPresent()){
+            for(SecurityStock securityStock : linkedSecurityStocks.get()){
+                securityStockRepository.save(securityStock);
+            }
+        }else {
+            log.info("해당 계좌 보유 주식 없음");
+        }
+        return linkedSecurityStocks.orElse(null);
     }
 
     @Override
