@@ -2,14 +2,12 @@ package com.pda.asset_service.controller;
 
 import com.pda.asset_service.dto.*;
 import com.pda.asset_service.service.*;
-//import com.pda.user_service.security.JwtTokenProvider;
 import com.pda.utils.api_utils.ApiUtils;
-import com.pda.utils.api_utils.CustomStringUtils;
-import com.pda.utils.auth.AuthClient;
-import com.pda.utils.auth.dto.AuthUserDto;
+import com.pda.utils.security.JwtTokenProvider;
+import com.pda.utils.security.openfeign.AuthClient;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-//import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +16,7 @@ import java.util.List;
 @Slf4j
 @RequestMapping("/api/assets")
 @AllArgsConstructor
+@PropertySource(value = {"env.properties"})
 public class AssetController {
 
     private final AssetServiceImpl assetService;
@@ -27,13 +26,13 @@ public class AssetController {
     private final PensionServiceImpl pensionService;
     private final LoanServiceImpl loanService;
     private final AuthClient authClient;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/mydata-link")
     public ApiUtils.ApiResult<List<MydataInfoDto>> linkMydata(@RequestHeader("Authorization") String bearerToken,
                                                               @RequestBody UserAccountInfoDto userAccountInfoDto) {
 
-        AuthUserDto authUserDto = authClient.validateToken(bearerToken);
-        int userId = authUserDto.getId();
+        int userId =  jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
         List<MydataInfoDto> bankAccountsLinkInfo = assetService.linkMydata(userId, userAccountInfoDto);
@@ -42,8 +41,7 @@ public class AssetController {
 
     @GetMapping("/bank-accounts")
     public ApiUtils.ApiResult<List<BankAccountDto>> getBankAccounts(@RequestHeader("Authorization") String bearerToken) {
-        AuthUserDto authUserDto = authClient.validateToken(bearerToken);
-        int userId = authUserDto.getId();
+        int userId =  jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
         List<BankAccountDto> bankAccounts = bankAccountService.getBankAccounts(userId);
         return ApiUtils.success(bankAccounts);

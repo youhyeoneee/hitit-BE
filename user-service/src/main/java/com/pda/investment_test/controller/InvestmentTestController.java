@@ -5,10 +5,9 @@ import com.pda.investment_test.dto.ResultDto;
 import com.pda.investment_test.jpa.answer.Answer;
 import com.pda.investment_test.jpa.user_answer.UserAnswer;
 import com.pda.investment_test.service.InvestmentTestService;
-import com.pda.auth.security.JwtTokenProvider;
 import com.pda.user_service.service.UserService;
 import com.pda.utils.api_utils.ApiUtils;
-import com.pda.utils.api_utils.CustomStringUtils;
+import com.pda.utils.security.JwtTokenProvider;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -40,8 +39,7 @@ public class InvestmentTestController {
     public ApiUtils.ApiResult<String> saveResults(@RequestBody List<ResultDto> resultDtos, @RequestHeader("Authorization") String bearerToken) {
         // 토큰 -> user id
         log.info("bearerToken : " + bearerToken);
-        String token = CustomStringUtils.getToken(bearerToken);
-        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
         List<String> answers = new ArrayList<>();
         // 점수 계산
@@ -73,8 +71,7 @@ public class InvestmentTestController {
     public ApiUtils.ApiResult<List<String>> getResults(@RequestHeader("Authorization") String bearerToken) {
         // 토큰 -> user id
         log.info("bearerToken : " + bearerToken);
-        String token = CustomStringUtils.getToken(bearerToken);
-        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
 
