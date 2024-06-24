@@ -1,6 +1,6 @@
 package com.pda.utils.rabbitmq.service;
 
-import com.pda.utils.rabbitmq.dto.AlarmDto;
+import com.pda.utils.rabbitmq.dto.NotificationDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -20,8 +20,7 @@ public class MessageService {
     @Value("${spring.rabbitmq.routing.userRoutingKey}")
     private String userRoutingKey;
 
-    public void sendMessageToUserService(AlarmDto alarmDto) {
-        log.info("Sending message to User Service: {}", alarmDto.getUserId());
-        rabbitTemplate.convertAndSend(userExchangeName, userRoutingKey, alarmDto);
+    public void sendNotificationMsgToUserService(NotificationDto notificationDto) {
+        rabbitTemplate.convertAndSend(userExchangeName, userRoutingKey, notificationDto);
     }
 }

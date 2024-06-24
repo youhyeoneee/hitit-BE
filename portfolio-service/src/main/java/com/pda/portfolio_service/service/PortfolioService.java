@@ -4,6 +4,9 @@ import com.pda.portfolio_service.dto.*;
 import com.pda.portfolio_service.dto_test.MyDataTestDto;
 import com.pda.portfolio_service.feign.*;
 import com.pda.portfolio_service.jpa.*;
+import com.pda.utils.rabbitmq.dto.NotificationDto;
+import com.pda.utils.rabbitmq.service.MessageService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class PortfolioService {
     @Autowired
     private PortfolioRepository portfolioRepository;
@@ -57,6 +61,9 @@ public class PortfolioService {
 
     @Autowired
     private OptimizeServiceClient optimizeServiceClient;
+
+    private final MessageService messageService;
+
 
     //// 1. 자체 서비스 - 포트폴리오 조회
     public List<HititPortfoliosResponseDto> getHititPortfolios() {
@@ -457,11 +464,17 @@ public class PortfolioService {
                 fundProductDtoList.add(dto);
             }
 
-            OptimizeDto optimizeDto = new OptimizeDto(allPortfolios.get(0).getUserId(), fundProductDtoList);
+            // TODO: User id가 이건지 확인
+            int userId = allPortfolios.get(0).getUserId();
+            OptimizeDto optimizeDto = new OptimizeDto(userId, fundProductDtoList);
 
             OptimizeResponseDto response = optimizeServiceClient.getOptimizeResult("application/json", optimizeDto);
 
             // 만약에 리밸런싱이 되었을 경우 -> 리밸런싱 리포트를 유저에게 전달하여야 한다.
+            // TODO: 리밸런싱 리포트 DB에 저장
+            int rebalancingId = 1;
+            // 알림 전송
+            NotificationDto notificationDto = new NotificationDto(userId, rebalancingId, false, "포트폴리오를 조정했어요!");
             // 일단 있다고 가정하고 출력.
             // 리밸런싱 리포트
             // 1. 기존 펀드 리스트의 펀드 이름과 펀드 코드, 비중을 출력
@@ -518,5 +531,16 @@ public class PortfolioService {
         requestBody.put("text", text);
 
         return flaskTestServiceClient.getSentiment("application/json", requestBody);
+    }
+
+    public void sendNotificationMessage(NotificationDto notificationDto) {
+
+        log.info("send Notification Message ~~ ");
+        log.info("user id : " + notificationDto.getUserId());
+        log.info("relalncing id : " + notificationDto.getRebalancingId());
+        log.info("check : " + notificationDto.getChecked());
+        log.info("summary : " + notificationDto.getSummary());
+
+        messageService.sendNotificationMsgToUserService(notificationDto);
     }
 }
