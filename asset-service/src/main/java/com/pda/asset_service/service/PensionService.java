@@ -19,5 +19,5 @@ public interface PensionService {
 
     List<PensionDto> getPensions(int userId);
 
-//    List<PensionDto> getUnclaimedRetirementAccounts(int userId);
+    List<PensionDto> getUnclaimedRetirementAccounts(int userId);
 }

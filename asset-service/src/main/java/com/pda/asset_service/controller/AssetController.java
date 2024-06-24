@@ -99,13 +99,15 @@ public class AssetController {
         return success(totalAssets);
     }
 
-//    @GetMapping("/retirement-pension-claim")
-//    public ApiUtils.ApiResult<List<PensionDto>> getUnclaimedRetirementAccounts(@RequestHeader("Authorization") String bearerToken){
-//        String token = CustomStringUtils.getToken(bearerToken);
-//        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
-//        log.info("user id : " + userId);
-//
-//        List<PensionDto> unclaimedRetirementAccounts = assetService.getUnclaimedRetirementAccounts(userId);
-//        return success(unclaimedRetirementAccounts);
-//    }
+    @GetMapping("/retirement-pension-claim")
+    public ApiUtils.ApiResult<List<PensionDto>> getUnclaimedRetirementAccounts(@RequestHeader("Authorization") String bearerToken){
+        String token = CustomStringUtils.getToken(bearerToken);
+        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        log.info("user id : " + userId);
+
+        List<PensionDto> unclaimedRetirementAccounts = assetService.getUnclaimedRetirementAccounts(userId);
+        return success(unclaimedRetirementAccounts);
+    }
+
+
 }

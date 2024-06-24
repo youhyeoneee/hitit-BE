@@ -62,15 +62,6 @@ public class AssetServiceImpl implements AssetService{
         allMydataLinkInfo.addAll(loansLinkInfo);
         log.info("05. loansLinkInfo = {}", loansLinkInfo);
 
-//        // 펀드
-//        List<MydataInfoDto> fundsLinkInfo = fundService.linkMyDataAccount(userId,userAccountInfoDto.getFunds());
-//        allMydataLinkInfo.addAll(fundsLinkInfo);
-//        log.info("06. fundsLinkInfo = {}", fundsLinkInfo);
-
-        // mq로 요청 필요...
-
-//        User updatedUser =  updateMydataStatus(userId);
-//        log.info("Mydata Link Updated User Info = {}", updatedUser);
         return allMydataLinkInfo;
     }
 
@@ -85,11 +76,11 @@ public class AssetServiceImpl implements AssetService{
         return bankAccountTotalBalance + securityAccountTotalBalance;
     }
 
-//    @Override
-//    public List<PensionDto> getUnclaimedRetirementAccounts(int userId) {
-//        List<PensionDto> unclaimedRetirementAccounts = pensionService.getUnclaimedRetirementAccounts(userId);
-//        return unclaimedRetirementAccounts;
-//    }
+    @Override
+    public List<PensionDto> getUnclaimedRetirementAccounts(int userId) {
+        List<PensionDto> unclaimedRetirementAccounts = pensionService.getUnclaimedRetirementAccounts(userId);
+        return unclaimedRetirementAccounts;
+    }
 
 
 }
