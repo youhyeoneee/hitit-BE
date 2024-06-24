@@ -1,6 +1,10 @@
 package com.pda.portfolio_service.controller;
 
 import com.pda.portfolio_service.dto.*;
+import com.pda.portfolio_service.dto_test.MyDataTestDto;
+import com.pda.portfolio_service.feign.MyDataFlaskLevelTestResponseDto;
+import com.pda.portfolio_service.feign.MyDataFlaskResponseDto;
+import com.pda.portfolio_service.feign.OptimizeResponseDto;
 import com.pda.portfolio_service.service.PortfolioService;
 import com.pda.security.JwtTokenProvider;
 import com.pda.utils.api_utils.ApiUtils;
@@ -30,6 +34,7 @@ public class PortfolioController {
 
     private final JwtTokenProvider jwtTokenProvider;
 
+    //// 1. 자체 서비스 - 포트폴리오 전체 조회
     @GetMapping("/hitit")
     public ApiUtils.ApiResult<List<HititPortfoliosResponseDto>> getHititPortfolios() {
         // 여기까지지의 데이터는 미리 정해진 데이터
@@ -38,6 +43,7 @@ public class PortfolioController {
         return success(hititPortfoliosResponseDto);
     }
 
+    //// 2. 자체 서비스 - 포트폴리오 내 펀드 조회
     @GetMapping("/hitit/{portfolio_id}")
     public ApiUtils.ApiResult getHititPortfoliosFunds(@PathVariable("portfolio_id") Integer portfolio_id) {
         if(!isNumber(portfolio_id)){
@@ -48,6 +54,7 @@ public class PortfolioController {
         return success(hititPortfoliosFundsResponseDto);
     }
 
+    //// 3. 자체 서비스 - 포트폴리오 내 펀드 내 주식, 채권 조회
     @GetMapping("/hitit/{portfolio_id}/{fund_id}")
     public ApiUtils.ApiResult getHititPortfoliosFundsStocksAndBonds(@PathVariable("portfolio_id") Integer portfolio_id,
                                                      @PathVariable("fund_id") Integer fund_id) {
@@ -70,7 +77,8 @@ public class PortfolioController {
 //        return success(portfolioFundAssetResponseDto);
 //    }
 
-    @PostMapping("/user")
+    //// 4. 자산 - 내 포트폴리오 조회
+    @GetMapping("/user")
     public ApiUtils.ApiResult getUserPortfolioFundAssets(@RequestHeader("Authorization") String bearerToken) {
         String token = CustomStringUtils.getToken(bearerToken);
         int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
@@ -80,14 +88,70 @@ public class PortfolioController {
         return success(portfolioFundAssetResponseDto);
     }
 
+    //// 5. 자산 - 내 포트폴리오 내 펀드 조회
+    @GetMapping("/userfunds")
+    public ApiUtils.ApiResult getUserPortfolioFundProducts(@RequestHeader("Authorization") String bearerToken) {
+        String token = CustomStringUtils.getToken(bearerToken);
+        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        log.info("user id : " + userId);
+
+        List<HititPortfoliosFundsResponseDto> portfolioFundAssetResponseDto = portfolioService.getUserPortfolioFundProducts(userId);
+        return success(portfolioFundAssetResponseDto);
+    }
+
+    //// 6. 자산 - 내 포트폴리오 내 펀드 내 주식, 채권 조회
+    @GetMapping("/userfunds/detail/{fund_id}")
+    public ApiUtils.ApiResult getUserPortfolioFundStocksAndBonds(@RequestHeader("Authorization") String bearerToken, @PathVariable("fund_id") Integer fund_id) {
+        String token = CustomStringUtils.getToken(bearerToken);
+        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        log.info("user id : " + userId);
+
+        HititPortfoliosFundsStocksAndBondsResponseDto portfolioFundAssetResponseDto = portfolioService.getUserPortfolioFundStocksAndBonds(userId, fund_id);
+        return success(portfolioFundAssetResponseDto);
+    }
+
+
+    @GetMapping("/mydata")
+    public ApiUtils.ApiResult<MyDataFlaskResponseDto> getMyDataPortfolios(@RequestHeader("Authorization") String bearerToken) {
+        String token = CustomStringUtils.getToken(bearerToken);
+        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        log.info("user id : " + userId);
+
+//        List<MyDataPortfoliosResponseDto> myDataPortfoliosResponseDto = portfolioService.getMyDataPortfolios(userId);
+//        return success(myDataPortfoliosResponseDto);
+        MyDataFlaskResponseDto myDataPortfoliosResponseDto = portfolioService.getMyDataPortfolios(userId);
+        return success(myDataPortfoliosResponseDto);
+    }
+
+    @PostMapping("/mydata/leveltest")
+    public ApiUtils.ApiResult<List<MyDataTestDto>> getMyDataPortfoliosLevelTest(@RequestBody MyDataFlaskLevelTest myDataFlaskLevelTest) {
+        List<MyDataTestDto> myDataFlaskLevelTestResponseDto = portfolioService.getMyDataPortfoliosLevelTest(myDataFlaskLevelTest);
+
+        return success(myDataFlaskLevelTestResponseDto);
+    }
+
+    @GetMapping("/rebal/getweight")
+    public ApiUtils.ApiResult<OptimizeResponseCamelCaseDto> optimizePortfolio() {
+        return success(portfolioService.optimizePortfolio());
+    }
+
+
+//    public ApiUtils.ApiResult getMyDataPortfoliosLevelTest(@RequestBody MyDataFlaskLevelTest myDataFlaskLevelTest) {
+////        1. user_select에 user_id가 있는지 조회
+////                1.1 있으면 "해당 유저가 선택한 포트폴리오가 존재한다." 반환
+////                1.2 없으면 전달받은 포트폴리오 정보를 저장
+////
+//
+////        List<MyDataPortfoliosResponseDto> myDataPortfoliosResponseDto = portfolioService.getMyDataPortfolios(userId);
+////        return success(myDataPortfoliosResponseDto);
+//        MyDataFlaskLevelTestResponseDto myDataFlaskLevelTestResponseDto = portfolioService.getMyDataPortfoliosLevelTest(myDataFlaskLevelTest);
+//        return success(myDataFlaskLevelTestResponseDto);
+//    }
+
+    //// Test: Spring - Flask 연동 테스트
     @GetMapping("/analyze-sentiment/{text}")
     public String analyzeSentiment(@PathVariable("text") String text) {
         return portfolioService.analyzeSentiment(text);
-    }
-
-    @GetMapping("/mydata/{user_id}")
-    public String getMyDataPortfolio(@PathVariable("user_id") Integer userId) {
-        return portfolioService.getMyDataPortfolio(userId);
     }
 
     // 나중에 util - Validator로 이동
