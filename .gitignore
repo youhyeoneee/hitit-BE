@@ -37,4 +37,6 @@ out/
 .vscode/
 
 **/application-db.properties
+**/application-sms.properties
+**/application-mq.properties
 **/env.properties

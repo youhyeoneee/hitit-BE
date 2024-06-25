@@ -1,4 +1,4 @@
-package com.pda.security;
+package com.pda.utils.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,8 +40,10 @@ public class WebSecurityConfig {
                 .csrf((csrfConfig) -> csrfConfig.disable() // .csrf().disable()
                 )
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/api/assets/**", "/api/mydata/**", "/api/portfolios/**", "/error", "/api/users/signup", "/api/users/login", "/api/users/login/kakao",
-                                "/api/investment_tests/questions/**")
+                        // TODO: mydata, portfolio 링크 정리
+                        .requestMatchers("/error", "/api/mydata/**", "/api/portfolios/**",
+                        "/api/users/signup", "/api/users/login", "/api/users/login/kakao", "api/users/validate/**",
+                                "/api/investment_tests/questions/**", "/send/**", "/api/notifications/subscribe/**")
                         .permitAll()
                         .anyRequest().authenticated()
                 )

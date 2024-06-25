@@ -1,15 +1,15 @@
 package com.pda.user_service.controller;
 
 
-import com.pda.security.JwtTokenProvider;
 import com.pda.user_service.dto.*;
 import com.pda.user_service.jpa.User;
 import com.pda.user_service.service.UserService;
 import com.pda.utils.api_utils.ApiUtils;
-import com.pda.utils.api_utils.CustomStringUtils;
+import com.pda.utils.security.JwtTokenProvider;
+import com.pda.utils.security.dto.UserDetailsDto;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
@@ -22,25 +22,22 @@ import static com.pda.utils.api_utils.ApiUtils.success;
 @Slf4j
 @RequestMapping("/api/users")
 @PropertySource(value = {"env.properties"})
+@RequiredArgsConstructor
 public class UserController {
 
     @Value("${kakao.client_id}")
     private String clientId;
     @Value("${kakao.redirect_uri}")
     private String redirectUri;
-
-    @Autowired
-    private UserService userService;
-    @Autowired
-    JwtTokenProvider jwtTokenProvider;
+    private final UserService userService;
+    private final JwtTokenProvider jwtTokenProvider;
     
 
     @PatchMapping()
     public ApiUtils.ApiResult updateUser(@RequestBody UserUpdateRequestDto userUpdateRequestDto, @RequestHeader("Authorization") String bearerToken) {
         // 토큰 -> user id
         log.info("bearerToken : " + bearerToken);
-        String token = CustomStringUtils.getToken(bearerToken);
-        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
         User updatedUser = userService.updateUser(userId, userUpdateRequestDto);
@@ -63,8 +60,8 @@ public class UserController {
             return error("로그인 실패", HttpStatus.BAD_REQUEST);
         }
 
-        log.info("email user log in : " + user.getUsername() + " - " + user.getEmail() );
-        String token = jwtTokenProvider.createToken(user.getUsername());
+        log.info("email user log in : " + user.getId() + " - " + user.getEmail() );
+        String token = jwtTokenProvider.createToken(String.valueOf(user.getId()));
         UserInfoDto userInfo = new UserInfoDto(user);
         LoginResponseDto loginResponseDto = new LoginResponseDto("로그인 성공", token, userInfo);
         return success(loginResponseDto);
@@ -78,11 +75,16 @@ public class UserController {
         if (user == null) {
             return error("로그인 실패", HttpStatus.BAD_REQUEST);
         }
-        log.info("kakao user log in : " + user.getUsername() + " - " + user.getEmail() );
-        String token = jwtTokenProvider.createToken(user.getUsername());
+        log.info("kakao user log in : " + user.getId() + " - " + user.getEmail() );
+        String token = jwtTokenProvider.createToken(String.valueOf(user.getId()));
         UserInfoDto userInfo = new UserInfoDto(user);
         LoginResponseDto loginResponseDto = new LoginResponseDto("로그인 성공", token, userInfo);
         return success(loginResponseDto);
     }
 
+    @GetMapping("/validate/{user_id}")
+    public UserDetailsDto validateUser(@PathVariable("user_id") int userId) {
+        User user = userService.findUserById(userId);
+        return userService.convert2UserDetailsDto(user);
+    }
 }

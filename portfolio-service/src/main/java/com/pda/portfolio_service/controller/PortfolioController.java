@@ -4,12 +4,13 @@ import com.pda.portfolio_service.dto.*;
 import com.pda.portfolio_service.dto_test.MyDataTestDto;
 import com.pda.portfolio_service.feign.MyDataFlaskResponseDto;
 import com.pda.portfolio_service.service.PortfolioService;
-import com.pda.security.JwtTokenProvider;
 import com.pda.utils.api_utils.ApiUtils;
 import com.pda.utils.api_utils.CustomStringUtils;
+import com.pda.utils.security.JwtTokenProvider;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +26,7 @@ import static com.pda.utils.api_utils.ApiUtils.success;
 @Slf4j
 @AllArgsConstructor
 @RequestMapping("/api/portfolios")
+@PropertySource(value = {"env.properties"})
 public class PortfolioController {
     @Autowired
     private PortfolioService portfolioService;
@@ -72,8 +74,7 @@ public class PortfolioController {
     //// 4. 자산 - 내 포트폴리오 조회
     @GetMapping("/user")
     public ApiUtils.ApiResult getUserPortfolioFundAssets(@RequestHeader("Authorization") String bearerToken) {
-        String token = CustomStringUtils.getToken(bearerToken);
-        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
         PortfolioFundAssetResponseDto portfolioFundAssetResponseDto = portfolioService.getUserPortfolioFundAssets(userId);
@@ -83,8 +84,7 @@ public class PortfolioController {
     //// 5. 자산 - 내 포트폴리오 내 펀드 조회
     @GetMapping("/userfunds")
     public ApiUtils.ApiResult getUserPortfolioFundProducts(@RequestHeader("Authorization") String bearerToken) {
-        String token = CustomStringUtils.getToken(bearerToken);
-        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
         List<HititPortfoliosFundsResponseDto> portfolioFundAssetResponseDto = portfolioService.getUserPortfolioFundProducts(userId);
@@ -94,8 +94,7 @@ public class PortfolioController {
     //// 6. 자산 - 내 포트폴리오 내 펀드 내 주식, 채권 조회
     @GetMapping("/userfunds/detail/{fund_id}")
     public ApiUtils.ApiResult getUserPortfolioFundStocksAndBonds(@RequestHeader("Authorization") String bearerToken, @PathVariable("fund_id") Integer fund_id) {
-        String token = CustomStringUtils.getToken(bearerToken);
-        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
         HititPortfoliosFundsStocksAndBondsResponseDto portfolioFundAssetResponseDto = portfolioService.getUserPortfolioFundStocksAndBonds(userId, fund_id);
@@ -125,8 +124,7 @@ public class PortfolioController {
     //// 8. 자체서비스 - 포트폴리오 선택 후 변경하기
     @PostMapping("/change/{portfolio_id}")
     public ApiUtils.ApiResult changeHitItPortfolio(@RequestHeader("Authorization") String bearerToken, @PathVariable("portfolio_id") Integer portfolio_id) {
-        String token = CustomStringUtils.getToken(bearerToken);
-        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
         boolean exists = portfolioService.checkUserPortfolioExists(userId);
@@ -159,8 +157,7 @@ public class PortfolioController {
     //// 10. 마이데이터 - 포트폴리오 선택하기
     @PostMapping("/mydata/change")
     public ApiUtils.ApiResult changeMyDataPortfolio(@RequestHeader("Authorization") String bearerToken, @RequestBody MyDataPortfolioDto myDataPortfolioDto) {
-        String token = CustomStringUtils.getToken(bearerToken);
-        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
         boolean exists = portfolioService.checkUserPortfolioExists(userId);
@@ -179,8 +176,7 @@ public class PortfolioController {
     //// 1. jwt token으로 user 꺼내기
     @GetMapping("/mydata")
     public ApiUtils.ApiResult<MyDataFlaskResponseDto> getMyDataPortfolios(@RequestHeader("Authorization") String bearerToken) {
-        String token = CustomStringUtils.getToken(bearerToken);
-        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
         // 1. OpenFeign으로 User에게 user에게 나이, 투자성향테스트 레벨 가져오기
@@ -204,6 +200,7 @@ public class PortfolioController {
 
     @GetMapping("/rebal/getweight")
     public ApiUtils.ApiResult<OptimizeResponseCamelCaseDto> optimizePortfolio() {
+
         return success(portfolioService.optimizePortfolio());
     }
 

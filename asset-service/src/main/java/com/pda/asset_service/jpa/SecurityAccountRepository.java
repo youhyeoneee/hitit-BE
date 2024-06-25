@@ -8,5 +8,8 @@ import java.util.Optional;
 
 @Repository
 public interface SecurityAccountRepository extends JpaRepository<SecurityAccount, String> {
-    Optional<List<SecurityAccount>> findByAssetUserId(int userId);
+    Optional<List<SecurityAccount>> findByUserId(int userId);
+    Optional<SecurityAccount> findByUserIdAndSecurityNameAndAccountType(int userId, String securityName, String accountType    );
+
+    SecurityAccount findByAccountNo(String accountNo);
 }

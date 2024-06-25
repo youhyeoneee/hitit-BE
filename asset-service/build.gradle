@@ -5,6 +5,11 @@ ext {
 
 dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    implementation 'org.springframework.session:spring-session-data-redis'
+    implementation 'net.nurigo:sdk:4.2.7'
+
 }
 
 dependencyManagement {

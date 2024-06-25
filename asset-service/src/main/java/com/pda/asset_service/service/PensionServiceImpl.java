@@ -1,9 +1,9 @@
 package com.pda.asset_service.service;
 
+
 import com.pda.asset_service.dto.MydataInfoDto;
 import com.pda.asset_service.dto.PensionDto;
 import com.pda.asset_service.dto.PensionResponseDto;
-import com.pda.asset_service.dto.SecurityAccountDto;
 import com.pda.asset_service.feign.MydataServiceClient;
 import com.pda.asset_service.jpa.*;
 import lombok.AllArgsConstructor;
@@ -20,22 +20,19 @@ import java.util.Optional;
 public class PensionServiceImpl implements PensionService{
 
     private final PensionRepository pensionRepository;
-    private final AssetUserRepository assetUserRepository;
     private final MydataInfoRepository mydataInfoRepository;
     private final MydataServiceClient mydataServiceClient;
 
     @Override
     public Pension convertToEntity(PensionResponseDto pensionResponseDto) {
-        AssetUser user = assetUserRepository.findById(pensionResponseDto.getUserId()).orElseThrow();
         return Pension.builder()
                 .companyName(pensionResponseDto.getCompanyName())
-                .pensionName(pensionResponseDto.getPensionName())
+                .pensionId(new PensionId(pensionResponseDto.getAccountNo(), pensionResponseDto.getPensionName()))
                 .pensionType(pensionResponseDto.getPensionType())
-                .assetUser(user)
+                .userId(pensionResponseDto.getUserId())
                 .interestRate(pensionResponseDto.getInterestRate())
                 .evaluationAmount(pensionResponseDto.getEvaluationAmount())
                 .expirationDate(pensionResponseDto.getExpirationDate())
-                .accountNo(pensionResponseDto.getAccountNo())
                 .retirementPensionClaimed(pensionResponseDto.getRetirementPensionClaimed())
                 .build();
     }
@@ -44,16 +41,17 @@ public class PensionServiceImpl implements PensionService{
     public PensionDto convertToDto(Pension pension) {
         return PensionDto.builder()
                 .companyName(pension.getCompanyName())
-                .pensionName(pension.getPensionName())
+                .pensionName(pension.getPensionId().getPensionName())
                 .pensionType(pension.getPensionType())
-                .userId(pension.getAssetUser().getId())
+                .userId(pension.getUserId())
                 .interestRate(pension.getInterestRate())
                 .evaluationAmount(pension.getEvaluationAmount())
                 .expirationDate(pension.getExpirationDate())
-                .accountNo(pension.getAccountNo())
+                .accountNo(pension.getPensionId().getAccountNo())
                 .retirementPensionClaimed(pension.getRetirementPensionClaimed())
                 .build();
     }
+
 
     @Override
     public List<MydataInfoDto> linkMyDataAccount(int userId, List<String> pensions) {
@@ -73,24 +71,24 @@ public class PensionServiceImpl implements PensionService{
                         pensionRepository.save(pension);
                         mydataInfoRepository.save(MydataInfo.builder()
                                 .assetType("pensions")
-                                .userId(pension.getAssetUser().getId())
+                                .userId(pension.getUserId())
                                 .companyName(pension.getCompanyName())
                                 .accountType(pension.getPensionType())
-                                .accountNo(pension.getAccountNo())
+                                .accountNo(pension.getPensionId().getAccountNo())
                                 .build());
 
                         MydataInfo savedInfo = mydataInfoRepository.findPensionByUserIdAndAssetTypeAndCompanyNameAndAccountNo(
-                                pension.getAssetUser().getId(),
+                                pension.getUserId(),
                                 "pensions",
                                 pension.getCompanyName(),
-                                pension.getAccountNo()
+                                pension.getPensionId().getAccountNo()
                         );
                         MydataInfoDto mydataInfoDto = MydataInfoDto.builder()
                                 .assetType(savedInfo.getAssetType())
                                 .userId(savedInfo.getUserId())
                                 .companyName(savedInfo.getCompanyName())
                                 .accountType(savedInfo.getAccountType())
-                                .accountNo(pension.getAccountNo())
+                                .accountNo(savedInfo.getAccountNo())
                                 .build();
 
                         pensionLinkInfo.add(mydataInfoDto);
@@ -105,7 +103,7 @@ public class PensionServiceImpl implements PensionService{
 
     @Override
     public List<PensionDto> getPensions(int userId) {
-        List<Pension> pensions = pensionRepository.findByAssetUserId(userId).orElse(null);
+        List<Pension> pensions = pensionRepository.findByUserId(userId).orElse(null);
 
         List<PensionDto> pensionDtos = new ArrayList<>();
         if (pensions != null) {
@@ -116,6 +114,31 @@ public class PensionServiceImpl implements PensionService{
             }
         }
         return pensionDtos;
+    }
+
+    @Override
+    public List<PensionDto> getUnclaimedRetirementAccounts(int userId) {
+        List<PensionResponseDto> unclaimedRetirementAccounts = mydataServiceClient.getUnclaimedRetirementAccounts(userId).orElse(null);
+
+        List<PensionDto> unclaimedRetirementAccountDtos = new ArrayList<>();
+        if (unclaimedRetirementAccounts != null) {
+            for (PensionResponseDto unclaimedRetirementAccount : unclaimedRetirementAccounts) {
+                PensionDto pensionDto = PensionDto.builder()
+                        .accountNo(unclaimedRetirementAccount.getAccountNo())
+                        .companyName(unclaimedRetirementAccount.getCompanyName())
+                        .pensionName(unclaimedRetirementAccount.getPensionName())
+                        .pensionType(unclaimedRetirementAccount.getPensionType())
+                        .interestRate(unclaimedRetirementAccount.getInterestRate())
+                        .evaluationAmount(unclaimedRetirementAccount.getEvaluationAmount())
+                        .expirationDate(unclaimedRetirementAccount.getExpirationDate())
+                        .userId(userId)
+                        .retirementPensionClaimed(unclaimedRetirementAccount.getRetirementPensionClaimed())
+                        .build();
+                log.info("find pension account = {}", pensionDto);
+                unclaimedRetirementAccountDtos.add(pensionDto);
+            }
+        }
+        return unclaimedRetirementAccountDtos;
     }
 
 }

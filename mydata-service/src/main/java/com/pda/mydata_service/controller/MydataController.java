@@ -6,6 +6,7 @@ import com.pda.mydata_service.service.MydataServiceImpl;
 import com.pda.utils.api_utils.ApiUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,7 @@ import java.util.Optional;
 @Slf4j
 @RequestMapping("/api/mydata")
 @AllArgsConstructor
+@PropertySource(value = {"env.properties"})
 public class MydataController {
 
     private final MydataServiceImpl mydataService;
@@ -62,5 +64,27 @@ public class MydataController {
             @PathVariable("securityName") String securityName) {
         Optional<List<SecurityAccountDto>> securityAccounts = mydataService.getSecurityAccountsByUserIdAndSecurityName(userId, securityName);
         return securityAccounts;
+    }
+
+    @GetMapping("/pension/unclaimed-retirement-accounts/{userId}")
+    public Optional<List<PensionDto>> getUnclaimedRetirementAccounts(@PathVariable("userId") int userId){
+        Optional<List<PensionDto>> unclaimedRetirementAccounts = mydataService.getUnclaimedRetirementAccounts(userId);
+        return unclaimedRetirementAccounts;
+    }
+
+    // 증권 거래 내역
+    @GetMapping("/security-transactions/{accountNo}")
+    public Optional<List<SecurityTransactionDto>> getSecurityTransactions(@PathVariable("accountNo") String accountNo){
+        log.info("ACCOUNTNO + {}", accountNo);
+        Optional<List<SecurityTransactionDto>> securityTransactions = mydataService.getSecurityTransactions(accountNo);
+        return securityTransactions;
+    }
+
+    // 보유 주식
+    @GetMapping("/security-stocks/{accountNo}")
+    public Optional<List<SecurityStockDto>> getSecurityStocks(@PathVariable("accountNo") String accountNo){
+        Optional<List<SecurityStockDto>> securityStocks = mydataService.getSecurityStocks(accountNo);
+        log.info("Controller security stocks = {}", securityStocks.get());
+        return securityStocks;
     }
 }

@@ -6,33 +6,32 @@ import com.pda.user_service.jpa.UserRepository;
 import com.pda.utils.exception.DuplicatedEmailException;
 import com.pda.utils.exception.login.NotCorrectPasswordException;
 import com.pda.utils.exception.login.NotFoundUserException;
+import com.pda.utils.security.dto.UserDetailsDto;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
 import java.util.Optional;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @PropertySource(value = {"env.properties"})
-public class UserService implements UserDetailsService {
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+public class UserService { //implements UserDetailsService {
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${kakao.client_id}")
     private String clientId;
@@ -47,7 +46,7 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public User signup(SignupUserDto userDto) throws DuplicatedEmailException {
-        String encodedPassword = passwordEncoder.encode(userDto.getPassword());
+        String encodedPassword = " "; // passwordEncoder.encode(userDto.getPassword());
         userDto.setPassword(encodedPassword);
         User user = userDto.toEntity();
 
@@ -123,26 +122,21 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findById(Integer.valueOf(username));
-        return user.orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
-    }
 
     @Transactional
-    public void updateInvestmentTypeAndScore(int userId, String investmentType, int investmentTestScore) throws UsernameNotFoundException {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+    public void updateInvestmentTypeAndScore(int userId, String investmentType, int investmentTestScore) { // throws UsernameNotFoundException {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
         user.setInvestmentType(investmentType);
         user.setInvestmentTestScore(investmentTestScore);
         userRepository.save(user);
     }
 
     public User findUserById(int userId) throws NotFoundUserException {
-        return userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("사용자가 존재하지 않습니다."));
+        return userRepository.findById(userId).orElseThrow(() -> new NotFoundUserException("사용자가 존재하지 않습니다."));
     }
 
-    public User updateUser(int userId, UserUpdateRequestDto dto) throws UsernameNotFoundException {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("사용자가 존재하지 않습니다."));
+    public User updateUser(int userId, UserUpdateRequestDto dto) throws NotFoundUserException {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundUserException("사용자가 존재하지 않습니다."));
 
         if (dto.getEmail() != null) {
             user.setEmail(dto.getEmail());
@@ -177,7 +171,21 @@ public class UserService implements UserDetailsService {
 
         userRepository.save(user);
 
-        User savedUser = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+        User savedUser = userRepository.findById(userId).orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
         return savedUser;
+    }
+
+    public UserDetailsDto convert2UserDetailsDto(User user) throws NotFoundUserException {
+        // User 엔티티를 UserDetailsDto로 변환
+        UserDetailsDto userDetailsDto = new UserDetailsDto();
+        userDetailsDto.setUsername(String.valueOf(user.getId()));
+        userDetailsDto.setPassword(user.getPassword());
+        userDetailsDto.setAuthorities(null); // 별도의 권한 없음  // Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")
+        userDetailsDto.setAccountNonExpired(true);
+        userDetailsDto.setAccountNonLocked(true);
+        userDetailsDto.setCredentialsNonExpired(true);
+        userDetailsDto.setEnabled(true);
+
+        return userDetailsDto;
     }
 }

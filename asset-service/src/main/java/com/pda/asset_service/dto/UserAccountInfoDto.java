@@ -1,7 +1,6 @@
 package com.pda.asset_service.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.pda.asset_service.jpa.BankAccount;
 import lombok.Getter;
 
 import java.util.List;
