@@ -16,4 +16,6 @@ public interface AssetService {
     Integer getTotalAssets(int userId);
 
     List<RetirementAccountDto> getUnclaimedRetirementAccounts(int userId);
+
+    Integer checkMydata(int userId);
 }
