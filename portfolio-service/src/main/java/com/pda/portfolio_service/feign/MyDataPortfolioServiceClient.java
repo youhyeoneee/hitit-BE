@@ -1,12 +1,15 @@
 package com.pda.portfolio_service.feign;
 
 import com.pda.portfolio_service.dto.MyDataFlaskLevelTest;
+import com.pda.portfolio_service.dto.StockIncomeRevResponseDto;
+import com.pda.portfolio_service.dto.StockRevIncomeRequestDto;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
-@FeignClient(name = "mydataPortfolioClient", url = "http://172.31.13.91:8080")
+
+@PropertySource("env.properties")
+@FeignClient(name = "mydataPortfolioClient", url = "${service.url.ml}")
 public interface MyDataPortfolioServiceClient {
     @PostMapping("/mydata/funds")
     MyDataFlaskResponseDto getMyDataPortfolio(@RequestHeader("Accept") String contentType,
@@ -15,4 +18,8 @@ public interface MyDataPortfolioServiceClient {
     @PostMapping("/mydata/fundss")
     MyDataFlaskLevelTestResponseDto getMyDataLevelTestPortfolio(@RequestHeader("Accept") String contentType,
                                                                 @RequestBody MyDataFlaskLevelTest myDataFlaskLevelTest);
+
+    @PostMapping(value = "/dart/info", consumes = "application/json", produces = "application/json")
+    StockIncomeRevResponseDto getStockIncomeRev(@RequestHeader("Accept") String contentType, @RequestBody StockRevIncomeRequestDto stockRevIncomeRequestDto);
+
 }

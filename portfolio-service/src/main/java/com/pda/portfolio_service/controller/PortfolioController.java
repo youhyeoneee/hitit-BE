@@ -92,12 +92,13 @@ public class PortfolioController {
     }
 
     //// 6. 자산 - 내 포트폴리오 내 펀드 내 주식, 채권 조회
-    @GetMapping("/userfunds/detail/{fund_id}")
-    public ApiUtils.ApiResult getUserPortfolioFundStocksAndBonds(@RequestHeader("Authorization") String bearerToken, @PathVariable("fund_id") Integer fund_id) {
+    @GetMapping("/userfunds/detail/{fundIdx}")
+    public ApiUtils.ApiResult getUserPortfolioFundStocksAndBonds(@RequestHeader("Authorization") String bearerToken,
+                                                                 @PathVariable("fundIdx") Integer fundIdx) {
         int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
-        HititPortfoliosFundsStocksAndBondsResponseDto portfolioFundAssetResponseDto = portfolioService.getUserPortfolioFundStocksAndBonds(userId, fund_id);
+        HititPortfoliosFundsStocksAndBondsResponseDto portfolioFundAssetResponseDto = portfolioService.getUserPortfolioFundStocksAndBonds(userId, fundIdx);
         return success(portfolioFundAssetResponseDto);
     }
 
