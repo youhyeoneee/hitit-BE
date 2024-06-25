@@ -612,7 +612,7 @@ public class PortfolioService {
             List<UserPortfolios> allPortfolios = userPortfoliosRepository.findAll();
 
             // 2. 가져온 행의 포트폴리오 Id로 펀드 리스트를 가져온다.
-            List<UserPortfoliosFundProducts> fundProducts = userPortfoliosFundProductsRepository.findByIdPortfolioId(allPortfolios.get(0).getId());
+            List<UserPortfoliosFundProducts> fundProducts = userPortfoliosFundProductsRepository.findByIdPortfolioId(allPortfolios.get(1).getId());
 
             // 3. 가져온 펀드 리스트들을 weight 기준으로 내림차순 정렬한다.
             Collections.sort(fundProducts, Comparator.comparing(UserPortfoliosFundProducts::getWeight).reversed());

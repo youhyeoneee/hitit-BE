@@ -174,11 +174,16 @@ public class PortfolioController {
     }
 
 
+    // 11. 마이데이터 - 포트폴리오 전체 조회
     @GetMapping("/mydata")
     public ApiUtils.ApiResult<MyDataFlaskResponseDto> getMyDataPortfolios(@RequestHeader("Authorization") String bearerToken) {
         String token = CustomStringUtils.getToken(bearerToken);
         int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
         log.info("user id : " + userId);
+
+        // 1. OpenFeign으로 User에게 user에게 나이, 투자성향테스트 레벨 가져오기
+
+        // 2. OpenFeign으로 Asset에게 투자거래내역, 보유주식, 총자산 가져오기
 
         MyDataFlaskResponseDto myDataPortfoliosResponseDto = portfolioService.getMyDataPortfolios(userId);
         return success(myDataPortfoliosResponseDto);
