@@ -57,6 +57,9 @@ public class PortfolioService {
     private FundProductsRepository fundProductsRepository;
 
     @Autowired
+    private FundPricesRepository fundPricesRepository;
+
+    @Autowired
     private FlaskTestServiceClient flaskTestServiceClient;
 
     @Autowired
@@ -1002,6 +1005,47 @@ public class PortfolioService {
 
     }
 
+    public List<Float> getMyDataPortfoliosRate(int userId) {
+        log.info("user ID : " + userId);
+        // 1. User의 Portfolio Id 가져오기
+        UserPortfolios userPortfolios
+                = userPortfoliosRepository.findByUserId(userId)
+                .orElseThrow(()
+                        -> new NoSuchElementException("유저가 존재하지 않습니다."));
+        // 2. 해당 포트폴리오가 생성된 날짜를 조회
+        Date createdAt = userPortfolios.getCreatedAt();
+
+         // 3. Portfolio Id를 통해 펀드리스트 가져오기
+        List<UserPortfoliosFundProducts> fundProducts = userPortfoliosFundProductsRepository.findByIdPortfolioId(userPortfolios.getId());
+
+        // 4. 일자별 가격 저장할 리스트 생성
+        List<Float> dailyPrices = new ArrayList<>();
+
+
+        // 각 펀드의 코드와 비중을 매핑
+        Map<String, Float> fundCodeToWeightMap = fundProducts.stream()
+                .collect(Collectors.toMap(fp -> fp.getId().getFundCode(), UserPortfoliosFundProducts::getWeight));
+
+
+        for (String fundCode : fundCodeToWeightMap.keySet()) {
+            List<FundPrices> fundPrices = fundPricesRepository.findByIdFundCodeAndIdDateAfter(fundCode, createdAt);
+
+
+            for (int i = 0; i < fundPrices.size(); i++) {
+                float weightedPrice = fundPrices.get(i).getPrice() * (fundCodeToWeightMap.get(fundCode) / 100);
+
+                // dailyPrices 리스트의 크기를 동적으로 조절
+                if (i >= dailyPrices.size()) {
+                    dailyPrices.add(weightedPrice);
+                } else {
+                    dailyPrices.set(i, dailyPrices.get(i) + weightedPrice);
+                }
+            }
+        }
+
+        return dailyPrices;
+    }
+
     //// Test: Spring - Flask 연동 테스트
     public String analyzeSentiment(String text) {
         Map<String, Object> requestBody = new HashMap<>();
@@ -1031,5 +1075,4 @@ public class PortfolioService {
         }
         return result;
     }
-
 }

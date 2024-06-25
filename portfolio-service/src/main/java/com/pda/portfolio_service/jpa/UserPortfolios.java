@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Getter
 @Setter
 @Entity
@@ -33,4 +35,7 @@ public class UserPortfolios {
 
     @Column(name = "user_id")
     private Integer userId;
+
+    @Column(name = "created_at")
+    private Date createdAt;
 }

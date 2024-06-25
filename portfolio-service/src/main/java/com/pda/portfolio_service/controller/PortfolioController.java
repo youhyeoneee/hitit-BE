@@ -190,6 +190,19 @@ public class PortfolioController {
     }
 
 
+    @GetMapping("/rate")
+    public ApiUtils.ApiResult getMyDataPortfoliosRate(@RequestHeader("Authorization") String bearerToken) {
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
+        log.info("user id : " + userId);
+
+        boolean exists = portfolioService.checkUserPortfolioExists(userId);
+        if (exists) {
+            List<Float> myDataPortfoliosRate = portfolioService.getMyDataPortfoliosRate(userId);
+            return success(myDataPortfoliosRate);
+        } else {
+            return success("내 포트폴리오가 존재하지 않습니다.");
+        }
+    }
 
 
 
