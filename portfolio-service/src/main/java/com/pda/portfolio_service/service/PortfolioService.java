@@ -556,7 +556,7 @@ public class PortfolioService {
         // StockBalance 리스트 생성
 //        List<String> stockBalance = Arrays.asList("000430", "000200", "375800");
 
-        MydataDto mydata = dataService.getUserMydataByOpenFeign(7);
+        MydataDto mydata = dataService.getUserMydataByOpenFeign(userId);
         // 중복을 제거한 일차원 배열 생성
         Set<String> uniqueStockCodes = new HashSet<>();
         for (SecurityAccountStocksDto dto : mydata.getSecurityStocks()) {
