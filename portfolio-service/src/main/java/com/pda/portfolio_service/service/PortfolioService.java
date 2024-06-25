@@ -257,62 +257,80 @@ public class PortfolioService {
 
 
     //// 6. 자산 - 내 포트폴리오 내 펀드 내 주식, 채권 조회
+    @Transactional
     public HititPortfoliosFundsStocksAndBondsResponseDto getUserPortfolioFundStocksAndBonds(Integer userId, Integer fundId) {
-        // 1. User의 Portfolio Id 가져오기
-        UserPortfolios userPortfolios
-                = userPortfoliosRepository.findByUserId(userId)
-                .orElseThrow(()
-                        -> new NoSuchElementException("유저가 존재하지 않습니다."));
+        int retryCount = 0;
+        final int maxRetries = 10;
 
 
-        // 2. Portfolio Id를 통해 펀드리스트 가져오기
-        List<UserPortfoliosFundProducts> fundProducts = userPortfoliosFundProductsRepository.findByIdPortfolioId(userPortfolios.getId());
+        while (retryCount < maxRetries) {
+            try {
+                // 1. User의 Portfolio Id 가져오기
+                UserPortfolios userPortfolios
+                        = userPortfoliosRepository.findByUserId(userId)
+                        .orElseThrow(()
+                                -> new NoSuchElementException("유저가 존재하지 않습니다."));
 
 
-        // 가져온 private_portfolios_fund_products 데이터를 정렬
-        fundProducts.sort(Comparator
-                .comparingDouble(UserPortfoliosFundProducts::getWeight).reversed()
-                .thenComparing(Comparator.comparing(UserPortfoliosFundProducts::getFundName, Comparator.nullsLast(Comparator.naturalOrder()))));
+                // 2. Portfolio Id를 통해 펀드리스트 가져오기
+                List<UserPortfoliosFundProducts> fundProducts = userPortfoliosFundProductsRepository.findByIdPortfolioId(userPortfolios.getId());
 
 
-        // FE에서 유저가 선택한 fund 데이터 인덱스로 가져오기
-        UserPortfoliosFundProducts selectedFund = fundProducts.get(fundId);
+                // 가져온 private_portfolios_fund_products 데이터를 정렬
+                fundProducts.sort(Comparator
+                        .comparingDouble(UserPortfoliosFundProducts::getWeight).reversed()
+                        .thenComparing(Comparator.comparing(UserPortfoliosFundProducts::getFundName, Comparator.nullsLast(Comparator.naturalOrder()))));
 
-        FundProducts userPortfoliosFundAssets
-                = fundProductsRepository.findById(selectedFund.getId().getFundCode())
-                .orElseThrow(()
-                        -> new NoSuchElementException("펀드가 존재하지 않습니다."));;
 
-        // 선택한 fund의 fund_code로 private_portfolios_fund_stocks에서 fund_code에 해당하는 데이터 가져오고 List<HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto> 형식으로 리스트로 저장
-        Optional<List<FundStocks>> fundProductsStocks = fundStocksRepository.findByIdFundCode(selectedFund.getId().getFundCode());
-        List<HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto> fundStockDtos = fundProductsStocks.orElse(List.of()).stream()
-                .map(stock -> new HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto(stock.getId().getStockName(), stock.getSize(), stock.getStyle(), stock.getWeight()))
-                .collect(Collectors.toList());
+                // FE에서 유저가 선택한 fund 데이터 인덱스로 가져오기
+                UserPortfoliosFundProducts selectedFund = fundProducts.get(fundId);
 
-        // 선택한 fund의 fund_code로 private_portfolios_fund_bonds에서 fund_code에 해당하는 데이터 가져오고 List<HititPortfoliosFundsStocksAndBondsResponseDto.FundBondDto> 형식으로 리스트로 저장
-        Optional<List<FundBonds>> fundProductsBonds = fundBondsRepository.findByIdFundCode(selectedFund.getId().getFundCode());
-        List<HititPortfoliosFundsStocksAndBondsResponseDto.FundBondDto> fundBondDtos = fundProductsBonds.orElse(List.of()).stream()
-                .map(bond -> new HititPortfoliosFundsStocksAndBondsResponseDto.FundBondDto(bond.getId().getBondName(), bond.getExpireDate(), bond.getDuration(), bond.getCredit(), bond.getWeight()))
-                .collect(Collectors.toList());
+                FundProducts userPortfoliosFundAssets
+                        = fundProductsRepository.findById(selectedFund.getId().getFundCode())
+                        .orElseThrow(()
+                                -> new NoSuchElementException("펀드가 존재하지 않습니다."));
+                ;
 
-        // 모든 데이터를 저장할 HititPortfoliosFundsStocksAndBondsResponseDto 생성 후 담아서 Controller로 전달
-        return new HititPortfoliosFundsStocksAndBondsResponseDto(
-                selectedFund.getId().getFundCode(),
-                selectedFund.getId().getPortfolioId(),
-                selectedFund.getFundName(),
-                selectedFund.getFundTypeDetail(),
-                selectedFund.getCompanyName(),
-                selectedFund.getWeight(),
-                selectedFund.getReturn3m(),
-                userPortfoliosFundAssets.getStock(),
-                userPortfoliosFundAssets.getStockForeign(),
-                userPortfoliosFundAssets.getBond(),
-                userPortfoliosFundAssets.getBondForeign(),
-                userPortfoliosFundAssets.getInvestment(),
-                userPortfoliosFundAssets.getEtc(),
-                fundStockDtos,
-                fundBondDtos
-        );
+                // 선택한 fund의 fund_code로 private_portfolios_fund_stocks에서 fund_code에 해당하는 데이터 가져오고 List<HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto> 형식으로 리스트로 저장
+                Optional<List<FundStocks>> fundProductsStocks = fundStocksRepository.findByIdFundCode(selectedFund.getId().getFundCode());
+                List<HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto> fundStockDtos = fundProductsStocks.orElse(List.of()).stream()
+                        .map(stock -> new HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto(stock.getId().getStockName(), stock.getSize(), stock.getStyle(), stock.getWeight()))
+                        .collect(Collectors.toList());
+
+                // 선택한 fund의 fund_code로 private_portfolios_fund_bonds에서 fund_code에 해당하는 데이터 가져오고 List<HititPortfoliosFundsStocksAndBondsResponseDto.FundBondDto> 형식으로 리스트로 저장
+                Optional<List<FundBonds>> fundProductsBonds = fundBondsRepository.findByIdFundCode(selectedFund.getId().getFundCode());
+                List<HititPortfoliosFundsStocksAndBondsResponseDto.FundBondDto> fundBondDtos = fundProductsBonds.orElse(List.of()).stream()
+                        .map(bond -> new HititPortfoliosFundsStocksAndBondsResponseDto.FundBondDto(bond.getId().getBondName(), bond.getExpireDate(), bond.getDuration(), bond.getCredit(), bond.getWeight()))
+                        .collect(Collectors.toList());
+
+                // 모든 데이터를 저장할 HititPortfoliosFundsStocksAndBondsResponseDto 생성 후 담아서 Controller로 전달
+                HititPortfoliosFundsStocksAndBondsResponseDto response = new HititPortfoliosFundsStocksAndBondsResponseDto(
+                        selectedFund.getId().getFundCode(),
+                        selectedFund.getId().getPortfolioId(),
+                        selectedFund.getFundName(),
+                        selectedFund.getFundTypeDetail(),
+                        selectedFund.getCompanyName(),
+                        selectedFund.getWeight(),
+                        selectedFund.getReturn3m(),
+                        userPortfoliosFundAssets.getStock(),
+                        userPortfoliosFundAssets.getStockForeign(),
+                        userPortfoliosFundAssets.getBond(),
+                        userPortfoliosFundAssets.getBondForeign(),
+                        userPortfoliosFundAssets.getInvestment(),
+                        userPortfoliosFundAssets.getEtc(),
+                        fundStockDtos,
+                        fundBondDtos
+                );
+
+                return response;
+            } catch (NoSuchElementException e) {
+                retryCount++;
+                if (retryCount >= maxRetries) {
+                    throw new RuntimeException("최대 재시도 횟수에 도달했습니다.", e);
+                }
+            }
+        }
+        throw new RuntimeException("알 수 없는 오류가 발생했습니다.");
     }
 
     //// 7. 비회원 - 포트폴리오 선택하기
