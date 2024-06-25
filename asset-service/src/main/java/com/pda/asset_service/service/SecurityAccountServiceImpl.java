@@ -105,16 +105,14 @@ public class SecurityAccountServiceImpl implements SecurityAccountService{
         Optional<List<SecurityTransactionResponseDto>> linkedSecurityTransactions = mydataServiceClient.getSecurityTransactions(accountNo);
         if(linkedSecurityTransactions.isPresent()){
             for(SecurityTransactionResponseDto securityTransaction : linkedSecurityTransactions.get()){
-                SecurityAccount securityAccount = securityAccountRepository.findByAccountNo(accountNo);
                 securityTransactionRepository.save(SecurityTransaction.builder()
-                        .id(securityTransaction.getId())
-
-                        .txDatetime(securityTransaction.getTxDatetime())
+                                .id(securityTransaction.getId())
+                                .txDatetime(securityTransaction.getTxDatetime())
                                 .txType(securityTransaction.getTxType())
                                 .txAmount(securityTransaction.getTxAmount())
                                 .txQty(securityTransaction.getTxQty())
                                 .balAfterTx(securityTransaction.getBalAfterTx())
-                                .securityAccount(securityAccount)
+                                .accountNo(securityTransaction.getAccountNo())
                                 .stockCode(securityTransaction.getStockCode())
                         .build());
             }
@@ -130,14 +128,11 @@ public class SecurityAccountServiceImpl implements SecurityAccountService{
         log.info("linkSecurityStocks = {}", String.valueOf(linkedSecurityStocks));
         if(linkedSecurityStocks.isPresent()){
             for(SecurityStockResponseDto securityStock : linkedSecurityStocks.get()){
-                SecurityAccount securityAccount = securityAccountRepository.findByAccountNo(accountNo);
-
+                log.info("Security Stock 가져온거 꺼냄... = {}", securityStock);
                 SecurityStock newSecurityStock = SecurityStock.builder()
-                                .id(SecurityStockId.builder()
-                                .securityAccount(securityAccount)
-                                .stockCode(securityStock.getStockCode())
-                                .build())
-                                .build();
+                        .id(securityStock.getId())
+                                            .stockCode(securityStock.getStockCode())
+                                                .accountNo(securityStock.getAccountNo()).build();
                 securityStockRepository.save(newSecurityStock);
             }
         }else {

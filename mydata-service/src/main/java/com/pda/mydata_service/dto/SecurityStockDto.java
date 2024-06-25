@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class SecurityStockDto {
-
+    private Integer id;
     private String accountNo;
 
     private String stockCode;

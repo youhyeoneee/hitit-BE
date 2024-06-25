@@ -82,6 +82,7 @@ public class MydataController {
     @GetMapping("/security-stocks/{accountNo}")
     public Optional<List<SecurityStockDto>> getSecurityStocks(@PathVariable("accountNo") String accountNo){
         Optional<List<SecurityStockDto>> securityStocks = mydataService.getSecurityStocks(accountNo);
+        log.info("Controller security stocks = {}", securityStocks.get());
         return securityStocks;
     }
 }

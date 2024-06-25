@@ -8,7 +8,7 @@ import java.util.Optional;
 
 
 @Repository
-public interface SecurityStockRepository extends JpaRepository<SecurityStock, String> {
+public interface SecurityStockRepository extends JpaRepository<SecurityStock, Integer> {
     Optional<List<SecurityStock>> findByAccountNo(String accountNo);
 }
 

@@ -14,7 +14,13 @@ import lombok.NoArgsConstructor;
 @Table(name = "security_stocks")
 public class SecurityStock {
 
-    @EmbeddedId
-    private SecurityStockId id;
+    @Id
+    private Integer id;
+
+    @Column(name = "account_no")
+    private String accountNo;
+
+    @Column(name = "stock_code")
+    private String stockCode;
 }
 

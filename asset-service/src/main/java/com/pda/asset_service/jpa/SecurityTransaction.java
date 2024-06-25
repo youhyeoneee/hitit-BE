@@ -35,9 +35,8 @@ public class SecurityTransaction {
     @Column(name = "tx_qty")
     private Integer txQty;
 
-    @ManyToOne
-    @JoinColumn(name = "account_no")
-    private SecurityAccount securityAccount;
+    @Column(name = "account_no")
+    private String accountNo;
 
     @Column(name = "stock_code")
     private String stockCode;

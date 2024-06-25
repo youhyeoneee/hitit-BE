@@ -42,6 +42,6 @@ public class Pension implements Serializable {
     private Date expirationDate;
 
     @Column(name = "retirement_pension_claimed")
-    private Integer retirementPensionClaimed;
+    private String retirementPensionClaimed;
 }
 

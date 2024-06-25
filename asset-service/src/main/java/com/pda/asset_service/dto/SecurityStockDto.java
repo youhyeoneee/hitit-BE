@@ -15,6 +15,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class SecurityStockDto {
+
+    private Integer id;
+
     @JsonProperty("account_no")
     private String accountNo;
 

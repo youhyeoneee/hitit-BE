@@ -15,6 +15,9 @@ import lombok.NoArgsConstructor;
 public class SecurityStock {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
     @Column(name = "account_no")
     private String accountNo;
 
