@@ -15,7 +15,9 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import static com.pda.utils.api_utils.ApiUtils.error;
@@ -197,7 +199,7 @@ public class PortfolioController {
 
         boolean exists = portfolioService.checkUserPortfolioExists(userId);
         if (exists) {
-            List<Float> myDataPortfoliosRate = portfolioService.getMyDataPortfoliosRate(userId);
+            List<Map<Date, Float>> myDataPortfoliosRate = portfolioService.getMyDataPortfoliosRate(userId);
             return success(myDataPortfoliosRate);
         } else {
             return success("내 포트폴리오가 존재하지 않습니다.");

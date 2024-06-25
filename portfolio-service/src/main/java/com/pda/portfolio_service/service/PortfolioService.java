@@ -1006,7 +1006,7 @@ public class PortfolioService {
 
     }
 
-    public List<Float> getMyDataPortfoliosRate(int userId) {
+    public List<Map<Date, Float>> getMyDataPortfoliosRate(int userId) {
         log.info("user ID : " + userId);
         // 1. User의 Portfolio Id 가져오기
         UserPortfolios userPortfolios
@@ -1019,32 +1019,49 @@ public class PortfolioService {
          // 3. Portfolio Id를 통해 펀드리스트 가져오기
         List<UserPortfoliosFundProducts> fundProducts = userPortfoliosFundProductsRepository.findByIdPortfolioId(userPortfolios.getId());
 
-        // 4. 일자별 가격 저장할 리스트 생성
-        List<Float> dailyPrices = new ArrayList<>();
-
 
         // 각 펀드의 코드와 비중을 매핑
         Map<String, Float> fundCodeToWeightMap = fundProducts.stream()
                 .collect(Collectors.toMap(fp -> fp.getId().getFundCode(), UserPortfoliosFundProducts::getWeight));
 
+        // 펀드 코드별 가격 리스트 저장
+        Map<String, List<FundPrices>> fundPricesMap = new HashMap<>();
 
         for (String fundCode : fundCodeToWeightMap.keySet()) {
             List<FundPrices> fundPrices = fundPricesRepository.findByIdFundCodeAndIdDateAfter(fundCode, createdAt);
+            fundPricesMap.put(fundCode, fundPrices);
+        }
 
+        // 일자별 가격 저장할 리스트 생성
+        List<Map<Date, Float>> fundDates = new ArrayList<>();
 
-            for (int i = 0; i < fundPrices.size(); i++) {
-                float weightedPrice = fundPrices.get(i).getPrice() * (fundCodeToWeightMap.get(fundCode) / 100);
+        // 날짜별로 가격 계산
+        if (!fundPricesMap.isEmpty()) {
+            int maxSize = fundPricesMap.values().stream().mapToInt(List::size).max().orElse(0);
 
-                // dailyPrices 리스트의 크기를 동적으로 조절
-                if (i >= dailyPrices.size()) {
-                    dailyPrices.add(weightedPrice);
-                } else {
-                    dailyPrices.set(i, dailyPrices.get(i) + weightedPrice);
+            for (int i = 0; i < maxSize; i++) {
+                Map<Date, Float> dailyPricesMap = new HashMap<>();
+                float totalWeightedPrice = 0f;
+                Date date = null;
+
+                for (String fundCode : fundPricesMap.keySet()) {
+                    List<FundPrices> fundPrices = fundPricesMap.get(fundCode);
+                    if (fundPrices != null && i < fundPrices.size()) {
+                        FundPrices fundPrice = fundPrices.get(i);
+                        date = fundPrice.getId().getDate();  // 날짜는 동일한 인덱스의 날짜를 사용
+                        float weightedPrice = fundPrice.getPrice() * (fundCodeToWeightMap.get(fundCode) / 100);
+                        totalWeightedPrice += weightedPrice;
+                    }
+                }
+
+                if (date != null) {
+                    dailyPricesMap.put(date, totalWeightedPrice);
+                    fundDates.add(dailyPricesMap);
                 }
             }
         }
 
-        return dailyPrices;
+        return fundDates;
     }
 
     //// Test: Spring - Flask 연동 테스트
