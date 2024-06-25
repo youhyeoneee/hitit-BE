@@ -112,26 +112,21 @@ public class AssetController {
     // portfolio openFeign mapping
     // 보유 주식
     @GetMapping("/security-stocks/{userId}")
-    public Optional<List<SecurityAccountStocksDto>> getSecurityStocks(@RequestHeader("Authorization") String bearerToken){
-        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
-        log.info("user id : " + userId);
+    public Optional<List<SecurityAccountStocksDto>> getSecurityStocks(@PathVariable("userId") int userId){
+
         Optional<List<SecurityAccountStocksDto>> securityStockResponseDtos = securityStockService.getSecurityStocks(userId);
         return securityStockResponseDtos;
     }
     // 총자산
     @GetMapping("/totalAssets/{userId}")
-    public Integer getTotalAssets2(@RequestHeader("Authorization") String bearerToken){
-        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
-        log.info("user id : " + userId);
+    public Integer getTotalAssets2(@PathVariable("userId") int userId){
         Integer totalAssets = assetService.getTotalAssets(userId);
         return totalAssets;
     }
 
     // 거래내역
     @GetMapping("/security-transactions/{userId}")
-    public Optional<List<SecurityAccountTransactionsDto>> getSecurityTransactions(@RequestHeader("Authorization") String bearerToken){
-        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
-        log.info("user id : " + userId);
+    public Optional<List<SecurityAccountTransactionsDto>> getSecurityTransactions(@PathVariable("userId") int userId){
         Optional<List<SecurityAccountTransactionsDto>> securityTransactionResponseDtos = securityTransactionService.getSecurityTransactions(userId);
         return securityTransactionResponseDtos;
     }
