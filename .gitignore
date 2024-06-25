@@ -40,3 +40,4 @@ out/
 **/application-sms.properties
 **/application-mq.properties
 **/env.properties
+*.pem
