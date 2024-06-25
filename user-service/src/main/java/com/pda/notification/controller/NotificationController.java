@@ -23,9 +23,9 @@ public class NotificationController {
     private final NotificationService notificationService;
     private final JwtTokenProvider jwtTokenProvider;
 
-    @GetMapping(value = "/subscribe/{user_id}", produces = "text/event-stream")
-    public SseEmitter subscribeNotifications(@PathVariable("user_id") int userId) {
-//        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
+    @GetMapping(value = "/subscribe", produces = "text/event-stream")
+    public SseEmitter subscribeNotifications(@RequestHeader("Authorization") String bearerToken) {
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("subscribe user : " + userId);
         return notificationService.createEmitter(userId);
     }
@@ -36,4 +36,5 @@ public class NotificationController {
         List<Notification> notifications = notificationService.findAllNotificationByUserId(userId);
         return success(notifications);
     }
+    // TODO: 알림 읽기
 }
