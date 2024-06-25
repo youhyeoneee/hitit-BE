@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(name = "user-service", url = "http://localhost:8081")
 public interface AuthClient {
-    @GetMapping("/api/users/validate/{user_id}")
+    @GetMapping("/api/openfeign/users/validate/{user_id}")
     UserDetailsDto validateUser(@PathVariable("user_id") int userId);
 }
 

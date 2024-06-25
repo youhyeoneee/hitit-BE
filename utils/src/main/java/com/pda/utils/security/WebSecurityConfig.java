@@ -42,7 +42,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         // TODO: mydata, portfolio 링크 정리
                         .requestMatchers("/error", "/api/mydata/**", "/api/portfolios/**",
-                        "/api/users/signup", "/api/users/login", "/api/users/login/kakao", "api/users/validate/**",
+                        "/api/users/signup", "/api/users/login", "/api/users/login/kakao", "api/openfeign/users/**",
                                 "/api/investment_tests/questions/**", "/send/**", "/api/notifications/subscribe/**")
                         .permitAll()
                         .anyRequest().authenticated()

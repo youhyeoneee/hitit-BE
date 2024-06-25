@@ -64,7 +64,7 @@ public class PortfolioService {
     private OptimizeServiceClient optimizeServiceClient;
 
     private final MessageService messageService;
-
+    private final UserServiceClient userServiceClient;
 
     //// 1. 자체 서비스 - 포트폴리오 조회
     public List<HititPortfoliosResponseDto> getHititPortfolios() {
@@ -504,6 +504,10 @@ public class PortfolioService {
 
     public MyDataFlaskResponseDto getMyDataPortfolios(Integer userId) {
         // 1. User 모듈에 나이 전달 받기
+        UserAgeTestScoreDto userAgeTestScoreDto = userServiceClient.getUserAgeTestScore(userId);
+        Integer age = userAgeTestScoreDto.getAge();
+        Integer userTestScore = userAgeTestScoreDto.getUserTestScore();
+        log.info("user age : " + age + " and test score : " + userTestScore);
 
         // 2. Asset 모듈에 주식 거래내역, 자산, 보유주식
         // Transaction 객체 리스트 생성
