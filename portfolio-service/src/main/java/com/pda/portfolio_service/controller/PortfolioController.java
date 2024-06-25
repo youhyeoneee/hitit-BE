@@ -174,7 +174,9 @@ public class PortfolioController {
     }
 
 
-    // 11. 마이데이터 - 포트폴리오 전체 조회
+    // 11. 마이데이터 - 포트폴리오 추천 받기
+    //// 이걸로 진행할 것
+    //// 1. jwt token으로 user 꺼내기
     @GetMapping("/mydata")
     public ApiUtils.ApiResult<MyDataFlaskResponseDto> getMyDataPortfolios(@RequestHeader("Authorization") String bearerToken) {
         String token = CustomStringUtils.getToken(bearerToken);
@@ -188,6 +190,10 @@ public class PortfolioController {
         MyDataFlaskResponseDto myDataPortfoliosResponseDto = portfolioService.getMyDataPortfolios(userId);
         return success(myDataPortfoliosResponseDto);
     }
+
+
+
+
 
     @PostMapping("/mydata/leveltest")
     public ApiUtils.ApiResult<List<MyDataTestDto>> getMyDataPortfoliosLevelTest(@RequestBody MyDataFlaskLevelTest myDataFlaskLevelTest) {
