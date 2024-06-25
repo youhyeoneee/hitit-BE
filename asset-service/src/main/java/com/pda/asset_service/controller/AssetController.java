@@ -48,10 +48,8 @@ public class AssetController {
     }
 
     @GetMapping("/security-accounts")
-    public ApiUtils.ApiResult<List<SecurityAccountDto>> getSecurityAccounts(@RequestParam("user_id") int userId) {
-// TODO: 변경
-//        String token = CustomStringUtils.getToken(bearerToken);
-//        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+    public ApiUtils.ApiResult<List<SecurityAccountDto>> getSecurityAccounts(@RequestHeader("Authorization") String bearerToken) {
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
         List<SecurityAccountDto> securityAccounts = securityAccountService.getSecurityAccounts(userId);
@@ -59,11 +57,9 @@ public class AssetController {
     }
 
     @GetMapping("/cards")
-    public ApiUtils.ApiResult<List<CardDto>> getCards(@RequestParam("user_id") int userId) {
+    public ApiUtils.ApiResult<List<CardDto>> getCards(@RequestHeader("Authorization") String bearerToken) {
 
-//        TODO: 변경
-//        String token = CustomStringUtils.getToken(bearerToken);
-//        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
         List<CardDto> cards = cardService.getCards(userId);
@@ -71,10 +67,8 @@ public class AssetController {
     }
 
     @GetMapping("/pensions")
-    public ApiUtils.ApiResult<List<PensionDto>> getPensions(@RequestParam("user_id") int userId) {
-//        TODO: 변경
-//        String token = CustomStringUtils.getToken(bearerToken);
-//        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+    public ApiUtils.ApiResult<List<PensionDto>> getPensions(@RequestHeader("Authorization") String bearerToken) {
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
         List<PensionDto> pensions = pensionService.getPensions(userId);
@@ -82,10 +76,8 @@ public class AssetController {
     }
 
     @GetMapping("/loans")
-    public ApiUtils.ApiResult<List<LoanDto>> getLoans(@RequestParam("user_id") int userId) {
-//        TODO: 변경
-//        String token = CustomStringUtils.getToken(bearerToken);
-//        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+    public ApiUtils.ApiResult<List<LoanDto>> getLoans(@RequestHeader("Authorization") String bearerToken) {
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
         List<LoanDto> loans = loanService.getLoans(userId);
@@ -93,10 +85,8 @@ public class AssetController {
     }
 
     @GetMapping("/totalAssets")
-    public ApiUtils.ApiResult<Integer> getTotalAssets(@RequestParam("user_id") int userId) {
-//        TODO: 변경
-//        String token = CustomStringUtils.getToken(bearerToken);
-//        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+    public ApiUtils.ApiResult<Integer> getTotalAssets(@RequestHeader("Authorization") String bearerToken) {
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
         Integer totalAssets = assetService.getTotalAssets(userId);
