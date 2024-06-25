@@ -214,9 +214,16 @@ public class PortfolioController {
 //    }
 
     @GetMapping("/rebal/getweight")
-    public ApiUtils.ApiResult<RebalancingData> optimizePortfolio() {
+    public ApiUtils.ApiResult optimizePortfolio(@RequestHeader("Authorization") String bearerToken) {
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
+        log.info("user id : " + userId);
 
-        return success(portfolioService.optimizePortfolio());
+        boolean exists = portfolioService.checkUserPortfolioExists(userId);
+        if (exists) {
+            return success(portfolioService.optimizePortfolio(userId));
+        } else {
+            return success("내 포트폴리오가 존재하지 않습니다.");
+        }
     }
 
     //// Test: Spring - Flask 연동 테스트
