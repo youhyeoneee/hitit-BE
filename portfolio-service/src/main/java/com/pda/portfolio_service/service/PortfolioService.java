@@ -140,7 +140,10 @@ public class PortfolioService {
         // 선택한 fund의 fund_code로 private_portfolios_fund_stocks에서 fund_code에 해당하는 데이터 가져오고 List<HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto> 형식으로 리스트로 저장
         Optional<List<PortfolioFundStock>> fundProductsStocks = portfolioFundStockRepository.findByIdFundCode(selectedFund.getId().getFundCode());
         List<HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto> fundStockDtos = fundProductsStocks.orElse(List.of()).stream()
-                .map(stock -> new HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto(stock.getId().getStockName(), stock.getSize(), stock.getStyle(), stock.getWeight()))
+                .map(stock -> {
+                    String stockName = stock.getId().getStockName();
+                    StockIncomeRevResponseDto.StockIncomeRevDto stockIncomeRevDto = stockName2IncomeRev(stockName);
+                    return new HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto(stockName, stock.getSize(), stock.getStyle(), stock.getWeight(), stockIncomeRevDto.getIncome(), stockIncomeRevDto.getRev());})
                 .collect(Collectors.toList());
 
         // 선택한 fund의 fund_code로 private_portfolios_fund_bonds에서 fund_code에 해당하는 데이터 가져오고 List<HititPortfoliosFundsStocksAndBondsResponseDto.FundBondDto> 형식으로 리스트로 저장
@@ -230,6 +233,7 @@ public class PortfolioService {
 
     //// 5. 자산 - 내 포트폴리오 내 펀드 조회
     public List<HititPortfoliosFundsResponseDto> getUserPortfolioFundProducts(int userId) {
+        log.info("user ID : " + userId);
         // 1. User의 Portfolio Id 가져오기
         UserPortfolios userPortfolios
                 = userPortfoliosRepository.findByUserId(userId)
@@ -257,7 +261,7 @@ public class PortfolioService {
 
 
     //// 6. 자산 - 내 포트폴리오 내 펀드 내 주식, 채권 조회
-    public HititPortfoliosFundsStocksAndBondsResponseDto getUserPortfolioFundStocksAndBonds(Integer userId, Integer fundId) {
+    public HititPortfoliosFundsStocksAndBondsResponseDto getUserPortfolioFundStocksAndBonds(Integer userId, Integer fundIdx) {
         // 1. User의 Portfolio Id 가져오기
         UserPortfolios userPortfolios
                 = userPortfoliosRepository.findByUserId(userId)
@@ -276,7 +280,7 @@ public class PortfolioService {
 
 
         // FE에서 유저가 선택한 fund 데이터 인덱스로 가져오기
-        UserPortfoliosFundProducts selectedFund = fundProducts.get(fundId);
+        UserPortfoliosFundProducts selectedFund = fundProducts.get(fundIdx);
 
         FundProducts userPortfoliosFundAssets
                 = fundProductsRepository.findById(selectedFund.getId().getFundCode())
@@ -285,8 +289,12 @@ public class PortfolioService {
 
         // 선택한 fund의 fund_code로 private_portfolios_fund_stocks에서 fund_code에 해당하는 데이터 가져오고 List<HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto> 형식으로 리스트로 저장
         Optional<List<FundStocks>> fundProductsStocks = fundStocksRepository.findByIdFundCode(selectedFund.getId().getFundCode());
+        // 주식
         List<HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto> fundStockDtos = fundProductsStocks.orElse(List.of()).stream()
-                .map(stock -> new HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto(stock.getId().getStockName(), stock.getSize(), stock.getStyle(), stock.getWeight()))
+                .map(stock -> {
+                    String stockName = stock.getId().getStockName();
+                    StockIncomeRevResponseDto.StockIncomeRevDto stockIncomeRevDto = stockName2IncomeRev(stockName);
+                    return new HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto(stockName, stock.getSize(), stock.getStyle(), stock.getWeight(), stockIncomeRevDto.getIncome(), stockIncomeRevDto.getRev());})
                 .collect(Collectors.toList());
 
         // 선택한 fund의 fund_code로 private_portfolios_fund_bonds에서 fund_code에 해당하는 데이터 가져오고 List<HititPortfoliosFundsStocksAndBondsResponseDto.FundBondDto> 형식으로 리스트로 저장
@@ -548,7 +556,11 @@ public class PortfolioService {
                     // 선택한 fund의 fund_code로 private_portfolios_fund_stocks에서 fund_code에 해당하는 데이터 가져오고 List<HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto> 형식으로 리스트로 저장
                     Optional<List<FundStocks>> fundProductsStocks = fundStocksRepository.findByIdFundCode(fund.getFundCode());
                     List<HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto> fundStockDtos = fundProductsStocks.orElse(List.of()).stream()
-                            .map(stock -> new HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto(stock.getId().getStockName(), stock.getSize(), stock.getStyle(), stock.getWeight()))
+                            .map(stock -> {
+                                String stockName = stock.getId().getStockName();
+                                log.info(">>>> search : " + stockName);
+                                StockIncomeRevResponseDto.StockIncomeRevDto stockIncomeRevDto = stockName2IncomeRev(stockName);
+                                return new HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto(stockName, stock.getSize(), stock.getStyle(), stock.getWeight(), stockIncomeRevDto.getIncome(), stockIncomeRevDto.getRev());})
                             .collect(Collectors.toList());
 
                     // 선택한 fund의 fund_code로 private_portfolios_fund_bonds에서 fund_code에 해당하는 데이터 가져오고 List<HititPortfoliosFundsStocksAndBondsResponseDto.FundBondDto> 형식으로 리스트로 저장
@@ -716,5 +728,15 @@ public class PortfolioService {
         messageService.sendNotificationMsgToUserService(notificationDto);
     }
 
+    private StockIncomeRevResponseDto.StockIncomeRevDto stockName2IncomeRev(String stockName) {
+        log.info("stock name : " + stockName);
+        StockRevIncomeRequestDto stockRevIncomeRequestDto = new StockRevIncomeRequestDto(stockName);
+        StockIncomeRevResponseDto stockIncomeRevResponseDto = myDataPortfolioServiceClient.getStockIncomeRev("application/json", stockRevIncomeRequestDto);
+        StockIncomeRevResponseDto.StockIncomeRevDto result = stockIncomeRevResponseDto.getResponse();
+        if (result == null) {
+            return new StockIncomeRevResponseDto.StockIncomeRevDto(null, null);
+        }
+        return result;
+    }
 
 }

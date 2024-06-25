@@ -3,6 +3,7 @@ package com.pda.portfolio_service.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.Date;
@@ -38,6 +39,8 @@ public class HititPortfoliosFundsStocksAndBondsResponseDto {
         private String size;
         private String style;
         private Float weight;
+        private String income;
+        private String rev;
     }
 
     @Getter
