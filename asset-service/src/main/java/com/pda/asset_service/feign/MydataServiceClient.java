@@ -4,13 +4,15 @@ import com.pda.asset_service.dto.*;
 import com.pda.asset_service.jpa.SecurityStock;
 import com.pda.asset_service.jpa.SecurityTransaction;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 import java.util.Optional;
 
-@FeignClient(name = "mydata-service", url = "http://localhost:8082")
+@PropertySource(value = "env.properties")
+@FeignClient(name = "mydata-service", url = "${service.url.mydata}")
 public interface MydataServiceClient {
 
     @GetMapping("/api/mydata/bank-account/{userId}")

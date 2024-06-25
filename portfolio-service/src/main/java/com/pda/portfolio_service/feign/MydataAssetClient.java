@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import java.util.List;
 import java.util.Optional;
 
-@FeignClient(name = "asset-service", url = "http://localhost:8083/api/assets")
+@FeignClient(name = "asset-service", url = "${service.url.asset}/api/assets")
 public interface MydataAssetClient {
 
     // 보유 주식

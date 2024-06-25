@@ -1,7 +1,10 @@
 package com.pda.utils.security;
 
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -12,8 +15,12 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
+@PropertySource("env.properties")
 @EnableWebSecurity
 public class WebSecurityConfig {
+
+    @Value("${service.url.fe}")
+    private String feUrl;
 
     @Bean
     public JwtTokenProvider jwtTokenProvider() {
@@ -22,11 +29,12 @@ public class WebSecurityConfig {
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
+        System.out.println(feUrl);
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:5173")
+                        .allowedOrigins("http://localhost:5173", feUrl)
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
                         .allowedHeaders("*")
                         .allowCredentials(true);
@@ -42,8 +50,8 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         // TODO: mydata, portfolio 링크 정리
                         .requestMatchers("/error", "/api/mydata/**","/api/assets/**", "/api/portfolios/**",
-                        "/api/users/signup", "/api/users/login", "/api/users/login/kakao", "api/openfeign/users/**",
-                                "/api/investment_tests/questions/**", "/send/**", "/api/notifications/subscribe/**")
+                        "/api/users/signup", "/api/users/login", "/api/users/login/kakao", "api/users/openfeign/**",
+                                "/api/users/investment_tests/questions/**", "/api/users/notifications/subscribe/**")
                         .permitAll()
                         .anyRequest().authenticated()
                 )
