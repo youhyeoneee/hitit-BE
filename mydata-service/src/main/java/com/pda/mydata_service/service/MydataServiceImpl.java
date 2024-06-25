@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -23,6 +24,8 @@ public class MydataServiceImpl implements MydataService{
     private final SecurityAccountRepository securityAccountRepository;
     private final LoanRepository loanRepository;
     private final PensionRepository pensionRepository;
+    private final SecurityTransactionRepository securityTransactionRepository;
+    private final SecurityStockRepository securityStockRepository;
 
     @Override
     public BankAccount convertToEntity(BankAccountDto bankAccountDto) {
@@ -109,7 +112,7 @@ public class MydataServiceImpl implements MydataService{
 
     @Override
     public Optional<List<PensionDto>> getPensionsByUserIdAndCompanyName(int userId, String companyName) {
-        Optional<List<Pension>> pensions = pensionRepository.findByMydataUser_IdAndCompanyName(userId, companyName);
+        Optional<List<Pension>> pensions = pensionRepository.findByUserIdAndCompanyName(userId, companyName);
         if (pensions.isPresent()) {
             List<PensionDto> pensionDtos = pensions.get().stream()
                     .map(this::convertToDto)
@@ -122,7 +125,6 @@ public class MydataServiceImpl implements MydataService{
 
     @Override
     public Optional<List<SecurityAccountDto>> getSecurityAccountsByUserIdAndSecurityName(int userId, String securityName) {
-        log.info("///////////////////////////////////////////////////");
         Optional<List<SecurityAccount>> securityAccounts = securityAccountRepository.findByMydataUser_IdAndSecurityName(userId, securityName);
         if (securityAccounts.isPresent()) {
             List<SecurityAccountDto> securityAccountDtos = securityAccounts.get().stream()
@@ -133,6 +135,55 @@ public class MydataServiceImpl implements MydataService{
             return Optional.empty();
         }
     }
+
+    @Override
+    public Optional<List<PensionDto>> getUnclaimedRetirementAccounts(int userId) {
+        Optional<List<Pension>> unclaimedRetirementAccounts = pensionRepository.findByUserIdAndRetirementPensionClaimed(userId, "0");;
+        log.info("FROM REPO = {}", unclaimedRetirementAccounts.get());
+        if (unclaimedRetirementAccounts.isPresent()) {
+            List<PensionDto> pensionDtoList = unclaimedRetirementAccounts.get().stream()
+                    .map(this::convertToDto)
+                    .collect(Collectors.toList());
+
+            log.info("미청구 퇴직연금 리스트 = {}", pensionDtoList);
+            return Optional.of(pensionDtoList);
+        } else {
+            return Optional.empty();
+        }
+
+    }
+
+    @Override
+    public Optional<List<SecurityTransactionDto>> getSecurityTransactions(String accountNo) {
+        Optional<List<SecurityTransaction>> securityTransactions = securityTransactionRepository.findBySecurityAccount_AccountNo(accountNo);
+        if (securityTransactions.isPresent()) {
+            List<SecurityTransactionDto> securityTransactionDtos = securityTransactions.get().stream()
+                    .map(this::convertToDto)
+                    .toList();
+            return Optional.of(securityTransactionDtos);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<List<SecurityStockDto>> getSecurityStocks(String accountNo) {
+        Optional<List<SecurityStock>> securityStocks = securityStockRepository.findByAccountNo(accountNo);
+        if (securityStocks.isPresent()) {
+            log.info("MydataServiceImpl = {}", securityStocks.get());
+            List<SecurityStockDto> securityStockDtos = securityStocks.get().stream()
+                    .map(this::convertToDto)
+                    .toList();
+            return Optional.of(securityStockDtos);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+
+
+
+
 
     private LoanDto convertToDto(Loan loan) {
         return LoanDto.builder()
@@ -168,7 +219,7 @@ public class MydataServiceImpl implements MydataService{
                 .evaluationAmount(pension.getEvaluationAmount())
                 .expirationDate(pension.getExpirationDate())
                 .accountNo(pension.getAccountNo())
-                .userId(pension.getMydataUser().getId())
+                .userId(pension.getUserId())
                 .retirementPensionClaimed(pension.getRetirementPensionClaimed())
                 .build();
     }
@@ -183,6 +234,29 @@ public class MydataServiceImpl implements MydataService{
                 .userId(securityAccount.getMydataUser().getId())
                 .build();
     }
+
+    private SecurityStockDto convertToDto(SecurityStock securityStock) {
+        return SecurityStockDto.builder()
+                .id(securityStock.getId())
+                .accountNo(securityStock.getAccountNo())
+                .stockCode(securityStock.getStockCode())
+                .build();
+    }
+
+    private SecurityTransactionDto convertToDto(SecurityTransaction securityTransaction) {
+        return SecurityTransactionDto.builder()
+                .id(securityTransaction.getId())
+                .txDatetime(securityTransaction.getTxDatetime())
+                .txType(securityTransaction.getTxType())
+                .txAmount(securityTransaction.getTxAmount())
+                .balAfterTx(securityTransaction.getBalAfterTx())
+                .txQty(securityTransaction.getTxQty())
+                .accountNo(securityTransaction.getSecurityAccount().getAccountNo())
+                .stockCode(securityTransaction.getStockCode())
+                .build();
+    }
+
+
 
 
 }

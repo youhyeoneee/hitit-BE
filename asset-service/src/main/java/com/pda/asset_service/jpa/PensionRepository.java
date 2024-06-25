@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface PensionRepository extends JpaRepository<Pension, PensionId> {
     Optional<List<Pension>> findByUserId(int userId);
+
+//    Optional<List<Pension>> findByUserIdAndRetirementPensionClaimed(int userId, int isClaimed);
 }

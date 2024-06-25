@@ -1,8 +1,7 @@
-package com.pda.asset_service.jpa;
+package com.pda.mydata_service.jpa;
 
 
 import jakarta.persistence.*;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,8 +34,9 @@ public class SecurityTransaction {
     @Column(name = "tx_qty")
     private Integer txQty;
 
-    @Column(name = "account_no")
-    private String accountNo;
+    @ManyToOne
+    @JoinColumn(name = "account_no")
+    private SecurityAccount securityAccount;
 
     @Column(name = "stock_code")
     private String stockCode;

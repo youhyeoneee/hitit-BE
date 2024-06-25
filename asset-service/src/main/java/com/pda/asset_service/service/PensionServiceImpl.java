@@ -116,4 +116,29 @@ public class PensionServiceImpl implements PensionService{
         return pensionDtos;
     }
 
+    @Override
+    public List<PensionDto> getUnclaimedRetirementAccounts(int userId) {
+        List<PensionResponseDto> unclaimedRetirementAccounts = mydataServiceClient.getUnclaimedRetirementAccounts(userId).orElse(null);
+
+        List<PensionDto> unclaimedRetirementAccountDtos = new ArrayList<>();
+        if (unclaimedRetirementAccounts != null) {
+            for (PensionResponseDto unclaimedRetirementAccount : unclaimedRetirementAccounts) {
+                PensionDto pensionDto = PensionDto.builder()
+                        .accountNo(unclaimedRetirementAccount.getAccountNo())
+                        .companyName(unclaimedRetirementAccount.getCompanyName())
+                        .pensionName(unclaimedRetirementAccount.getPensionName())
+                        .pensionType(unclaimedRetirementAccount.getPensionType())
+                        .interestRate(unclaimedRetirementAccount.getInterestRate())
+                        .evaluationAmount(unclaimedRetirementAccount.getEvaluationAmount())
+                        .expirationDate(unclaimedRetirementAccount.getExpirationDate())
+                        .userId(userId)
+                        .retirementPensionClaimed(unclaimedRetirementAccount.getRetirementPensionClaimed())
+                        .build();
+                log.info("find pension account = {}", pensionDto);
+                unclaimedRetirementAccountDtos.add(pensionDto);
+            }
+        }
+        return unclaimedRetirementAccountDtos;
+    }
+
 }

@@ -1,14 +1,9 @@
 package com.pda.asset_service.service;
 
 
-import com.pda.asset_service.dto.MydataInfoDto;
-import com.pda.asset_service.dto.SecurityAccountDto;
-import com.pda.asset_service.dto.SecurityAccountResponseDto;
+import com.pda.asset_service.dto.*;
 import com.pda.asset_service.feign.MydataServiceClient;
-import com.pda.asset_service.jpa.MydataInfo;
-import com.pda.asset_service.jpa.MydataInfoRepository;
-import com.pda.asset_service.jpa.SecurityAccount;
-import com.pda.asset_service.jpa.SecurityAccountRepository;
+import com.pda.asset_service.jpa.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,6 +19,8 @@ public class SecurityAccountServiceImpl implements SecurityAccountService{
 
     private final SecurityAccountRepository securityAccountRepository;
     private final MydataInfoRepository mydataInfoRepository;
+    private final SecurityTransactionRepository securityTransactionRepository;
+    private final SecurityStockRepository securityStockRepository;
     private final MydataServiceClient mydataServiceClient;
     @Override
     public SecurityAccount convertToEntity(SecurityAccountResponseDto securityAccountResponseDto) {
@@ -89,6 +86,10 @@ public class SecurityAccountServiceImpl implements SecurityAccountService{
                                 .build();
 
                         securityAccountsLinkInfo.add(mydataInfoDto);
+
+                        // 거래내역, 보유주식 데이터 가져오기
+                        linkSecurityTransactions(securityAccount.getAccountNo());
+                        linkSecurityStocks(securityAccount.getAccountNo());
                     }
                 }
             }else{
@@ -96,6 +97,48 @@ public class SecurityAccountServiceImpl implements SecurityAccountService{
             }
         }
         return securityAccountsLinkInfo;
+    }
+
+
+    public void linkSecurityTransactions(String accountNo){
+        log.info("GGGGGGGGGGGGGGOOOOOOOOOOOOOOOOOOOOOOO = {}", accountNo);
+        Optional<List<SecurityTransactionResponseDto>> linkedSecurityTransactions = mydataServiceClient.getSecurityTransactions(accountNo);
+        if(linkedSecurityTransactions.isPresent()){
+            for(SecurityTransactionResponseDto securityTransaction : linkedSecurityTransactions.get()){
+                securityTransactionRepository.save(SecurityTransaction.builder()
+                                .id(securityTransaction.getId())
+                                .txDatetime(securityTransaction.getTxDatetime())
+                                .txType(securityTransaction.getTxType())
+                                .txAmount(securityTransaction.getTxAmount())
+                                .txQty(securityTransaction.getTxQty())
+                                .balAfterTx(securityTransaction.getBalAfterTx())
+                                .accountNo(securityTransaction.getAccountNo())
+                                .stockCode(securityTransaction.getStockCode())
+                        .build());
+            }
+        }else {
+            log.info("해당 계좌 거래 내역 없음");
+        }
+//        return linkedSecurityTransactions.orElse(null);
+    }
+
+
+    public void linkSecurityStocks(String accountNo){
+        Optional<List<SecurityStockResponseDto>> linkedSecurityStocks  = mydataServiceClient.getSecurityStocks(accountNo);
+        log.info("linkSecurityStocks = {}", String.valueOf(linkedSecurityStocks));
+        if(linkedSecurityStocks.isPresent()){
+            for(SecurityStockResponseDto securityStock : linkedSecurityStocks.get()){
+                log.info("Security Stock 가져온거 꺼냄... = {}", securityStock);
+                SecurityStock newSecurityStock = SecurityStock.builder()
+                        .id(securityStock.getId())
+                                            .stockCode(securityStock.getStockCode())
+                                                .accountNo(securityStock.getAccountNo()).build();
+                securityStockRepository.save(newSecurityStock);
+            }
+        }else {
+            log.info("해당 계좌 보유 주식 없음");
+        }
+//        return linkedSecurityStocks.orElse(null);
     }
 
     @Override

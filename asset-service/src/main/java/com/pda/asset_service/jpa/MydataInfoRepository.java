@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MydataInfoRepository extends JpaRepository<MydataInfo, Integer> {
@@ -21,4 +22,7 @@ public interface MydataInfoRepository extends JpaRepository<MydataInfo, Integer>
     MydataInfo findCardByUserIdAndAssetTypeAndCompanyNameAndAccountNo(int id, String cards, String companyName, String cardNo);
 
     MydataInfo findSecurityByUserIdAndAssetTypeAndCompanyNameAndAccountNo(int id, String securityAccounts, String securityName, String accountNo);
+
+
+    Optional<List<MydataInfo>> findByUserIdAndAssetType(int userId, String securityAccounts);
 }

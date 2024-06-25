@@ -11,6 +11,9 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
+
+import static com.pda.utils.api_utils.ApiUtils.success;
 
 @RestController
 @Slf4j
@@ -27,6 +30,8 @@ public class AssetController {
     private final LoanServiceImpl loanService;
     private final AuthClient authClient;
     private final JwtTokenProvider jwtTokenProvider;
+    private final SecurityStockServiceImpl securityStockService;
+    private final SecurityTransactionServiceImpl securityTransactionService;
 
     @PostMapping("/mydata-link")
     public ApiUtils.ApiResult<List<MydataInfoDto>> linkMydata(@RequestHeader("Authorization") String bearerToken,
@@ -36,7 +41,7 @@ public class AssetController {
         log.info("user id : " + userId);
 
         List<MydataInfoDto> bankAccountsLinkInfo = assetService.linkMydata(userId, userAccountInfoDto);
-        return ApiUtils.success(bankAccountsLinkInfo);
+        return success(bankAccountsLinkInfo);
     }
 
     @GetMapping("/bank-accounts")
@@ -44,7 +49,7 @@ public class AssetController {
         int userId =  jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
         List<BankAccountDto> bankAccounts = bankAccountService.getBankAccounts(userId);
-        return ApiUtils.success(bankAccounts);
+        return success(bankAccounts);
     }
 
     @GetMapping("/security-accounts")
@@ -53,7 +58,7 @@ public class AssetController {
         log.info("user id : " + userId);
 
         List<SecurityAccountDto> securityAccounts = securityAccountService.getSecurityAccounts(userId);
-        return ApiUtils.success(securityAccounts);
+        return success(securityAccounts);
     }
 
     @GetMapping("/cards")
@@ -63,7 +68,7 @@ public class AssetController {
         log.info("user id : " + userId);
 
         List<CardDto> cards = cardService.getCards(userId);
-        return ApiUtils.success(cards);
+        return success(cards);
     }
 
     @GetMapping("/pensions")
@@ -81,7 +86,7 @@ public class AssetController {
         log.info("user id : " + userId);
 
         List<LoanDto> loans = loanService.getLoans(userId);
-        return ApiUtils.success(loans);
+        return success(loans);
     }
 
     @GetMapping("/totalAssets")
@@ -91,6 +96,45 @@ public class AssetController {
 
         Integer totalAssets = assetService.getTotalAssets(userId);
         log.info("totalAssets = {}", totalAssets);
-        return ApiUtils.success(totalAssets);
+        return success(totalAssets);
     }
+
+    @GetMapping("/retirement-pension-claim")
+    public ApiUtils.ApiResult<List<PensionDto>> getUnclaimedRetirementAccounts(@RequestHeader("Authorization") String bearerToken){
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
+        log.info("user id : " + userId);
+
+        List<PensionDto> unclaimedRetirementAccounts = assetService.getUnclaimedRetirementAccounts(userId);
+        log.info(unclaimedRetirementAccounts.toString());
+        return success(unclaimedRetirementAccounts);
+    }
+
+    // portfolio openFeign mapping
+    // 보유 주식
+    @GetMapping("/security-stocks/{userId}")
+    public Optional<List<SecurityAccountStocksDto>> getSecurityStocks(@RequestHeader("Authorization") String bearerToken){
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
+        log.info("user id : " + userId);
+        Optional<List<SecurityAccountStocksDto>> securityStockResponseDtos = securityStockService.getSecurityStocks(userId);
+        return securityStockResponseDtos;
+    }
+    // 총자산
+    @GetMapping("/totalAssets/{userId}")
+    public Integer getTotalAssets(@RequestHeader("Authorization") String bearerToken){
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
+        log.info("user id : " + userId);
+        Integer totalAssets = assetService.getTotalAssets(userId);
+        return totalAssets;
+    }
+
+    // 거래내역
+    @GetMapping("/security-transactions/{userId}")
+    public Optional<List<SecurityAccountTransactionsDto>> getSecurityTransactions(@RequestHeader("Authorization") String bearerToken){
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
+        log.info("user id : " + userId);
+        Optional<List<SecurityAccountTransactionsDto>> securityTransactionResponseDtos = securityTransactionService.getSecurityTransactions(userId);
+        return securityTransactionResponseDtos;
+    }
+
+
 }

@@ -12,22 +12,20 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PensionResponseDto {
-    private String companyName;
+public class SecurityTransactionResponseDto {
+    private Integer id;
 
-    private String pensionName;
+    private Date txDatetime;
 
-    private String pensionType;
+    private String txType;
 
-    private Double interestRate;
+    private String txAmount;
 
-    private String evaluationAmount;
+    private Integer balAfterTx;
 
-    private Date expirationDate;
+    private Integer txQty;
 
     private String accountNo;
 
-    private String retirementPensionClaimed;
-
-    private Integer userId;
+    private String stockCode;
 }

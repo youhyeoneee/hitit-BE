@@ -43,6 +43,6 @@ public class Pension implements Serializable {
     private Date expirationDate;
 
     @Column(name = "retirement_pension_claimed")
-    private Boolean retirementPensionClaimed;
+    private String retirementPensionClaimed;
 }
 
