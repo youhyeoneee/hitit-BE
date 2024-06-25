@@ -5,6 +5,7 @@ package com.pda.asset_service.service;
 
 import com.pda.asset_service.dto.MydataInfoDto;
 import com.pda.asset_service.dto.PensionDto;
+import com.pda.asset_service.dto.RetirementAccountDto;
 import com.pda.asset_service.dto.UserAccountInfoDto;
 
 import java.util.List;
@@ -14,5 +15,5 @@ public interface AssetService {
 
     Integer getTotalAssets(int userId);
 
-    List<PensionDto> getUnclaimedRetirementAccounts(int userId);
+    List<RetirementAccountDto> getUnclaimedRetirementAccounts(int userId);
 }
