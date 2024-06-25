@@ -287,15 +287,6 @@ public class PortfolioService {
                         .thenComparing(Comparator.comparing(UserPortfoliosFundProducts::getFundName, Comparator.nullsLast(Comparator.naturalOrder()))));
 
 
-        // 선택한 fund의 fund_code로 private_portfolios_fund_stocks에서 fund_code에 해당하는 데이터 가져오고 List<HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto> 형식으로 리스트로 저장
-        Optional<List<FundStocks>> fundProductsStocks = fundStocksRepository.findByIdFundCode(selectedFund.getId().getFundCode());
-        // 주식
-        List<HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto> fundStockDtos = fundProductsStocks.orElse(List.of()).stream()
-                .map(stock -> {
-                    String stockName = stock.getId().getStockName();
-                    StockIncomeRevResponseDto.StockIncomeRevDto stockIncomeRevDto = stockName2IncomeRev(stockName);
-                    return new HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto(stockName, stock.getSize(), stock.getStyle(), stock.getWeight(), stockIncomeRevDto.getIncome(), stockIncomeRevDto.getRev());})
-                .collect(Collectors.toList());
                 // FE에서 유저가 선택한 fund 데이터 인덱스로 가져오기
                 UserPortfoliosFundProducts selectedFund = fundProducts.get(fundId);
 
@@ -307,9 +298,20 @@ public class PortfolioService {
 
                 // 선택한 fund의 fund_code로 private_portfolios_fund_stocks에서 fund_code에 해당하는 데이터 가져오고 List<HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto> 형식으로 리스트로 저장
                 Optional<List<FundStocks>> fundProductsStocks = fundStocksRepository.findByIdFundCode(selectedFund.getId().getFundCode());
+
+                // 주식
                 List<HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto> fundStockDtos = fundProductsStocks.orElse(List.of()).stream()
-                        .map(stock -> new HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto(stock.getId().getStockName(), stock.getSize(), stock.getStyle(), stock.getWeight()))
+                        .map(stock -> {
+                            String stockName = stock.getId().getStockName();
+                            StockIncomeRevResponseDto.StockIncomeRevDto stockIncomeRevDto = stockName2IncomeRev(stockName);
+                            return new HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto(stockName, stock.getSize(), stock.getStyle(), stock.getWeight(), stockIncomeRevDto.getIncome(), stockIncomeRevDto.getRev());})
                         .collect(Collectors.toList());
+
+                // 선택한 fund의 fund_code로 private_portfolios_fund_stocks에서 fund_code에 해당하는 데이터 가져오고 List<HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto> 형식으로 리스트로 저장
+//                Optional<List<FundStocks>> fundProductsStocks = fundStocksRepository.findByIdFundCode(selectedFund.getId().getFundCode());
+//                List<HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto> fundStockDtos = fundProductsStocks.orElse(List.of()).stream()
+//                        .map(stock -> new HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto(stock.getId().getStockName(), stock.getSize(), stock.getStyle(), stock.getWeight()))
+//                        .collect(Collectors.toList());
 
                 // 선택한 fund의 fund_code로 private_portfolios_fund_bonds에서 fund_code에 해당하는 데이터 가져오고 List<HititPortfoliosFundsStocksAndBondsResponseDto.FundBondDto> 형식으로 리스트로 저장
                 Optional<List<FundBonds>> fundProductsBonds = fundBondsRepository.findByIdFundCode(selectedFund.getId().getFundCode());
