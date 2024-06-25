@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import static com.pda.utils.api_utils.ApiUtils.error;
 
@@ -43,7 +44,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({NotFoundUserException.class, NotCorrectPasswordException.class,
-            QuestionNotFoundException.class, AnswerNotFoundException.class, UserAnswerNotFoundException.class})
+            QuestionNotFoundException.class, AnswerNotFoundException.class, UserAnswerNotFoundException.class,
+    NoSuchElementException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiUtils.ApiResult<String> handleBadRequestException(RuntimeException error) {
         String errorMessage = error.getMessage();

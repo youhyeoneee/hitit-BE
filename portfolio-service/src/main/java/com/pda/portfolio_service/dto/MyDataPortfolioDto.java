@@ -1,4 +1,4 @@
-package com.pda.portfolio_service.dto_test;
+package com.pda.portfolio_service.dto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -14,31 +14,26 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MyDataTestDto {
-
+public class MyDataPortfolioDto {
     private String name;
     private String investmentType;
     private String summary;
     private int minimumSubscriptionFee;
     private int stockExposure;
     private double return3m;
-    private List<FundDto> funds;
-
+    private List<MyDataPortfolioFundDto> funds;
 
     @Getter
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor
-
-    public static class FundDto {
-
+    public static class MyDataPortfolioFundDto {
         private String fundCode;
         private String fundName;
         private String fundTypeDetail;
         private String companyName;
-        private double weight;
-        private double return3m;
-        // PortfolioFundAsset 관련 필드
+        private Float weight;
+        private Float return3m;
         private Float stock;
         private Float stockForeign;
         private Float bond;
