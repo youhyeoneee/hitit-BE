@@ -7,6 +7,7 @@ import com.pda.portfolio_service.jpa.*;
 import com.pda.utils.rabbitmq.dto.NotificationDto;
 import com.pda.utils.rabbitmq.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -176,7 +177,7 @@ public class PortfolioService {
         UserPortfolios userPortfolios
                 = userPortfoliosRepository.findByUserId(userId)
                 .orElseThrow(()
-                        -> new NoSuchElementException("유저가 존재하지 않습니다."));
+                        -> new NoSuchElementException("포트폴리오가 존재하지 않습니다."));
 
 
         // 2. Portfolio Id를 통해 펀드리스트 가져오기
@@ -326,12 +327,179 @@ public class PortfolioService {
     }
 
     // 유저에 포트폴리오 삽입
-//    public void changeUserPortfolio(Integer userId, Integer portfolio_id) {
+    public void selectUserPortfolio(Integer userId, Integer portfolio_id) {
 //        1. portfolio_id로 private_portfolios의 id로 행 조회
 //        2. portfolio_id로 private_portfolios_fund_products의 portfolio_id에 해당 하는 행들 전부 조회
 //        3. 1번에서 조회한 행 user_portfolios에 조회한 행(id 제외) + userId 저장(auto_increment)
-//        4.
-//    }
+//        4. 2번에서 조회한 행 user_portfolios_fund_products에 저장
+
+        // 1. portfolio_id로 private_portfolios의 id로 행 조회
+        Portfolio privatePortfolio = portfolioRepository.findById(portfolio_id)
+                .orElseThrow(() -> new RuntimeException("포트폴리오를 찾을 수 없습니다."));
+
+        // 2. portfolio_id로 private_portfolios_fund_products의 portfolio_id에 해당하는 행들 전부 조회
+        List<PortfolioFund> privateFundProducts = portfolioFundRepository.findByIdPortfolioId(portfolio_id);
+
+        // 3. 1번에서 조회한 행 user_portfolios에 조회한 행(id 제외) + userId 저장(auto_increment)
+        UserPortfolios userPortfolios = new UserPortfolios();
+
+        userPortfolios.setName(privatePortfolio.getName());
+        userPortfolios.setInvestmentType(privatePortfolio.getInvestmentType());
+        userPortfolios.setSummary(privatePortfolio.getSummary());
+        userPortfolios.setMinimumSubscriptionFee(privatePortfolio.getMinimumSubscriptionFee());
+        userPortfolios.setStockExposure(privatePortfolio.getStockExposure());
+        userPortfolios.setUserId(userId);
+
+        // privatePortfolio의 나머지 필드를 userPortfolio에 복사
+        UserPortfolios savedUser = userPortfoliosRepository.save(userPortfolios);
+
+        // 4. 2번에서 조회한 행 user_portfolios_fund_products에 저장
+        for (PortfolioFund privateFundProduct : privateFundProducts) {
+            UserPortfoliosFundProducts userFundProduct = new UserPortfoliosFundProducts();
+            PortfolioFundId portfolioFundId = new PortfolioFundId( privateFundProduct.getId().getFundCode(), savedUser.getId());
+
+            userFundProduct.setId(portfolioFundId);
+            userFundProduct.setFundName(privateFundProduct.getFundName());
+            userFundProduct.setFundTypeDetail(privateFundProduct.getFundTypeDetail());
+            userFundProduct.setCompanyName(privateFundProduct.getCompanyName());
+            userFundProduct.setWeight(privateFundProduct.getWeight());
+            userFundProduct.setReturn3m(privateFundProduct.getReturn3m());
+
+            userPortfoliosFundProductsRepository.save(userFundProduct);
+        }
+    }
+
+    @Transactional
+    public void changeUserPortfolio(int userId, Integer portfolio_id) {
+        // 1. portfolio_id로 private_portfolios의 id로 행 조회
+        Portfolio privatePortfolio = portfolioRepository.findById(portfolio_id)
+                .orElseThrow(() -> new RuntimeException("포트폴리오를 찾을 수 없습니다."));
+
+        // 2. portfolio_id로 private_portfolios_fund_products의 portfolio_id에 해당하는 행들 전부 조회
+        List<PortfolioFund> privateFundProducts = portfolioFundRepository.findByIdPortfolioId(portfolio_id);
+
+        // 3. userId로 UserPortfolios에서 userId에 해당하는 행 조회
+        // 4. 해당 행의 id값으로
+        //   UserPortfoliosFundProducts에서 portfolio_id와 저 id가 같은 행들 모두 삭제
+        // 5. userId로 UserPortfolios 삭제
+        // 3. userId로 UserPortfolios에서 userId에 해당하는 행 조회
+        UserPortfolios existingUserPortfolios = userPortfoliosRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("포트폴리오를 찾을 수 없습니다."));;
+
+        // 4. 해당 행의 id값으로 UserPortfoliosFundProducts에서 portfolio_id와 저 id가 같은 행들 모두 삭제
+
+        userPortfoliosFundProductsRepository.deleteByIdPortfolioId(existingUserPortfolios.getId());
+
+        // 5. userId로 UserPortfolios 삭제
+        userPortfoliosRepository.deleteByUserId(userId);
+
+        // 3. 1번에서 조회한 행 user_portfolios에 조회한 행(id 제외) + userId 저장(auto_increment)
+        UserPortfolios userPortfolios = new UserPortfolios();
+
+        userPortfolios.setName(privatePortfolio.getName());
+        userPortfolios.setInvestmentType(privatePortfolio.getInvestmentType());
+        userPortfolios.setSummary(privatePortfolio.getSummary());
+        userPortfolios.setMinimumSubscriptionFee(privatePortfolio.getMinimumSubscriptionFee());
+        userPortfolios.setStockExposure(privatePortfolio.getStockExposure());
+        userPortfolios.setUserId(userId);
+
+        // privatePortfolio의 나머지 필드를 userPortfolio에 복사
+        UserPortfolios savedUser = userPortfoliosRepository.save(userPortfolios);
+
+        // 4. 2번에서 조회한 행 user_portfolios_fund_products에 저장
+        for (PortfolioFund privateFundProduct : privateFundProducts) {
+            UserPortfoliosFundProducts userFundProduct = new UserPortfoliosFundProducts();
+            PortfolioFundId portfolioFundId = new PortfolioFundId( privateFundProduct.getId().getFundCode(), savedUser.getId());
+
+            userFundProduct.setId(portfolioFundId);
+            userFundProduct.setFundName(privateFundProduct.getFundName());
+            userFundProduct.setFundTypeDetail(privateFundProduct.getFundTypeDetail());
+            userFundProduct.setCompanyName(privateFundProduct.getCompanyName());
+            userFundProduct.setWeight(privateFundProduct.getWeight());
+            userFundProduct.setReturn3m(privateFundProduct.getReturn3m());
+
+            userPortfoliosFundProductsRepository.save(userFundProduct);
+        }
+    }
+
+    //// 9. 마이데이터 - 포트폴리오 선택하기
+    public void selectMyDataPortfolio(Integer userId, MyDataPortfolioDto myDataPortfolioDto) {
+
+        // 1. user_portfolios에 조회한 행(id 제외) + userId 저장(auto_increment)
+        UserPortfolios userPortfolios = new UserPortfolios();
+
+        userPortfolios.setName(myDataPortfolioDto.getName());
+        userPortfolios.setInvestmentType(myDataPortfolioDto.getInvestmentType());
+        userPortfolios.setSummary(myDataPortfolioDto.getSummary());
+        userPortfolios.setMinimumSubscriptionFee(myDataPortfolioDto.getMinimumSubscriptionFee());
+        userPortfolios.setStockExposure(myDataPortfolioDto.getStockExposure());
+        userPortfolios.setUserId(userId);
+
+        // 2. user_portfolios에 저장
+        UserPortfolios savedUser = userPortfoliosRepository.save(userPortfolios);
+
+        // 3. 2번에서 조회한 행 user_portfolios_fund_products에 저장
+        for (MyDataPortfolioDto.MyDataPortfolioFundDto privateFundProduct : myDataPortfolioDto.getFunds()) {
+            UserPortfoliosFundProducts userFundProduct = new UserPortfoliosFundProducts();
+            PortfolioFundId portfolioFundId = new PortfolioFundId( privateFundProduct.getFundCode(), savedUser.getId());
+
+            userFundProduct.setId(portfolioFundId);
+            userFundProduct.setFundName(privateFundProduct.getFundName());
+            userFundProduct.setFundTypeDetail(privateFundProduct.getFundTypeDetail());
+            userFundProduct.setCompanyName(privateFundProduct.getCompanyName());
+            userFundProduct.setWeight(privateFundProduct.getWeight());
+            userFundProduct.setReturn3m(privateFundProduct.getReturn3m());
+
+            userPortfoliosFundProductsRepository.save(userFundProduct);
+        }
+    }
+
+    @Transactional
+    public void changeMyDataPortfolio(int userId, MyDataPortfolioDto myDataPortfolioDto) {
+
+        // 3. userId로 UserPortfolios에서 userId에 해당하는 행 조회
+        // 4. 해당 행의 id값으로
+        //   UserPortfoliosFundProducts에서 portfolio_id와 저 id가 같은 행들 모두 삭제
+        // 5. userId로 UserPortfolios 삭제
+        // 3. userId로 UserPortfolios에서 userId에 해당하는 행 조회
+        UserPortfolios existingUserPortfolios = userPortfoliosRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("포트폴리오를 찾을 수 없습니다."));;
+
+        // 4. 해당 행의 id값으로 UserPortfoliosFundProducts에서 portfolio_id와 저 id가 같은 행들 모두 삭제
+
+        userPortfoliosFundProductsRepository.deleteByIdPortfolioId(existingUserPortfolios.getId());
+
+        // 5. userId로 UserPortfolios 삭제
+        userPortfoliosRepository.deleteByUserId(userId);
+
+        // 3. 1번에서 조회한 행 user_portfolios에 조회한 행(id 제외) + userId 저장(auto_increment)
+        UserPortfolios userPortfolios = new UserPortfolios();
+
+        userPortfolios.setName(myDataPortfolioDto.getName());
+        userPortfolios.setInvestmentType(myDataPortfolioDto.getInvestmentType());
+        userPortfolios.setSummary(myDataPortfolioDto.getSummary());
+        userPortfolios.setMinimumSubscriptionFee(myDataPortfolioDto.getMinimumSubscriptionFee());
+        userPortfolios.setStockExposure(myDataPortfolioDto.getStockExposure());
+        userPortfolios.setUserId(userId);
+
+        // privatePortfolio의 나머지 필드를 userPortfolio에 복사
+        UserPortfolios savedUser = userPortfoliosRepository.save(userPortfolios);
+
+        // 4. 2번에서 조회한 행 user_portfolios_fund_products에 저장
+        for (MyDataPortfolioDto.MyDataPortfolioFundDto privateFundProduct : myDataPortfolioDto.getFunds()) {
+            UserPortfoliosFundProducts userFundProduct = new UserPortfoliosFundProducts();
+            PortfolioFundId portfolioFundId = new PortfolioFundId( privateFundProduct.getFundCode(), savedUser.getId());
+
+            userFundProduct.setId(portfolioFundId);
+            userFundProduct.setFundName(privateFundProduct.getFundName());
+            userFundProduct.setFundTypeDetail(privateFundProduct.getFundTypeDetail());
+            userFundProduct.setCompanyName(privateFundProduct.getCompanyName());
+            userFundProduct.setWeight(privateFundProduct.getWeight());
+            userFundProduct.setReturn3m(privateFundProduct.getReturn3m());
+
+            userPortfoliosFundProductsRepository.save(userFundProduct);
+        }
+    }
 
 
     public MyDataFlaskResponseDto getMyDataPortfolios(Integer userId) {
@@ -543,4 +711,6 @@ public class PortfolioService {
 
         messageService.sendNotificationMsgToUserService(notificationDto);
     }
+
+
 }

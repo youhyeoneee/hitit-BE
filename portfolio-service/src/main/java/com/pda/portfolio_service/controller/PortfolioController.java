@@ -116,10 +116,59 @@ public class PortfolioController {
 //        if (exists) {
 //            return success( "포트폴리오를 바꾸겠습니까?");
 //        } else {
-//            portfolioService.changeUserPortfolio(userId, portfolio_id);
+//            portfolioService.selectUserPortfolio(userId, portfolio_id);
 //            return success("포트폴리오가 변경되었습니다.");
 //        }
 //    }
+
+    //// 8. 자체서비스 - 포트폴리오 선택 후 변경하기
+    @PostMapping("/change/{portfolio_id}")
+    public ApiUtils.ApiResult changeHitItPortfolio(@RequestHeader("Authorization") String bearerToken, @PathVariable("portfolio_id") Integer portfolio_id) {
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
+        log.info("user id : " + userId);
+
+        boolean exists = portfolioService.checkUserPortfolioExists(userId);
+        if (exists) {
+            portfolioService.changeUserPortfolio(userId, portfolio_id);
+            return success("포트폴리오가 변경되었습니다.");
+        } else {
+            portfolioService.selectUserPortfolio(userId, portfolio_id);
+            return success("포트폴리오가 선택되었습니다.");
+        }
+    }
+
+    //// 9. 마이데이터 - 포트폴리오 선택하기
+//    @PostMapping("/mydata/select")
+//    public ApiUtils.ApiResult selectMyDataPortfolio(@RequestHeader("Authorization") String bearerToken, @RequestBody MyDataPortfolioDto myDataPortfolioDto) {
+//        String token = CustomStringUtils.getToken(bearerToken);
+//        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+//        log.info("user id" + userId);
+//
+//        boolean exists = portfolioService.checkUserPortfolioExists(userId);
+//        if (exists) {
+//            return success( "포트폴리오를 바꾸겠습니까?");
+//        } else {
+//            portfolioService.selectMyDataPortfolio(userId, myDataPortfolioDto);
+//            return success("포트폴리오가 변경되었습니다.");
+//        }
+//    }
+
+
+    //// 10. 마이데이터 - 포트폴리오 선택하기
+    @PostMapping("/mydata/change")
+    public ApiUtils.ApiResult changeMyDataPortfolio(@RequestHeader("Authorization") String bearerToken, @RequestBody MyDataPortfolioDto myDataPortfolioDto) {
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
+        log.info("user id : " + userId);
+
+        boolean exists = portfolioService.checkUserPortfolioExists(userId);
+        if (exists) {
+            portfolioService.changeMyDataPortfolio(userId, myDataPortfolioDto);
+            return success("포트폴리오가 변경되었습니다.");
+        } else {
+            portfolioService.selectMyDataPortfolio(userId, myDataPortfolioDto);
+            return success("포트폴리오가 선택되었습니다.");
+        }
+    }
 
 
     @GetMapping("/mydata")

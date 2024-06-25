@@ -2,6 +2,7 @@ package com.pda.portfolio_service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Date;
@@ -31,8 +32,9 @@ public class HititPortfoliosFundsStocksAndBondsResponseDto {
 
     @Getter
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class FundStockDto {
-        private String stock_name;
+        private String stockName;
         private String size;
         private String style;
         private Float weight;
@@ -40,8 +42,9 @@ public class HititPortfoliosFundsStocksAndBondsResponseDto {
 
     @Getter
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class FundBondDto {
-        private String bond_name;
+        private String bondName;
         private Date expiredDate;
         private Float duration;
         private String credit;
