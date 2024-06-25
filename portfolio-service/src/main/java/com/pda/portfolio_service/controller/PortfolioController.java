@@ -3,6 +3,7 @@ package com.pda.portfolio_service.controller;
 import com.pda.portfolio_service.dto.*;
 import com.pda.portfolio_service.dto_test.MyDataTestDto;
 import com.pda.portfolio_service.feign.MyDataFlaskResponseDto;
+import com.pda.portfolio_service.redis.RebalancingData;
 import com.pda.portfolio_service.service.PortfolioService;
 import com.pda.utils.api_utils.ApiUtils;
 import com.pda.utils.api_utils.CustomStringUtils;
@@ -172,14 +173,25 @@ public class PortfolioController {
     }
 
 
+    // 11. 마이데이터 - 포트폴리오 추천 받기
+    //// 이걸로 진행할 것
+    //// 1. jwt token으로 user 꺼내기
     @GetMapping("/mydata")
     public ApiUtils.ApiResult<MyDataFlaskResponseDto> getMyDataPortfolios(@RequestHeader("Authorization") String bearerToken) {
         int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
+        // 1. OpenFeign으로 User에게 user에게 나이, 투자성향테스트 레벨 가져오기
+
+        // 2. OpenFeign으로 Asset에게 투자거래내역, 보유주식, 총자산 가져오기
+
         MyDataFlaskResponseDto myDataPortfoliosResponseDto = portfolioService.getMyDataPortfolios(userId);
         return success(myDataPortfoliosResponseDto);
     }
+
+
+
+
 
     @PostMapping("/mydata/leveltest")
     public ApiUtils.ApiResult<List<MyDataTestDto>> getMyDataPortfoliosLevelTest(@RequestBody MyDataFlaskLevelTest myDataFlaskLevelTest) {
@@ -189,12 +201,10 @@ public class PortfolioController {
     }
 
     @GetMapping("/rebal/getweight")
-    public ApiUtils.ApiResult<OptimizeResponseCamelCaseDto> optimizePortfolio() {
+    public ApiUtils.ApiResult<RebalancingData> optimizePortfolio() {
 
         return success(portfolioService.optimizePortfolio());
     }
-
-
 
     //// Test: Spring - Flask 연동 테스트
     @GetMapping("/analyze-sentiment/{text}")

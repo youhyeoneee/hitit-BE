@@ -21,7 +21,9 @@ public class OptimizeResponseMapper {
                                                 stock.getStockCode(),
                                                 stock.getStockName(),
                                                 stock.getBadNewsTitle(),
-                                                stock.getBadNewsUrl()
+                                                stock.getBadNewsUrl(),
+                                                stock.getRev(),
+                                                stock.getIncome()
                                         ))
                                         .collect(Collectors.toList())
                         ))

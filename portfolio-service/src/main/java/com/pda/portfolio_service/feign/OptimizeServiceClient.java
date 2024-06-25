@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-@FeignClient(name = "optimizeServiceClient", url = "http://172.31.13.91:8080")
+@FeignClient(name = "optimizeServiceClient", url = "http://3.35.20.60:8080")
 public interface OptimizeServiceClient {
     @PostMapping("/rebal/getweight")
     OptimizeResponseDto getOptimizeResult(@RequestHeader("Accept") String contentType,

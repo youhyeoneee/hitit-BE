@@ -49,5 +49,7 @@ public class OptimizeResponseDto {
         private String stockName;
         private String badNewsTitle;
         private String badNewsUrl;
+        private String rev;
+        private String income;
     }
 }

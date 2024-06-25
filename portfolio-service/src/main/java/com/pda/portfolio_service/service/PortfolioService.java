@@ -4,6 +4,7 @@ import com.pda.portfolio_service.dto.*;
 import com.pda.portfolio_service.dto_test.MyDataTestDto;
 import com.pda.portfolio_service.feign.*;
 import com.pda.portfolio_service.jpa.*;
+import com.pda.portfolio_service.redis.RebalancingData;
 import com.pda.utils.rabbitmq.dto.NotificationDto;
 import com.pda.utils.rabbitmq.service.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -261,31 +262,30 @@ public class PortfolioService {
 
 
     //// 6. 자산 - 내 포트폴리오 내 펀드 내 주식, 채권 조회
-    public HititPortfoliosFundsStocksAndBondsResponseDto getUserPortfolioFundStocksAndBonds(Integer userId, Integer fundIdx) {
-        // 1. User의 Portfolio Id 가져오기
-        UserPortfolios userPortfolios
-                = userPortfoliosRepository.findByUserId(userId)
-                .orElseThrow(()
-                        -> new NoSuchElementException("유저가 존재하지 않습니다."));
+    @Transactional
+    public HititPortfoliosFundsStocksAndBondsResponseDto getUserPortfolioFundStocksAndBonds(Integer userId, Integer fundId) {
+        int retryCount = 0;
+        final int maxRetries = 10;
 
 
-        // 2. Portfolio Id를 통해 펀드리스트 가져오기
-        List<UserPortfoliosFundProducts> fundProducts = userPortfoliosFundProductsRepository.findByIdPortfolioId(userPortfolios.getId());
+        while (retryCount < maxRetries) {
+            try {
+                // 1. User의 Portfolio Id 가져오기
+                UserPortfolios userPortfolios
+                        = userPortfoliosRepository.findByUserId(userId)
+                        .orElseThrow(()
+                                -> new NoSuchElementException("유저가 존재하지 않습니다."));
 
 
-        // 가져온 private_portfolios_fund_products 데이터를 정렬
-        fundProducts.sort(Comparator
-                .comparingDouble(UserPortfoliosFundProducts::getWeight).reversed()
-                .thenComparing(Comparator.comparing(UserPortfoliosFundProducts::getFundName, Comparator.nullsLast(Comparator.naturalOrder()))));
+                // 2. Portfolio Id를 통해 펀드리스트 가져오기
+                List<UserPortfoliosFundProducts> fundProducts = userPortfoliosFundProductsRepository.findByIdPortfolioId(userPortfolios.getId());
 
 
-        // FE에서 유저가 선택한 fund 데이터 인덱스로 가져오기
-        UserPortfoliosFundProducts selectedFund = fundProducts.get(fundIdx);
+                // 가져온 private_portfolios_fund_products 데이터를 정렬
+                fundProducts.sort(Comparator
+                        .comparingDouble(UserPortfoliosFundProducts::getWeight).reversed()
+                        .thenComparing(Comparator.comparing(UserPortfoliosFundProducts::getFundName, Comparator.nullsLast(Comparator.naturalOrder()))));
 
-        FundProducts userPortfoliosFundAssets
-                = fundProductsRepository.findById(selectedFund.getId().getFundCode())
-                .orElseThrow(()
-                        -> new NoSuchElementException("펀드가 존재하지 않습니다."));;
 
         // 선택한 fund의 fund_code로 private_portfolios_fund_stocks에서 fund_code에 해당하는 데이터 가져오고 List<HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto> 형식으로 리스트로 저장
         Optional<List<FundStocks>> fundProductsStocks = fundStocksRepository.findByIdFundCode(selectedFund.getId().getFundCode());
@@ -296,31 +296,55 @@ public class PortfolioService {
                     StockIncomeRevResponseDto.StockIncomeRevDto stockIncomeRevDto = stockName2IncomeRev(stockName);
                     return new HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto(stockName, stock.getSize(), stock.getStyle(), stock.getWeight(), stockIncomeRevDto.getIncome(), stockIncomeRevDto.getRev());})
                 .collect(Collectors.toList());
+                // FE에서 유저가 선택한 fund 데이터 인덱스로 가져오기
+                UserPortfoliosFundProducts selectedFund = fundProducts.get(fundId);
 
-        // 선택한 fund의 fund_code로 private_portfolios_fund_bonds에서 fund_code에 해당하는 데이터 가져오고 List<HititPortfoliosFundsStocksAndBondsResponseDto.FundBondDto> 형식으로 리스트로 저장
-        Optional<List<FundBonds>> fundProductsBonds = fundBondsRepository.findByIdFundCode(selectedFund.getId().getFundCode());
-        List<HititPortfoliosFundsStocksAndBondsResponseDto.FundBondDto> fundBondDtos = fundProductsBonds.orElse(List.of()).stream()
-                .map(bond -> new HititPortfoliosFundsStocksAndBondsResponseDto.FundBondDto(bond.getId().getBondName(), bond.getExpireDate(), bond.getDuration(), bond.getCredit(), bond.getWeight()))
-                .collect(Collectors.toList());
+                FundProducts userPortfoliosFundAssets
+                        = fundProductsRepository.findById(selectedFund.getId().getFundCode())
+                        .orElseThrow(()
+                                -> new NoSuchElementException("펀드가 존재하지 않습니다."));
+                ;
 
-        // 모든 데이터를 저장할 HititPortfoliosFundsStocksAndBondsResponseDto 생성 후 담아서 Controller로 전달
-        return new HititPortfoliosFundsStocksAndBondsResponseDto(
-                selectedFund.getId().getFundCode(),
-                selectedFund.getId().getPortfolioId(),
-                selectedFund.getFundName(),
-                selectedFund.getFundTypeDetail(),
-                selectedFund.getCompanyName(),
-                selectedFund.getWeight(),
-                selectedFund.getReturn3m(),
-                userPortfoliosFundAssets.getStock(),
-                userPortfoliosFundAssets.getStockForeign(),
-                userPortfoliosFundAssets.getBond(),
-                userPortfoliosFundAssets.getBondForeign(),
-                userPortfoliosFundAssets.getInvestment(),
-                userPortfoliosFundAssets.getEtc(),
-                fundStockDtos,
-                fundBondDtos
-        );
+                // 선택한 fund의 fund_code로 private_portfolios_fund_stocks에서 fund_code에 해당하는 데이터 가져오고 List<HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto> 형식으로 리스트로 저장
+                Optional<List<FundStocks>> fundProductsStocks = fundStocksRepository.findByIdFundCode(selectedFund.getId().getFundCode());
+                List<HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto> fundStockDtos = fundProductsStocks.orElse(List.of()).stream()
+                        .map(stock -> new HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto(stock.getId().getStockName(), stock.getSize(), stock.getStyle(), stock.getWeight()))
+                        .collect(Collectors.toList());
+
+                // 선택한 fund의 fund_code로 private_portfolios_fund_bonds에서 fund_code에 해당하는 데이터 가져오고 List<HititPortfoliosFundsStocksAndBondsResponseDto.FundBondDto> 형식으로 리스트로 저장
+                Optional<List<FundBonds>> fundProductsBonds = fundBondsRepository.findByIdFundCode(selectedFund.getId().getFundCode());
+                List<HititPortfoliosFundsStocksAndBondsResponseDto.FundBondDto> fundBondDtos = fundProductsBonds.orElse(List.of()).stream()
+                        .map(bond -> new HititPortfoliosFundsStocksAndBondsResponseDto.FundBondDto(bond.getId().getBondName(), bond.getExpireDate(), bond.getDuration(), bond.getCredit(), bond.getWeight()))
+                        .collect(Collectors.toList());
+
+                // 모든 데이터를 저장할 HititPortfoliosFundsStocksAndBondsResponseDto 생성 후 담아서 Controller로 전달
+                HititPortfoliosFundsStocksAndBondsResponseDto response = new HititPortfoliosFundsStocksAndBondsResponseDto(
+                        selectedFund.getId().getFundCode(),
+                        selectedFund.getId().getPortfolioId(),
+                        selectedFund.getFundName(),
+                        selectedFund.getFundTypeDetail(),
+                        selectedFund.getCompanyName(),
+                        selectedFund.getWeight(),
+                        selectedFund.getReturn3m(),
+                        userPortfoliosFundAssets.getStock(),
+                        userPortfoliosFundAssets.getStockForeign(),
+                        userPortfoliosFundAssets.getBond(),
+                        userPortfoliosFundAssets.getBondForeign(),
+                        userPortfoliosFundAssets.getInvestment(),
+                        userPortfoliosFundAssets.getEtc(),
+                        fundStockDtos,
+                        fundBondDtos
+                );
+
+                return response;
+            } catch (NoSuchElementException e) {
+                retryCount++;
+                if (retryCount >= maxRetries) {
+                    throw new RuntimeException("최대 재시도 횟수에 도달했습니다.", e);
+                }
+            }
+        }
+        throw new RuntimeException("알 수 없는 오류가 발생했습니다.");
     }
 
     //// 7. 비회원 - 포트폴리오 선택하기
@@ -630,50 +654,189 @@ public class PortfolioService {
 
 
     //// 리밸런싱 로직
-    public OptimizeResponseCamelCaseDto optimizePortfolio() {
+    public RebalancingData optimizePortfolio() {
             // 1. user_portfolios에서 모든 데이터를 가져온다.
             List<UserPortfolios> allPortfolios = userPortfoliosRepository.findAll();
 
             // 2. 가져온 행의 포트폴리오 Id로 펀드 리스트를 가져온다.
-            List<UserPortfoliosFundProducts> fundProducts = userPortfoliosFundProductsRepository.findByIdPortfolioId(allPortfolios.get(0).getId());
+            List<UserPortfoliosFundProducts> fundProducts = userPortfoliosFundProductsRepository.findByIdPortfolioId(allPortfolios.get(4).getId());
 
-            // 3. 가져온 펀드 리스트들을 weight 기준으로 내림차순 정렬한다.
-            Collections.sort(fundProducts, Comparator.comparing(UserPortfoliosFundProducts::getWeight).reversed());
+            // 3. fundProducts 리스트를 "국내채권형", "해외채권형"으로 분리
+            List<UserPortfoliosFundProducts> domesticAndOverseasBondFunds = new ArrayList<>();
+            List<UserPortfoliosFundProducts> otherFunds = new ArrayList<>();
+
+            for (UserPortfoliosFundProducts fundProduct : fundProducts) {
+                if ("국내채권형".equals(fundProduct.getFundTypeDetail()) || "해외채권형".equals(fundProduct.getFundTypeDetail())) {
+                    domesticAndOverseasBondFunds.add(fundProduct);
+                } else {
+                otherFunds.add(fundProduct);
+                }
+            }
+
+            // 4. "국내채권형", "해외채권형"이 아닌 항목들을 weight 기준으로 내림차순 정렬
+            Collections.sort(otherFunds, Comparator.comparing(UserPortfoliosFundProducts::getWeight).reversed());
+
+            // 5. 정렬된 리스트에 "국내채권형", "해외채권형" 항목들을 뒤에 추가
+            otherFunds.addAll(domesticAndOverseasBondFunds);
+
+            // 6. "국내채권형", "해외채권형"이 아닌 항목들의 개수를 셈
+            int countNonBondFunds = otherFunds.size() - domesticAndOverseasBondFunds.size();
+
+            // 결과 출력 (필요시)
+            System.out.println("국내채권형, 해외채권형이 아닌 펀드들의 갯수: " + countNonBondFunds);
+
+            // 정렬된 리스트
+            List<UserPortfoliosFundProducts> sortedFundProducts = otherFunds;
+
+            // "해외주식형" 펀드의 인덱스 리스트를 구함
+            List<Integer> overseasIndexes = new ArrayList<>();
+            for (int i = 0; i < sortedFundProducts.size(); i++) {
+                if ("해외주식형".equals(sortedFundProducts.get(i).getFundTypeDetail())) {
+                    overseasIndexes.add(i);
+                }
+            }
+
 
             // 4. 가져온 펀드 리스트의 펀드 코드와 비중을 정렬한다.
             List<FundProductDto> fundProductDtoList = new ArrayList<>();
 
-            for (UserPortfoliosFundProducts fundProduct : fundProducts) {
+            for (UserPortfoliosFundProducts fundProduct : sortedFundProducts) {
                 FundProductDto dto = new FundProductDto(fundProduct.getId().getFundCode(), fundProduct.getWeight()/100);
                 fundProductDtoList.add(dto);
             }
 
-            // TODO: User id가 이건지 확인
-            int userId = allPortfolios.get(0).getUserId();
-            OptimizeDto optimizeDto = new OptimizeDto(userId, fundProductDtoList);
+//            // TODO: User id가 이건지 확인
+            int userId = allPortfolios.get(4).getUserId();
+            OptimizeDto optimizeDto = new OptimizeDto(userId, countNonBondFunds, overseasIndexes, fundProductDtoList);
 
             OptimizeResponseDto response = optimizeServiceClient.getOptimizeResult("application/json", optimizeDto);
+//
+//            // 만약에 리밸런싱이 되었을 경우 -> 리밸런싱 리포트를 유저에게 전달하여야 한다.
+//            // TODO: 리밸런싱 리포트 DB에 저장
+//            int rebalancingId = 1;
+//            // 알림 전송
+//            NotificationDto notificationDto = new NotificationDto(userId, rebalancingId, false, "포트폴리오를 조정했어요!");
+//            // 일단 있다고 가정하고 출력.
+//            // 리밸런싱 리포트
+//            // 1. 기존 펀드 리스트의 펀드 이름과 펀드 코드, 비중을 출력
+//            System.out.println("기존 펀드 리스트:");
+//            for (UserPortfoliosFundProducts fundProduct : sortedFundProducts) {
+//                System.out.println("펀드 이름" + fundProduct.getFundName() + "펀드 코드" + fundProduct.getId().getFundCode() + ", 비중: " + fundProduct.getWeight());
+//            }
 
-            // 만약에 리밸런싱이 되었을 경우 -> 리밸런싱 리포트를 유저에게 전달하여야 한다.
-            // TODO: 리밸런싱 리포트 DB에 저장
-            int rebalancingId = 1;
-            // 알림 전송
-            NotificationDto notificationDto = new NotificationDto(userId, rebalancingId, false, "포트폴리오를 조정했어요!");
-            // 일단 있다고 가정하고 출력.
-            // 리밸런싱 리포트
-            // 1. 기존 펀드 리스트의 펀드 이름과 펀드 코드, 비중을 출력
-            System.out.println("기존 펀드 리스트:");
-            for (UserPortfoliosFundProducts fundProduct : fundProducts) {
-                System.out.println("펀드 이름" + fundProduct.getFundName() + "펀드 코드" + fundProduct.getId().getFundCode() + ", 비중: " + fundProduct.getWeight());
+
+            // 리밸런싱 포트폴리오
+            RebalancingData rebalancingData = new RebalancingData();
+
+
+            // 전 Weight
+            List<Float> beforeWeight = new ArrayList<>();
+
+            for (int i = 0; i < sortedFundProducts.size(); i++) {
+                beforeWeight.add(sortedFundProducts.get(i).getWeight());
             }
 
-            List<Float> updatedWeights = response.getResponse().getWeights();
+            // 후 Weight
+            List<Float> afterWeight = new ArrayList<>();
+
+            for (int i = 0; i < response.getResponse().getWeights().size(); i++) {
+                float weight = response.getResponse().getWeights().get(i) * 100;
+                float roundedWeight = Math.round(weight * 10) / 10.0f;
+                afterWeight.add(roundedWeight);
+            }
+
+
+
+            // VarianceData 초기화
+            // 이거 넣어줘야함
+            List<RebalancingData.VarianceData> variance = new ArrayList<>();
+
+            for (int i = 0; i < sortedFundProducts.size(); i++) {
+                RebalancingData.WeightData weightData = new RebalancingData.WeightData();
+                weightData.setAfterWeights(afterWeight.get(i));
+                weightData.setBeforeWeights(beforeWeight.get(i));
+
+                List<RebalancingData.WeightData> listWeightData = new ArrayList<>();
+                listWeightData.add(weightData);
+
+                RebalancingData.VarianceData varianceData = new RebalancingData.VarianceData();
+                Map<String, List<RebalancingData.WeightData>> varianceMap = new HashMap<>();
+                varianceMap.put(sortedFundProducts.get(i).getFundName(), listWeightData);
+                varianceData.setVariance(varianceMap);
+
+                variance.add(varianceData);
+            }
+
+        // variance, userId 초기화
+        rebalancingData.setVariance(variance);
+        rebalancingData.setUserId(response.getResponse().getUserId());
+
+        List<RebalancingData.FundData> rebalancingDatas = new ArrayList<>();
+
+
+        for(int i = 0; i < response.getResponse().getFunds().size(); i++) {
+
+            // 펀드 1개의 펀드 코드
+            FundProducts rebalanceFunds =  fundProductsRepository.findById( response.getResponse().getFunds().get(i).getFundCode())
+                    .orElseThrow(() -> new RuntimeException("펀드를 찾을 수 없습니다."));
+
+            RebalancingData.FundInfo fundInfo = new RebalancingData.FundInfo();
+            fundInfo.setFundName( rebalanceFunds.getFundName());
+            fundInfo.setCompanyName(rebalanceFunds.getCompanyName());
+            fundInfo.setReturn3m(rebalanceFunds.getReturn3m());
+
+
+            List<String> stockName = new ArrayList<>();
+            List<String> badNewsTitles = new ArrayList<>();
+            List<String> badNewsUrls = new ArrayList<>();
+            List<String> stockCodes = new ArrayList<>();
+            List<String> rev = new ArrayList<>();;
+            List<String> income = new ArrayList<>();
+
+            List<RebalancingData.StockInfo> stockInfoList = new ArrayList<>();
+            for(int j = 0; j < response.getResponse().getFunds().get(i).getStocks().size(); j++) {
+                stockName.add(response.getResponse().getFunds().get(i).getStocks().get(j).getStockName());
+                badNewsTitles.add(response.getResponse().getFunds().get(i).getStocks().get(j).getBadNewsTitle());
+                badNewsUrls.add(response.getResponse().getFunds().get(i).getStocks().get(j).getBadNewsUrl());
+                stockCodes.add(response.getResponse().getFunds().get(i).getStocks().get(j).getStockCode());
+                rev.add(response.getResponse().getFunds().get(i).getStocks().get(j).getRev());
+                income.add(response.getResponse().getFunds().get(i).getStocks().get(j).getIncome());
+            }
+
+            RebalancingData.StockInfo stockInfo = new RebalancingData.StockInfo();
+            stockInfo.setStockName(stockName);
+            stockInfo.setBadNewsTitles(badNewsTitles);
+            stockInfo.setBadNewsUrls(badNewsUrls);
+            stockInfo.setStockCodes(stockCodes);
+            stockInfo.setRev(rev);
+            stockInfo.setIncome(income);
+
+            stockInfoList.add(stockInfo);
+
+            fundInfo.setStockInfo(stockInfoList);
+
+            List<RebalancingData.FundInfo> fundInfoList = new ArrayList<>();
+            fundInfoList.add(fundInfo);
+
+            Map<String, List<RebalancingData.FundInfo>> fundData = new HashMap<>();
+            fundData.put(response.getResponse().getFunds().get(i).getFundCode(), fundInfoList);
+
+            RebalancingData.FundData fundDatas = new RebalancingData.FundData();
+            fundDatas.setFundData(fundData);
+
+            rebalancingDatas.add(fundDatas);
+        }
+
+        rebalancingData.setRebalancingData(rebalancingDatas);
+
+
+        List<Float> updatedWeights = response.getResponse().getWeights();
 
             System.out.println("변경된 펀드 리스트:");
             for (int i = 0; i < updatedWeights.size(); i++) {
-                if (i < fundProducts.size()) {
-                    String fundCode = fundProducts.get(i).getId().getFundCode();
-                    Integer portfolioId = fundProducts.get(i).getId().getPortfolioId();
+                if (i < sortedFundProducts.size()) {
+                    String fundCode = sortedFundProducts.get(i).getId().getFundCode();
+                    Integer portfolioId = sortedFundProducts.get(i).getId().getPortfolioId();
 
                     // 해당 fundCode와 portfolioId에 맞는 행을 찾습니다.
                     UserPortfoliosFundProducts fundProduct = userPortfoliosFundProductsRepository.findByIdPortfolioIdAndIdFundCode(portfolioId, fundCode);
@@ -686,11 +849,11 @@ public class PortfolioService {
                     System.out.println("펀드 이름" + fundProduct.getFundName() +  "펀드 코드: " + fundProduct.getId().getFundCode() + ", 비중: " + fundProduct.getWeight());
                 }
             }
-            // 2. 비중이 변경된 이후 펀드 리스트의 펀드 이름과 펀드 코드, 비중을 출력
 
 
 
-            return OptimizeResponseMapper.toCamelCase(response);
+            return rebalancingData;
+//            return OptimizeResponseMapper.toCamelCase(response);
 //        for (UserPortfolios portfolio : allPortfolios) {
 //            List<UserPortfoliosFundProducts> fundProducts = userPortfoliosFundProductsRepository.findByIdPortfolioId(portfolio.getId());
 //
