@@ -36,7 +36,7 @@ public class RebalancingData {
     }
     @Data
     public static class WeightData {
-        private double afterWeights;
-        private double beforeWeights;
+        private float afterWeights;
+        private float beforeWeights;
     }
 }

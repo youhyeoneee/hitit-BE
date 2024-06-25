@@ -3,6 +3,7 @@ package com.pda.portfolio_service.controller;
 import com.pda.portfolio_service.dto.*;
 import com.pda.portfolio_service.dto_test.MyDataTestDto;
 import com.pda.portfolio_service.feign.MyDataFlaskResponseDto;
+import com.pda.portfolio_service.redis.RebalancingData;
 import com.pda.portfolio_service.service.PortfolioService;
 import com.pda.utils.api_utils.ApiUtils;
 import com.pda.utils.api_utils.CustomStringUtils;
@@ -199,7 +200,7 @@ public class PortfolioController {
     }
 
     @GetMapping("/rebal/getweight")
-    public ApiUtils.ApiResult<OptimizeResponseCamelCaseDto> optimizePortfolio() {
+    public ApiUtils.ApiResult<RebalancingData> optimizePortfolio() {
 
         return success(portfolioService.optimizePortfolio());
     }
