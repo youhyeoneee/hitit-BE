@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @FeignClient(name = "user-service", url = "${service.url.user}")
 public interface UserServiceClient {
-    @PostMapping("/api/openfeign/users/{user_id}")
+    @PostMapping("/api/users/openfeign/{user_id}")
     UserAgeTestScoreDto getUserAgeTestScore(@PathVariable("user_id") int userId);
 
 }

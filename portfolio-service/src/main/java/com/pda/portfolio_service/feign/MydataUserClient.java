@@ -7,7 +7,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "user-service", url = "${service.url.user}/api/openfeign/users/")
+@FeignClient(name = "user-service", url = "${service.url.user}/api/users/openfeign")
 public interface MydataUserClient {
 
     @GetMapping("/{user_id}")
