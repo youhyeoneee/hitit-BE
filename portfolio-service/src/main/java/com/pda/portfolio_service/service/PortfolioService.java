@@ -787,12 +787,13 @@ public class PortfolioService {
 
 
     //// 리밸런싱 로직
-    public RebalancingData optimizePortfolio() {
+    public RebalancingData optimizePortfolio(int userId) {
             // 1. user_portfolios에서 모든 데이터를 가져온다.
-            List<UserPortfolios> allPortfolios = userPortfoliosRepository.findAll();
+            UserPortfolios allPortfolios = userPortfoliosRepository.findByUserId(userId)
+                    .orElseThrow(() -> new RuntimeException("펀드를 찾을 수 없습니다."));;
 
             // 2. 가져온 행의 포트폴리오 Id로 펀드 리스트를 가져온다.
-            List<UserPortfoliosFundProducts> fundProducts = userPortfoliosFundProductsRepository.findByIdPortfolioId(allPortfolios.get(4).getId());
+            List<UserPortfoliosFundProducts> fundProducts = userPortfoliosFundProductsRepository.findByIdPortfolioId(allPortfolios.getId());
 
             // 3. fundProducts 리스트를 "국내채권형", "해외채권형"으로 분리
             List<UserPortfoliosFundProducts> domesticAndOverseasBondFunds = new ArrayList<>();
@@ -839,7 +840,7 @@ public class PortfolioService {
             }
 
 //            // TODO: User id가 이건지 확인
-            int userId = allPortfolios.get(4).getUserId();
+//            int userId = allPortfolios.get(4).getUserId();
             OptimizeDto optimizeDto = new OptimizeDto(userId, countNonBondFunds, overseasIndexes, fundProductDtoList);
 
             OptimizeResponseDto response = optimizeServiceClient.getOptimizeResult("application/json", optimizeDto);
@@ -985,7 +986,7 @@ public class PortfolioService {
 
 
 
-            return rebalancingData;
+        return rebalancingData;
 //            return OptimizeResponseMapper.toCamelCase(response);
 //        for (UserPortfolios portfolio : allPortfolios) {
 //            List<UserPortfoliosFundProducts> fundProducts = userPortfoliosFundProductsRepository.findByIdPortfolioId(portfolio.getId());
