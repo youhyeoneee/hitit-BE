@@ -1,6 +1,7 @@
 package com.pda.notification.service;
 
 
+import com.pda.utils.exception.login.NotFoundUserException;
 import com.pda.utils.rabbitmq.dto.NotificationDto;
 import com.pda.notification.jpa.Notification;
 import com.pda.notification.jpa.NotificationRepository;
@@ -12,6 +13,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -71,5 +73,17 @@ public class NotificationService {
 
     public List<Notification> findAllNotificationByUserId(int userId) {
         return notificationRepository.findAllByUserId(userId);
+    }
+
+    @Transactional
+    public Notification setCheckdNotification(int notificationId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new NoSuchElementException(notificationId + "번 알림이 존재하지 않습니다."));
+
+        if (notification.getChecked() != null) {
+            notification.setChecked(true);
+        }
+
+        return notification;
     }
 }
