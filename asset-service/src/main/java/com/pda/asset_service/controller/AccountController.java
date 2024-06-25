@@ -6,12 +6,13 @@ import com.pda.asset_service.dto.SecurityAccountDto;
 import com.pda.asset_service.service.AccountServiceImpl;
 import com.pda.asset_service.sms.SMSCertificationService;
 import com.pda.asset_service.sms.UserDto;
-import com.pda.security.JwtTokenProvider;
 import com.pda.utils.api_utils.ApiUtils;
 import com.pda.utils.api_utils.CustomStringUtils;
 import com.pda.utils.exception.sms.SmsCertificationException;
+import com.pda.utils.security.JwtTokenProvider;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +23,7 @@ import static com.pda.utils.api_utils.ApiUtils.success;
 @Slf4j
 @RequestMapping("/api/assets")
 @AllArgsConstructor
+@PropertySource(value = {"env.properties"})
 public class AccountController {
 
     private final SMSCertificationService smsCertificationService;
@@ -52,8 +54,7 @@ public class AccountController {
     // DC 퇴직연금 신한투자증권 계좌가 있는지 조회
     @GetMapping("/account/shinhan")
     public ApiUtils.ApiResult<SecurityAccountDto> checkAccountShinhan(@RequestHeader("Authorization") String bearerToken){
-        String token = CustomStringUtils.getToken(bearerToken);
-        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
         SecurityAccountDto securityAccountDto = accountService.getRetirementAccountShinhan(userId);
@@ -63,8 +64,7 @@ public class AccountController {
 //     계좌 개설
     @PostMapping("/account")
     public ApiUtils.ApiResult<AccountDto> createAccount(@RequestHeader("Authorization") String bearerToken, @RequestBody AccountCreateDto accountCreateDto){
-        String token = CustomStringUtils.getToken(bearerToken);
-        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
         AccountDto accountDto = accountService.createAccount(userId, accountCreateDto);
@@ -74,8 +74,7 @@ public class AccountController {
 //     내 계좌 조회
     @GetMapping("/account")
     public ApiUtils.ApiResult<AccountDto> getAccount(@RequestHeader("Authorization") String bearerToken){
-        String token = CustomStringUtils.getToken(bearerToken);
-        int userId = Integer.parseInt(jwtTokenProvider.getUsername(token));
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
         AccountDto accountDto = accountService.getAccount(userId);
