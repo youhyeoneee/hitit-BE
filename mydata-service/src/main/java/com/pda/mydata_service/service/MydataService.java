@@ -24,7 +24,7 @@ public interface MydataService {
 
     Optional<List<SecurityAccountDto>> getSecurityAccountsByUserIdAndSecurityName(int userId, String securityName);
 
-    Optional<List<PensionDto>> getUnclaimedRetirementAccounts(int userId);
+    Optional<List<RetirementAccountDto>> getUnclaimedRetirementAccounts(int userId);
 
     Optional<List<SecurityTransactionDto>> getSecurityTransactions(String accountNo);
 

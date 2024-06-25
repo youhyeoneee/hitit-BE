@@ -35,7 +35,7 @@ public interface MydataServiceClient {
 
     // 미청구 퇴직 연금
     @GetMapping("/api/mydata/pension/unclaimed-retirement-accounts/{userId}")
-    Optional<List<PensionResponseDto>> getUnclaimedRetirementAccounts(@PathVariable("userId") int userId);
+    Optional<List<RetirementAccountResponseDto>> getUnclaimedRetirementAccounts(@PathVariable("userId") int userId);
 
     // 증권 거래 내역
     @GetMapping("/api/mydata/security-transactions/{accountNo}")

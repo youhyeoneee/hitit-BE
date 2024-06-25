@@ -1,9 +1,7 @@
 package com.pda.asset_service.service;
 
 
-import com.pda.asset_service.dto.MydataInfoDto;
-import com.pda.asset_service.dto.PensionDto;
-import com.pda.asset_service.dto.PensionResponseDto;
+import com.pda.asset_service.dto.*;
 import com.pda.asset_service.feign.MydataServiceClient;
 import com.pda.asset_service.jpa.*;
 import lombok.AllArgsConstructor;
@@ -117,13 +115,13 @@ public class PensionServiceImpl implements PensionService{
     }
 
     @Override
-    public List<PensionDto> getUnclaimedRetirementAccounts(int userId) {
-        List<PensionResponseDto> unclaimedRetirementAccounts = mydataServiceClient.getUnclaimedRetirementAccounts(userId).orElse(null);
+    public List<RetirementAccountDto> getUnclaimedRetirementAccounts(int userId) {
+        List<RetirementAccountResponseDto> unclaimedRetirementAccounts = mydataServiceClient.getUnclaimedRetirementAccounts(userId).orElse(null);
 
-        List<PensionDto> unclaimedRetirementAccountDtos = new ArrayList<>();
+        List<RetirementAccountDto> unclaimedRetirementAccountDtos = new ArrayList<>();
         if (unclaimedRetirementAccounts != null) {
-            for (PensionResponseDto unclaimedRetirementAccount : unclaimedRetirementAccounts) {
-                PensionDto pensionDto = PensionDto.builder()
+            for (RetirementAccountResponseDto unclaimedRetirementAccount : unclaimedRetirementAccounts) {
+                RetirementAccountDto pensionDto = RetirementAccountDto.builder()
                         .accountNo(unclaimedRetirementAccount.getAccountNo())
                         .companyName(unclaimedRetirementAccount.getCompanyName())
                         .pensionName(unclaimedRetirementAccount.getPensionName())
@@ -132,6 +130,7 @@ public class PensionServiceImpl implements PensionService{
                         .evaluationAmount(unclaimedRetirementAccount.getEvaluationAmount())
                         .expirationDate(unclaimedRetirementAccount.getExpirationDate())
                         .userId(userId)
+                        .balance(unclaimedRetirementAccount.getBalance())
                         .retirementPensionClaimed(unclaimedRetirementAccount.getRetirementPensionClaimed())
                         .build();
                 log.info("find pension account = {}", pensionDto);
