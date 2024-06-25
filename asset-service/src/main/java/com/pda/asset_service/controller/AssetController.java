@@ -108,6 +108,16 @@ public class AssetController {
         log.info(unclaimedRetirementAccounts.toString());
         return success(unclaimedRetirementAccounts);
     }
+    @GetMapping("/mydata-link")
+    public ApiUtils.ApiResult<Integer> IsMydataLinked(@RequestHeader("Authorization") String bearerToken){
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
+        log.info("user id : " + userId);
+
+        Integer mydataLinkedCount = assetService.checkMydata(userId);
+        return  success(mydataLinkedCount);
+
+    }
+
 
     // portfolio openFeign mapping
     // 보유 주식
