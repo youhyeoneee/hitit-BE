@@ -82,9 +82,4 @@ public class UserController {
         return success(loginResponseDto);
     }
 
-    @GetMapping("/validate/{user_id}")
-    public UserDetailsDto validateUser(@PathVariable("user_id") int userId) {
-        User user = userService.findUserById(userId);
-        return userService.convert2UserDetailsDto(user);
-    }
 }
