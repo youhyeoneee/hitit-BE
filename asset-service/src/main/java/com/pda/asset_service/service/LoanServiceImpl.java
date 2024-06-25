@@ -83,7 +83,7 @@ public class LoanServiceImpl implements LoanService{
                         );
                         MydataInfoDto mydataInfoDto = MydataInfoDto.builder()
                                 .assetType(savedInfo.getAssetType())
-                                .userId(savedInfo.getUserId())
+                                .userId(userId)
                                 .companyName(savedInfo.getCompanyName())
                                 .accountType(savedInfo.getAccountType())
                                 .accountNo(loan.getAccountNo())

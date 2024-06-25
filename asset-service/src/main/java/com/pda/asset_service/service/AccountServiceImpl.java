@@ -74,15 +74,19 @@ public class AccountServiceImpl implements AccountService{
     @Override
     public AccountDto getAccount(int userId) {
         Account foundAccount = accountRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalStateException("계좌 정보를 찾을 수 없습니다."));
-        return AccountDto.builder()
-                .accountNo(foundAccount.getAccountNo())
-                .ssn(foundAccount.getSsn())
-                .name(foundAccount.getName())
-                .balance(foundAccount.getBalance())
-                .companyName(foundAccount.getCompanyName())
-                .pensionType(foundAccount.getPensionType())
-                .build();
+                .orElse(null);
+        if(foundAccount != null){
+            return AccountDto.builder()
+                    .accountNo(foundAccount.getAccountNo())
+                    .ssn(foundAccount.getSsn())
+                    .name(foundAccount.getName())
+                    .balance(foundAccount.getBalance())
+                    .companyName(foundAccount.getCompanyName())
+                    .pensionType(foundAccount.getPensionType())
+                    .build();
+        }else{
+            return null;
+        }
     }
 
     public String generateAccountNumber() {

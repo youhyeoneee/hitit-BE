@@ -80,7 +80,7 @@ public class BankAccountServiceImpl implements BankAccountService{
                                     .build());
 
                             MydataInfo savedInfo = mydataInfoRepository.findBankAccountByUserIdAndAssetTypeAndCompanyNameAndAccountNo(
-                                    bankAccount.getUserId(),
+                                    userId,
                                     "bank_accounts",
                                     bankAccount.getBankName(),
                                     bankAccount.getAccountNo()

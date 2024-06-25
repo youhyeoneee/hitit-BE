@@ -3,6 +3,7 @@ package com.pda.asset_service.service;
 
 
 import com.pda.asset_service.dto.MydataInfoDto;
+import com.pda.asset_service.dto.PensionDto;
 import com.pda.asset_service.dto.UserAccountInfoDto;
 import com.pda.asset_service.jpa.MydataInfoRepository;
 import jakarta.transaction.Transactional;
@@ -61,15 +62,6 @@ public class AssetServiceImpl implements AssetService{
         allMydataLinkInfo.addAll(loansLinkInfo);
         log.info("05. loansLinkInfo = {}", loansLinkInfo);
 
-//        // 펀드
-//        List<MydataInfoDto> fundsLinkInfo = fundService.linkMyDataAccount(userId,userAccountInfoDto.getFunds());
-//        allMydataLinkInfo.addAll(fundsLinkInfo);
-//        log.info("06. fundsLinkInfo = {}", fundsLinkInfo);
-
-        // mq로 요청 필요...
-
-//        User updatedUser =  updateMydataStatus(userId);
-//        log.info("Mydata Link Updated User Info = {}", updatedUser);
         return allMydataLinkInfo;
     }
 
@@ -82,6 +74,12 @@ public class AssetServiceImpl implements AssetService{
         Integer securityAccountTotalBalance = securityAccountService.getSecurityAccountsBalance(userId);
         log.info("securityAccountTotalBalance = {}", securityAccountTotalBalance);
         return bankAccountTotalBalance + securityAccountTotalBalance;
+    }
+
+    @Override
+    public List<PensionDto> getUnclaimedRetirementAccounts(int userId) {
+        List<PensionDto> unclaimedRetirementAccounts = pensionService.getUnclaimedRetirementAccounts(userId);
+        return unclaimedRetirementAccounts;
     }
 
 

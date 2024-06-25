@@ -26,9 +26,8 @@ public class Pension {
     @Column(name = "pension_type")
     private String pensionType;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private MydataUser mydataUser;
+    @Column(name = "user_id")
+    private Integer userId;
 
     @Column(name = "interest_rate")
     private Double interestRate;
@@ -40,7 +39,7 @@ public class Pension {
     private Date expirationDate;
 
     @Column(name = "retirement_pension_claimed")
-    private Boolean retirementPensionClaimed;
+    private String retirementPensionClaimed;
 
     @Id
     @Column(name = "account_no")

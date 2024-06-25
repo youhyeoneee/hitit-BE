@@ -11,4 +11,6 @@ public interface SecurityAccountRepository extends JpaRepository<SecurityAccount
     Optional<List<SecurityAccount>> findByUserId(int userId);
 
     Optional<SecurityAccount> findByUserIdAndSecurityNameAndAccountType(int userId, String securityName, String accountType    );
+
+    SecurityAccount findByAccountNo(String accountNo);
 }
