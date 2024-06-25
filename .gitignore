@@ -38,4 +38,5 @@ out/
 
 **/application-db.properties
 **/application-sms.properties
+**/application-mq.properties
 **/env.properties
