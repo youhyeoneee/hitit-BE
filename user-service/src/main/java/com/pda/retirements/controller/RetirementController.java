@@ -20,7 +20,7 @@ import static com.pda.utils.api_utils.ApiUtils.success;
 
 @RestController
 @Slf4j
-@RequestMapping("/api/retirements")
+@RequestMapping("/api/users/retirements")
 @AllArgsConstructor
 public class RetirementController {
     private UserService userService;
