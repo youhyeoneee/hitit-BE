@@ -42,7 +42,7 @@ public class NotificationController {
                                                @PathVariable int id) {
         int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("subscribe user : " + userId);
-        Notification notification = notificationService.updateNotification(userId);
+        Notification notification = notificationService.setCheckdNotification(userId);
         return success(notification);
     }
 }
