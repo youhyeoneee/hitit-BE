@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -137,13 +138,39 @@ public class MydataServiceImpl implements MydataService{
     }
 
     @Override
-    public Optional<List<PensionDto>> getUnclaimedRetirementAccounts(int userId) {
+    public Optional<List<RetirementAccountDto>> getUnclaimedRetirementAccounts(int userId) {
         Optional<List<Pension>> unclaimedRetirementAccounts = pensionRepository.findByUserIdAndRetirementPensionClaimed(userId, "0");;
         log.info("FROM REPO = {}", unclaimedRetirementAccounts.get());
+
         if (unclaimedRetirementAccounts.isPresent()) {
-            List<PensionDto> pensionDtoList = unclaimedRetirementAccounts.get().stream()
-                    .map(this::convertToDto)
-                    .collect(Collectors.toList());
+            List<RetirementAccountDto> pensionDtoList = new ArrayList<>();
+
+            for (Pension pension : unclaimedRetirementAccounts.get()) {
+                Optional<BankAccount> bankAccount = bankAccountRepository.findByAccountNo(pension.getAccountNo());
+                Integer balance = 0;
+
+                if (bankAccount.isPresent()) {
+                    balance = bankAccount.get().getBalance();
+                } else {
+                    Optional<SecurityAccount> securityAccount = securityAccountRepository.findByAccountNo(pension.getAccountNo());
+                    if (securityAccount.isPresent()) {
+                        balance = securityAccount.get().getBalance();
+                    }
+                }
+
+                RetirementAccountDto dto = RetirementAccountDto.builder()
+                        .accountNo(pension.getAccountNo())
+                        .pensionName(pension.getPensionName())
+                        .companyName(pension.getCompanyName())
+                        .pensionType(pension.getPensionType())
+                        .expirationDate(pension.getExpirationDate())
+                        .interestRate(pension.getInterestRate())
+                        .evaluationAmount(pension.getEvaluationAmount())
+                        .retirementPensionClaimed(pension.getRetirementPensionClaimed())
+                        .userId(pension.getUserId())
+                        .balance(balance).build();
+                pensionDtoList.add(dto);
+            }
 
             log.info("미청구 퇴직연금 리스트 = {}", pensionDtoList);
             return Optional.of(pensionDtoList);
