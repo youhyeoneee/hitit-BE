@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -16,9 +15,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class AlarmDto {
+public class NotificationDto {
     private int userId;
     private int rebalancingId;
-    private Boolean check;
+    private Boolean checked;
     private String summary;
 }
