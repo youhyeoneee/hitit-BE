@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.*;
 @PropertySource("env.properties")
 @FeignClient(name = "mydataPortfolioClient", url = "${service.url.ml}")
 public interface MyDataPortfolioServiceClient {
-    @PostMapping("/mydata/funds")
+    @PostMapping("/mydata/funds/test")
     MyDataFlaskResponseDto getMyDataPortfolio(@RequestHeader("Accept") String contentType,
                                                     @RequestBody MyDataFundData myDataFundData);
 
-    @PostMapping("/mydata/fundss")
-    MyDataFlaskLevelTestResponseDto getMyDataLevelTestPortfolio(@RequestHeader("Accept") String contentType,
-                                                                @RequestBody MyDataFlaskLevelTest myDataFlaskLevelTest);
+    @PostMapping("/mydata/funds")
+    MyDataFlaskResponseDto getMyDataLevelTestPortfolio(@RequestHeader("Accept") String contentType,
+                                                                @RequestBody MyDataFundData myDataFundData);
 
     @PostMapping(value = "/dart/info", consumes = "application/json", produces = "application/json")
     StockIncomeRevResponseDto getStockIncomeRev(@RequestHeader("Accept") String contentType, @RequestBody StockRevIncomeRequestDto stockRevIncomeRequestDto);

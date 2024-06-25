@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -66,6 +67,8 @@ public class PortfolioService {
 
     private final MessageService messageService;
     private final UserServiceClient userServiceClient;
+
+    private final DataService dataService;
 
     //// 1. 자체 서비스 - 포트폴리오 조회
     public List<HititPortfoliosResponseDto> getHititPortfolios() {
@@ -536,7 +539,7 @@ public class PortfolioService {
     }
 
 
-    public MyDataFlaskResponseDto getMyDataPortfolios(Integer userId) {
+    public List<MyDataTestDto> getMyDataPortfolios(Integer userId) {
         // 1. User 모듈에 나이 전달 받기
         UserAgeTestScoreDto userAgeTestScoreDto = userServiceClient.getUserAgeTestScore(userId);
         Integer age = userAgeTestScoreDto.getAge();
@@ -545,40 +548,73 @@ public class PortfolioService {
 
         // 2. Asset 모듈에 주식 거래내역, 자산, 보유주식
         // Transaction 객체 리스트 생성
-        List<MyDataTransaction> transactions = Arrays.asList(
-                new MyDataTransaction("2024-03-02", "buy", "000340"),
-                new MyDataTransaction("2024-03-02", "sell", "000340")
-        );
+//        List<MyDataTransaction> transactions = Arrays.asList(
+//                new MyDataTransaction("2024-03-02", "buy", "000340"),
+//                new MyDataTransaction("2024-03-02", "sell", "000340")
+//        );
 
         // StockBalance 리스트 생성
-        List<String> stockBalance = Arrays.asList("000430", "000200", "375800");
+//        List<String> stockBalance = Arrays.asList("000430", "000200", "375800");
+
+        MydataDto mydata = dataService.getUserMydataByOpenFeign(7);
+        // 중복을 제거한 일차원 배열 생성
+        Set<String> uniqueStockCodes = new HashSet<>();
+        for (SecurityAccountStocksDto dto : mydata.getSecurityStocks()) {
+            uniqueStockCodes.addAll(dto.getStockCodes());
+        }
+
+        // Set을 List로 변환
+        List<String> uniqueStockCodesList = new ArrayList<>(uniqueStockCodes);
+
+
+        System.out.println(mydata.getSecurityTransactions());
+
+        // 변환된 MyDataTransaction 리스트 생성
+        // 현재 날짜와 시간을 가져옵니다.
+        Date date = new Date();
+
+        // 날짜 형식을 지정합니다.
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+
+        // Date 객체를 String으로 변환합니다.
+        String strDate = formatter.format(date);
+
+        List<MyDataTransaction> transactions = mydata.getSecurityTransactions().stream()
+                .flatMap(dto -> dto.getSecurityAccountTransactions().stream())
+                .map(tx -> new MyDataTransaction(formatter.format(tx.getTxDatetime()),tx.getTxType(), tx.getStockCode()))
+                .collect(Collectors.toList());
+
+        // 결과 출력
+        transactions.forEach(System.out::println);
 
         // FundData 객체 생성
-        MyDataFundData fundData = new MyDataFundData(userId, transactions, stockBalance, 24, 100000);
+        MyDataFundData fundData = new MyDataFundData(userId, transactions, uniqueStockCodesList, age, mydata.getTotalAssets());
 
+        MyDataFlaskResponseDto myDataFlaskResponseDto = new MyDataFlaskResponseDto();
 
-        MyDataFlaskResponseDto myDataFlaskResponseDto =  myDataPortfolioServiceClient.getMyDataPortfolio("application/json", fundData);
-        log.info(myDataFlaskResponseDto.toString());
-        return myDataFlaskResponseDto;
-    }
+        if (userTestScore != null) {
+            log.info("user age : " + age + " and test score : " + userTestScore);
+            fundData.setUser_test_score(userTestScore);
+            myDataFlaskResponseDto =  myDataPortfolioServiceClient.getMyDataPortfolio("application/json", fundData);
+        } else {
+            log.warn("user age : " + age + " but test score is null");
+            myDataFlaskResponseDto =  myDataPortfolioServiceClient.getMyDataPortfolio("application/json", fundData);
 
-    public List<MyDataTestDto> getMyDataPortfoliosLevelTest(MyDataFlaskLevelTest myDataFlaskLevelTest) {
+        }
 
         List<MyDataTestDto> myDataTestDtoList = new ArrayList<>();
 
-        MyDataFlaskLevelTestResponseDto responseDto = myDataPortfolioServiceClient.getMyDataLevelTestPortfolio("application/json", myDataFlaskLevelTest);
+        if (myDataFlaskResponseDto != null) {
+            List<MyDataFlaskResponseDto.FundGroup> fundGroups = myDataFlaskResponseDto.getResponse();
 
-        if (responseDto != null) {
-            List<MyDataFlaskLevelTestResponseDto.FundGroup> fundGroups = responseDto.getResponse();
-
-            for (MyDataFlaskLevelTestResponseDto.FundGroup fundGroup : fundGroups) {
+            for (MyDataFlaskResponseDto.FundGroup fundGroup : fundGroups) {
 
                 List<MyDataTestDto.FundDto> fundDtos = new ArrayList<>();
 
                 System.out.println("Fund Class: " + fundGroup.getFundClass());
 
 
-                for (MyDataFlaskLevelTestResponseDto.Fund fund : fundGroup.getFunds()) {
+                for (MyDataFlaskResponseDto.Fund fund : fundGroup.getFunds()) {
                     // 선택한 fund의 fund_code로 private_portfolios_fund_stocks에서 fund_code에 해당하는 데이터 가져오고 List<HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto> 형식으로 리스트로 저장
                     Optional<List<FundStocks>> fundProductsStocks = fundStocksRepository.findByIdFundCode(fund.getFundCode());
                     List<HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto> fundStockDtos = fundProductsStocks.orElse(List.of()).stream()
@@ -653,6 +689,98 @@ public class PortfolioService {
         }
         return myDataTestDtoList;
     }
+
+//    public List<MyDataTestDto> getMyDataPortfoliosLevelTest(MyDataFlaskLevelTest myDataFlaskLevelTest) {
+//
+//        List<MyDataTestDto> myDataTestDtoList = new ArrayList<>();
+//
+//        MyDataFlaskLevelTestResponseDto responseDto = myDataPortfolioServiceClient.getMyDataLevelTestPortfolio("application/json", myDataFlaskLevelTest);
+//
+//        if (responseDto != null) {
+//            List<MyDataFlaskLevelTestResponseDto.FundGroup> fundGroups = responseDto.getResponse();
+//
+//            for (MyDataFlaskLevelTestResponseDto.FundGroup fundGroup : fundGroups) {
+//
+//                List<MyDataTestDto.FundDto> fundDtos = new ArrayList<>();
+//
+//                System.out.println("Fund Class: " + fundGroup.getFundClass());
+//
+//
+//                for (MyDataFlaskLevelTestResponseDto.Fund fund : fundGroup.getFunds()) {
+//                    // 선택한 fund의 fund_code로 private_portfolios_fund_stocks에서 fund_code에 해당하는 데이터 가져오고 List<HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto> 형식으로 리스트로 저장
+//                    Optional<List<FundStocks>> fundProductsStocks = fundStocksRepository.findByIdFundCode(fund.getFundCode());
+//                    List<HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto> fundStockDtos = fundProductsStocks.orElse(List.of()).stream()
+//                            .map(stock -> {
+//                                String stockName = stock.getId().getStockName();
+//                                log.info(">>>> search : " + stockName);
+//                                StockIncomeRevResponseDto.StockIncomeRevDto stockIncomeRevDto = stockName2IncomeRev(stockName);
+//                                return new HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto(stockName, stock.getSize(), stock.getStyle(), stock.getWeight(), stockIncomeRevDto.getIncome(), stockIncomeRevDto.getRev());})
+//                            .collect(Collectors.toList());
+//
+//                    // 선택한 fund의 fund_code로 private_portfolios_fund_bonds에서 fund_code에 해당하는 데이터 가져오고 List<HititPortfoliosFundsStocksAndBondsResponseDto.FundBondDto> 형식으로 리스트로 저장
+//                    Optional<List<FundBonds>> fundProductsBonds = fundBondsRepository.findByIdFundCode(fund.getFundCode());
+//                    List<HititPortfoliosFundsStocksAndBondsResponseDto.FundBondDto> fundBondDtos = fundProductsBonds.orElse(List.of()).stream()
+//                            .map(bond -> new HititPortfoliosFundsStocksAndBondsResponseDto.FundBondDto(bond.getId().getBondName(), bond.getExpireDate(), bond.getDuration(), bond.getCredit(), bond.getWeight()))
+//                            .collect(Collectors.toList());
+//
+//                    MyDataTestDto.FundDto fundDto = new MyDataTestDto.FundDto(
+//                            fund.getFundCode(),
+//                            fund.getFundName(),
+//                            fund.getFundTypeDetail(),
+//                            fund.getCompanyName(),
+//                            20.0, // weight
+//                            fund.getReturn3m(),
+//                            (float)fund.getStock(),
+//                            (float)fund.getStockForeign(),
+//                            (float)fund.getBond(),
+//                            (float)fund.getBondForeign(),
+//                            (float)fund.getInvestment(),
+//                            (float)fund.getEtc(),
+//                            fundStockDtos,
+//                            fundBondDtos
+//                    );
+//                    fundDtos.add(fundDto);
+//
+//                    System.out.println("Fund Code: " + fund.getFundCode());
+//                    System.out.println("Fund Name: " + fund.getFundName());
+//                    System.out.println("Fund Type Detail: " + fund.getFundTypeDetail());
+//                    System.out.println("Company Name: " + fund.getCompanyName());
+//                    System.out.println("Return 3m: " + fund.getReturn3m());
+//
+//                    System.out.println("Stock: " + fund.getStock());
+//                    System.out.println("Stock Foreign: " + fund.getStockForeign());
+//                    System.out.println("Bond: " + fund.getBond());
+//                    System.out.println("Bond Foreign: " + fund.getBondForeign());
+//                    System.out.println("Investment: " + fund.getInvestment());
+//                    System.out.println("Etc: " + fund.getEtc());
+//
+//
+//                    System.out.println("Risk Grade: " + fund.getRiskGrade());
+//                    System.out.println("Risk Grade Txt: " + fund.getRiskGradeTxt());
+//                    System.out.println("Set Amount: " + fund.getSetAmount());
+//                    System.out.println("Set Date: " + fund.getSetDate());
+//                    System.out.println("Std Price: " + fund.getStdPrice());
+//
+//                    System.out.println("Stock Ratio: " + fund.getStockRatio());
+//                    System.out.println("Bond Ratio: " + fund.getBondRatio());
+//                    System.out.println("---------------------------------");
+//                }
+//
+//                MyDataTestDto myDataTestDto = new MyDataTestDto(
+//                        "스마트세이버",
+//                        fundGroup.getFundClass(),
+//                        "이 포트폴리오는 어떤 포트폴리오입니다.",
+//                        100, // minimumSubscriptionFee
+//                        20, // stockExposure
+//                        30.0, // return3m
+//                        fundDtos
+//                );
+//
+//                myDataTestDtoList.add(myDataTestDto);
+//            }
+//        }
+//        return myDataTestDtoList;
+//    }
 
 
     //// 리밸런싱 로직

@@ -14,14 +14,25 @@ import java.util.List;
 @ToString
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class MyDataFlaskResponseDto {
-    private List<Fund> response;
+    private List<FundGroup> response;
+
+    @ToString
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Setter
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class FundGroup {
+        private List<Fund> funds;
+        private String fundClass;
+    }
 
     // Getters and setters
-    public List<Fund> getResponse() {
+    public List<FundGroup> getResponse() {
         return response;
     }
 
-    public void setResponse(List<Fund> response) {
+    public void setResponse(List<FundGroup> response) {
         this.response = response;
     }
 
@@ -75,6 +86,8 @@ public class MyDataFlaskResponseDto {
         private String setDate;
         private double stdPrice;
         private double stock;
-        private String stockForeign;
+        private double stockForeign;
+        private Float stockRatio;
+        private Float bondRatio;
     }
 }

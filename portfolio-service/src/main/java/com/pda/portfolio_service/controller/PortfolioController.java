@@ -177,7 +177,7 @@ public class PortfolioController {
     //// 이걸로 진행할 것
     //// 1. jwt token으로 user 꺼내기
     @GetMapping("/mydata")
-    public ApiUtils.ApiResult<MyDataFlaskResponseDto> getMyDataPortfolios(@RequestHeader("Authorization") String bearerToken) {
+    public ApiUtils.ApiResult<List<MyDataTestDto>> getMyDataPortfolios(@RequestHeader("Authorization") String bearerToken) {
         int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
@@ -185,7 +185,7 @@ public class PortfolioController {
 
         // 2. OpenFeign으로 Asset에게 투자거래내역, 보유주식, 총자산 가져오기
 
-        MyDataFlaskResponseDto myDataPortfoliosResponseDto = portfolioService.getMyDataPortfolios(userId);
+        List<MyDataTestDto> myDataPortfoliosResponseDto = portfolioService.getMyDataPortfolios(userId);
         return success(myDataPortfoliosResponseDto);
     }
 
@@ -193,12 +193,12 @@ public class PortfolioController {
 
 
 
-    @PostMapping("/mydata/leveltest")
-    public ApiUtils.ApiResult<List<MyDataTestDto>> getMyDataPortfoliosLevelTest(@RequestBody MyDataFlaskLevelTest myDataFlaskLevelTest) {
-        List<MyDataTestDto> myDataFlaskLevelTestResponseDto = portfolioService.getMyDataPortfoliosLevelTest(myDataFlaskLevelTest);
-
-        return success(myDataFlaskLevelTestResponseDto);
-    }
+//    @PostMapping("/mydata/leveltest")
+//    public ApiUtils.ApiResult<List<MyDataTestDto>> getMyDataPortfoliosLevelTest(@RequestBody MyDataFlaskLevelTest myDataFlaskLevelTest) {
+//        List<MyDataTestDto> myDataFlaskLevelTestResponseDto = portfolioService.getMyDataPortfoliosLevelTest(myDataFlaskLevelTest);
+//
+//        return success(myDataFlaskLevelTestResponseDto);
+//    }
 
     @GetMapping("/rebal/getweight")
     public ApiUtils.ApiResult<RebalancingData> optimizePortfolio() {
