@@ -2,11 +2,10 @@ package com.pda.asset_service.service;
 
 
 
-import com.pda.asset_service.dto.MydataInfoDto;
-import com.pda.asset_service.dto.PensionDto;
-import com.pda.asset_service.dto.RetirementAccountDto;
-import com.pda.asset_service.dto.UserAccountInfoDto;
+import com.pda.asset_service.dto.*;
+import com.pda.asset_service.jpa.MydataInfo;
 import com.pda.asset_service.jpa.MydataInfoRepository;
+import com.pda.asset_service.jpa.SecurityAccount;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -81,6 +80,18 @@ public class AssetServiceImpl implements AssetService{
     public List<RetirementAccountDto> getUnclaimedRetirementAccounts(int userId) {
         List<RetirementAccountDto> unclaimedRetirementAccounts = pensionService.getUnclaimedRetirementAccounts(userId);
         return unclaimedRetirementAccounts;
+    }
+
+    @Override
+    public Integer checkMydata(int userId) {
+        List<MydataInfo> mydataInfos = mydataInfoRepository.findByUserId(userId);
+
+        if (mydataInfos != null) {
+            return mydataInfos.size();
+        }else {
+            return null;
+        }
+
     }
 
 
