@@ -46,7 +46,7 @@ public class UserService { //implements UserDetailsService {
 
     @Transactional
     public User signup(SignupUserDto userDto) throws DuplicatedEmailException {
-        String encodedPassword = " "; // passwordEncoder.encode(userDto.getPassword());
+        String encodedPassword = passwordEncoder.encode(userDto.getPassword());
         userDto.setPassword(encodedPassword);
         User user = userDto.toEntity();
 
