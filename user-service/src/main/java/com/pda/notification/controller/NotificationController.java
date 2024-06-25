@@ -36,5 +36,13 @@ public class NotificationController {
         List<Notification> notifications = notificationService.findAllNotificationByUserId(userId);
         return success(notifications);
     }
-    // TODO: 알림 읽기
+
+    @PatchMapping(value = "/{id}")
+    public ApiUtils.ApiResult readNotification(@RequestHeader("Authorization") String bearerToken,
+                                               @PathVariable int id) {
+        int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
+        log.info("subscribe user : " + userId);
+        Notification notification = notificationService.updateNotification(userId);
+        return success(notification);
+    }
 }

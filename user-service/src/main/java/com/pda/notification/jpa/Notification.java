@@ -33,4 +33,8 @@ public class Notification {
         this.summary = summary;
         this.createdAt = LocalDateTime.now();
     }
+
+    public void setChecked(Boolean checked) {
+        this.checked = checked;
+    }
 }
