@@ -67,8 +67,8 @@ public class MydataController {
     }
 
     @GetMapping("/pension/unclaimed-retirement-accounts/{userId}")
-    public Optional<List<PensionDto>> getUnclaimedRetirementAccounts(@PathVariable("userId") int userId){
-        Optional<List<PensionDto>> unclaimedRetirementAccounts = mydataService.getUnclaimedRetirementAccounts(userId);
+    public Optional<List<RetirementAccountDto>> getUnclaimedRetirementAccounts(@PathVariable("userId") int userId){
+        Optional<List<RetirementAccountDto>> unclaimedRetirementAccounts = mydataService.getUnclaimedRetirementAccounts(userId);
         return unclaimedRetirementAccounts;
     }
 

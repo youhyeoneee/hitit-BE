@@ -100,11 +100,11 @@ public class AssetController {
     }
 
     @GetMapping("/retirement-pension-claim")
-    public ApiUtils.ApiResult<List<PensionDto>> getUnclaimedRetirementAccounts(@RequestHeader("Authorization") String bearerToken){
+    public ApiUtils.ApiResult<List<RetirementAccountDto>> getUnclaimedRetirementAccounts(@RequestHeader("Authorization") String bearerToken){
         int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
 
-        List<PensionDto> unclaimedRetirementAccounts = assetService.getUnclaimedRetirementAccounts(userId);
+        List<RetirementAccountDto> unclaimedRetirementAccounts = assetService.getUnclaimedRetirementAccounts(userId);
         log.info(unclaimedRetirementAccounts.toString());
         return success(unclaimedRetirementAccounts);
     }

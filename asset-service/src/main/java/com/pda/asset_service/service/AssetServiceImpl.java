@@ -4,6 +4,7 @@ package com.pda.asset_service.service;
 
 import com.pda.asset_service.dto.MydataInfoDto;
 import com.pda.asset_service.dto.PensionDto;
+import com.pda.asset_service.dto.RetirementAccountDto;
 import com.pda.asset_service.dto.UserAccountInfoDto;
 import com.pda.asset_service.jpa.MydataInfoRepository;
 import jakarta.transaction.Transactional;
@@ -77,8 +78,8 @@ public class AssetServiceImpl implements AssetService{
     }
 
     @Override
-    public List<PensionDto> getUnclaimedRetirementAccounts(int userId) {
-        List<PensionDto> unclaimedRetirementAccounts = pensionService.getUnclaimedRetirementAccounts(userId);
+    public List<RetirementAccountDto> getUnclaimedRetirementAccounts(int userId) {
+        List<RetirementAccountDto> unclaimedRetirementAccounts = pensionService.getUnclaimedRetirementAccounts(userId);
         return unclaimedRetirementAccounts;
     }
 
