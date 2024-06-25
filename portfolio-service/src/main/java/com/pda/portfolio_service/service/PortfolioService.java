@@ -637,45 +637,84 @@ public class PortfolioService {
             List<UserPortfolios> allPortfolios = userPortfoliosRepository.findAll();
 
             // 2. 가져온 행의 포트폴리오 Id로 펀드 리스트를 가져온다.
-            List<UserPortfoliosFundProducts> fundProducts = userPortfoliosFundProductsRepository.findByIdPortfolioId(allPortfolios.get(1).getId());
+            List<UserPortfoliosFundProducts> fundProducts = userPortfoliosFundProductsRepository.findByIdPortfolioId(allPortfolios.get(3).getId());
 
-            // 3. 가져온 펀드 리스트들을 weight 기준으로 내림차순 정렬한다.
-            Collections.sort(fundProducts, Comparator.comparing(UserPortfoliosFundProducts::getWeight).reversed());
+            // 3. fundProducts 리스트를 "국내채권형", "해외채권형"으로 분리
+            List<UserPortfoliosFundProducts> domesticAndOverseasBondFunds = new ArrayList<>();
+            List<UserPortfoliosFundProducts> otherFunds = new ArrayList<>();
+
+            for (UserPortfoliosFundProducts fundProduct : fundProducts) {
+                if ("국내채권형".equals(fundProduct.getFundTypeDetail()) || "해외채권형".equals(fundProduct.getFundTypeDetail())) {
+                    domesticAndOverseasBondFunds.add(fundProduct);
+                } else {
+                otherFunds.add(fundProduct);
+                }
+            }
+
+            // 4. "국내채권형", "해외채권형"이 아닌 항목들을 weight 기준으로 내림차순 정렬
+            Collections.sort(otherFunds, Comparator.comparing(UserPortfoliosFundProducts::getWeight).reversed());
+
+            // 5. 정렬된 리스트에 "국내채권형", "해외채권형" 항목들을 뒤에 추가
+            otherFunds.addAll(domesticAndOverseasBondFunds);
+
+            // 6. "국내채권형", "해외채권형"이 아닌 항목들의 개수를 셈
+            int countNonBondFunds = otherFunds.size() - domesticAndOverseasBondFunds.size();
+
+            // 결과 출력 (필요시)
+            System.out.println("국내채권형, 해외채권형이 아닌 펀드들의 갯수: " + countNonBondFunds);
+
+            // 정렬된 리스트
+            List<UserPortfoliosFundProducts> sortedFundProducts = otherFunds;
+
+            // "해외주식형" 펀드의 인덱스 리스트를 구함
+            List<Integer> overseasIndexes = new ArrayList<>();
+            for (int i = 0; i < sortedFundProducts.size(); i++) {
+                if ("해외주식형".equals(sortedFundProducts.get(i).getFundTypeDetail())) {
+                    overseasIndexes.add(i);
+                }
+            }
+
 
             // 4. 가져온 펀드 리스트의 펀드 코드와 비중을 정렬한다.
             List<FundProductDto> fundProductDtoList = new ArrayList<>();
 
-            for (UserPortfoliosFundProducts fundProduct : fundProducts) {
+            for (UserPortfoliosFundProducts fundProduct : sortedFundProducts) {
                 FundProductDto dto = new FundProductDto(fundProduct.getId().getFundCode(), fundProduct.getWeight()/100);
                 fundProductDtoList.add(dto);
             }
 
-            // TODO: User id가 이건지 확인
-            int userId = allPortfolios.get(0).getUserId();
-            OptimizeDto optimizeDto = new OptimizeDto(userId, fundProductDtoList);
+//            // TODO: User id가 이건지 확인
+            int userId = allPortfolios.get(3).getUserId();
+            OptimizeDto optimizeDto = new OptimizeDto(userId, countNonBondFunds, overseasIndexes, fundProductDtoList);
 
             OptimizeResponseDto response = optimizeServiceClient.getOptimizeResult("application/json", optimizeDto);
+//
+//            // 만약에 리밸런싱이 되었을 경우 -> 리밸런싱 리포트를 유저에게 전달하여야 한다.
+//            // TODO: 리밸런싱 리포트 DB에 저장
+//            int rebalancingId = 1;
+//            // 알림 전송
+//            NotificationDto notificationDto = new NotificationDto(userId, rebalancingId, false, "포트폴리오를 조정했어요!");
+//            // 일단 있다고 가정하고 출력.
+//            // 리밸런싱 리포트
+//            // 1. 기존 펀드 리스트의 펀드 이름과 펀드 코드, 비중을 출력
+//            System.out.println("기존 펀드 리스트:");
+//            for (UserPortfoliosFundProducts fundProduct : sortedFundProducts) {
+//                System.out.println("펀드 이름" + fundProduct.getFundName() + "펀드 코드" + fundProduct.getId().getFundCode() + ", 비중: " + fundProduct.getWeight());
+//            }
 
-            // 만약에 리밸런싱이 되었을 경우 -> 리밸런싱 리포트를 유저에게 전달하여야 한다.
-            // TODO: 리밸런싱 리포트 DB에 저장
-            int rebalancingId = 1;
-            // 알림 전송
-            NotificationDto notificationDto = new NotificationDto(userId, rebalancingId, false, "포트폴리오를 조정했어요!");
-            // 일단 있다고 가정하고 출력.
-            // 리밸런싱 리포트
-            // 1. 기존 펀드 리스트의 펀드 이름과 펀드 코드, 비중을 출력
-            System.out.println("기존 펀드 리스트:");
-            for (UserPortfoliosFundProducts fundProduct : fundProducts) {
-                System.out.println("펀드 이름" + fundProduct.getFundName() + "펀드 코드" + fundProduct.getId().getFundCode() + ", 비중: " + fundProduct.getWeight());
-            }
+
+
+
+
+
 
             List<Float> updatedWeights = response.getResponse().getWeights();
 
             System.out.println("변경된 펀드 리스트:");
             for (int i = 0; i < updatedWeights.size(); i++) {
-                if (i < fundProducts.size()) {
-                    String fundCode = fundProducts.get(i).getId().getFundCode();
-                    Integer portfolioId = fundProducts.get(i).getId().getPortfolioId();
+                if (i < sortedFundProducts.size()) {
+                    String fundCode = sortedFundProducts.get(i).getId().getFundCode();
+                    Integer portfolioId = sortedFundProducts.get(i).getId().getPortfolioId();
 
                     // 해당 fundCode와 portfolioId에 맞는 행을 찾습니다.
                     UserPortfoliosFundProducts fundProduct = userPortfoliosFundProductsRepository.findByIdPortfolioIdAndIdFundCode(portfolioId, fundCode);
@@ -688,7 +727,7 @@ public class PortfolioService {
                     System.out.println("펀드 이름" + fundProduct.getFundName() +  "펀드 코드: " + fundProduct.getId().getFundCode() + ", 비중: " + fundProduct.getWeight());
                 }
             }
-            // 2. 비중이 변경된 이후 펀드 리스트의 펀드 이름과 펀드 코드, 비중을 출력
+
 
 
 

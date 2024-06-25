@@ -14,5 +14,7 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OptimizeDto {
     private Integer userId;
+    private Integer stockFundCount;
+    private List<Integer> overseasIndexes;
     private List<FundProductDto> funds;
 }

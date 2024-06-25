@@ -204,8 +204,6 @@ public class PortfolioController {
         return success(portfolioService.optimizePortfolio());
     }
 
-
-
     //// Test: Spring - Flask 연동 테스트
     @GetMapping("/analyze-sentiment/{text}")
     public String analyzeSentiment(@PathVariable("text") String text) {
