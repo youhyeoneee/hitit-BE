@@ -72,7 +72,7 @@ public class NotificationService {
     }
 
     public List<Notification> findAllNotificationByUserId(int userId) {
-        return notificationRepository.findAllByUserId(userId);
+        return notificationRepository.findAllByUserIdOrderByCreatedAtDesc(userId);
     }
 
     @Transactional
