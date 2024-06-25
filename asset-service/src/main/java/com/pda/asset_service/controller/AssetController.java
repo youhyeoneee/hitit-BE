@@ -120,7 +120,7 @@ public class AssetController {
     }
     // 총자산
     @GetMapping("/totalAssets/{userId}")
-    public Integer getTotalAssets(@RequestHeader("Authorization") String bearerToken){
+    public Integer getTotalAssets2(@RequestHeader("Authorization") String bearerToken){
         int userId = jwtTokenProvider.bearerToken2UserId(bearerToken);
         log.info("user id : " + userId);
         Integer totalAssets = assetService.getTotalAssets(userId);
