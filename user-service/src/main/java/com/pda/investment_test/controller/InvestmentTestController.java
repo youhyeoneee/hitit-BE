@@ -19,7 +19,7 @@ import static com.pda.utils.api_utils.ApiUtils.success;
 
 @RestController
 @Slf4j
-@RequestMapping("/api/investment_tests")
+@RequestMapping("/api/users/investment_tests")
 @AllArgsConstructor
 public class InvestmentTestController {
 

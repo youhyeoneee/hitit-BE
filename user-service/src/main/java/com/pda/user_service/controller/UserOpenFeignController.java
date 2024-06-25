@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/openfeign/users/")
+@RequestMapping("/api/users/openfeign")
 public class UserOpenFeignController {
 
     private final UserService userService;

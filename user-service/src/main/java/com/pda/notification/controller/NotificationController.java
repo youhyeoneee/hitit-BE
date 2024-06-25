@@ -17,7 +17,7 @@ import static com.pda.utils.api_utils.ApiUtils.success;
 @RestController
 @AllArgsConstructor
 @Slf4j
-@RequestMapping("/api/notifications")
+@RequestMapping("/api/users/notifications")
 public class NotificationController {
 
     private final NotificationService notificationService;

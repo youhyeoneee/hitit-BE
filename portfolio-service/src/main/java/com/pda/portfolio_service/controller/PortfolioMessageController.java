@@ -20,7 +20,7 @@ public class PortfolioMessageController {
 
     private final PortfolioService portfolioService;
 
-    @PostMapping(value = "/send/message")
+    @PostMapping(value = "/api/portfolios/send/message")
     public ApiUtils.ApiResult sendNotificationMessageTest(@RequestBody NotificationDto notificationDto) {
         portfolioService.sendNotificationMessage(notificationDto);
         return success(notificationDto);
