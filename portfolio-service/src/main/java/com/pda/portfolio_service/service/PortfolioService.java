@@ -16,7 +16,10 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -389,6 +392,23 @@ public class PortfolioService {
         userPortfolios.setMinimumSubscriptionFee(privatePortfolio.getMinimumSubscriptionFee());
         userPortfolios.setStockExposure(privatePortfolio.getStockExposure());
         userPortfolios.setUserId(userId);
+        // 현재 날짜를 LocalDate로 가져오기
+        LocalDate currentDate = LocalDate.now();
+
+        // 원하는 형식으로 날짜를 포맷팅
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedDate = currentDate.format(formatter);
+
+        // 포맷된 문자열을 Date 객체로 변환
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date date = simpleDateFormat.parse(formattedDate);
+            userPortfolios.setCreatedAt(date);
+            System.out.println("Formatted Date: " + formattedDate);
+            System.out.println("Date 객체: " + date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         // privatePortfolio의 나머지 필드를 userPortfolio에 복사
         UserPortfolios savedUser = userPortfoliosRepository.save(userPortfolios);
@@ -442,6 +462,23 @@ public class PortfolioService {
         userPortfolios.setMinimumSubscriptionFee(privatePortfolio.getMinimumSubscriptionFee());
         userPortfolios.setStockExposure(privatePortfolio.getStockExposure());
         userPortfolios.setUserId(userId);
+        // 현재 날짜를 LocalDate로 가져오기
+        LocalDate currentDate = LocalDate.now();
+
+        // 원하는 형식으로 날짜를 포맷팅
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedDate = currentDate.format(formatter);
+
+        // 포맷된 문자열을 Date 객체로 변환
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date date = simpleDateFormat.parse(formattedDate);
+            userPortfolios.setCreatedAt(date);
+            System.out.println("Formatted Date: " + formattedDate);
+            System.out.println("Date 객체: " + date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         // privatePortfolio의 나머지 필드를 userPortfolio에 복사
         UserPortfolios savedUser = userPortfoliosRepository.save(userPortfolios);
@@ -474,6 +511,23 @@ public class PortfolioService {
         userPortfolios.setMinimumSubscriptionFee(myDataPortfolioDto.getMinimumSubscriptionFee());
         userPortfolios.setStockExposure(myDataPortfolioDto.getStockExposure());
         userPortfolios.setUserId(userId);
+        // 현재 날짜를 LocalDate로 가져오기
+        LocalDate currentDate = LocalDate.now();
+
+        // 원하는 형식으로 날짜를 포맷팅
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedDate = currentDate.format(formatter);
+
+        // 포맷된 문자열을 Date 객체로 변환
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date date = simpleDateFormat.parse(formattedDate);
+            userPortfolios.setCreatedAt(date);
+            System.out.println("Formatted Date: " + formattedDate);
+            System.out.println("Date 객체: " + date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         // 2. user_portfolios에 저장
         UserPortfolios savedUser = userPortfoliosRepository.save(userPortfolios);
@@ -521,6 +575,24 @@ public class PortfolioService {
         userPortfolios.setMinimumSubscriptionFee(myDataPortfolioDto.getMinimumSubscriptionFee());
         userPortfolios.setStockExposure(myDataPortfolioDto.getStockExposure());
         userPortfolios.setUserId(userId);
+        // 현재 날짜를 LocalDate로 가져오기
+        LocalDate currentDate = LocalDate.now();
+
+        // 원하는 형식으로 날짜를 포맷팅
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedDate = currentDate.format(formatter);
+
+        // 포맷된 문자열을 Date 객체로 변환
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date date = simpleDateFormat.parse(formattedDate);
+            userPortfolios.setCreatedAt(date);
+            System.out.println("Formatted Date: " + formattedDate);
+            System.out.println("Date 객체: " + date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
 
         // privatePortfolio의 나머지 필드를 userPortfolio에 복사
         UserPortfolios savedUser = userPortfoliosRepository.save(userPortfolios);
@@ -616,7 +688,7 @@ public class PortfolioService {
 
                 System.out.println("Fund Class: " + fundGroup.getFundClass());
 
-
+                int count = 0;
                 for (MyDataFlaskResponseDto.Fund fund : fundGroup.getFunds()) {
                     // 선택한 fund의 fund_code로 private_portfolios_fund_stocks에서 fund_code에 해당하는 데이터 가져오고 List<HititPortfoliosFundsStocksAndBondsResponseDto.FundStockDto> 형식으로 리스트로 저장
                     Optional<List<FundStocks>> fundProductsStocks = fundStocksRepository.findByIdFundCode(fund.getFundCode());
@@ -634,12 +706,31 @@ public class PortfolioService {
                             .map(bond -> new HititPortfoliosFundsStocksAndBondsResponseDto.FundBondDto(bond.getId().getBondName(), bond.getExpireDate(), bond.getDuration(), bond.getCredit(), bond.getWeight()))
                             .collect(Collectors.toList());
 
+                    double weight;
+                    switch (count) {
+                        case 0:
+                            weight = 30.0;
+                            break;
+                        case 1:
+                        case 2:
+                            weight = 20.0;
+                            break;
+                        case 3:
+                        case 4:
+                            weight = 15.0;
+                            break;
+                        default:
+                            weight = 0.0;
+                            break;
+                    }
+                    count++;
+
                     MyDataTestDto.FundDto fundDto = new MyDataTestDto.FundDto(
                             fund.getFundCode(),
                             fund.getFundName(),
                             fund.getFundTypeDetail(),
                             fund.getCompanyName(),
-                            20.0, // weight
+                            weight, // weight
                             fund.getReturn3m(),
                             (float)fund.getStock(),
                             (float)fund.getStockForeign(),
@@ -677,13 +768,18 @@ public class PortfolioService {
                     System.out.println("---------------------------------");
                 }
 
+                double return3m = 0.0;
+                for(MyDataTestDto.FundDto fundDto : fundDtos) {
+                    return3m = return3m + fundDto.getReturn3m()*(fundDto.getWeight()/100);
+                }
+
                 MyDataTestDto myDataTestDto = new MyDataTestDto(
-                        "스마트세이버",
+                        "HitIt 개인화 상품",
                         fundGroup.getFundClass(),
-                        "이 포트폴리오는 어떤 포트폴리오입니다.",
+                        "이 포트폴리오는 사용자의 개인화된 정보를 통해 추천된 상품입니다.",
                         100, // minimumSubscriptionFee
                         20, // stockExposure
-                        30.0, // return3m
+                        return3m, // return3m
                         fundDtos
                 );
 
