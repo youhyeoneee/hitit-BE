@@ -1083,7 +1083,7 @@ public class PortfolioService {
 
                     // weight 값을 업데이트합니다.
                     fundProduct.setWeight(updatedWeights.get(i) * 100);
-//                    userPortfoliosFundProductsRepository.save(fundProduct);
+                    userPortfoliosFundProductsRepository.save(fundProduct);
 
                     // 변경된 펀드 리스트 출력
                     System.out.println("펀드 이름" + fundProduct.getFundName() +  "펀드 코드: " + fundProduct.getId().getFundCode() + ", 비중: " + fundProduct.getWeight());
