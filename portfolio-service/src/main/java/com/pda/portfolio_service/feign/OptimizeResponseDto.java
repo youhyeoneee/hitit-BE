@@ -24,6 +24,7 @@ public class OptimizeResponseDto {
     public static class Response {
         private List<Fund> funds;
         private Integer userId;
+        private List<Float> beforeWeights;
         private List<Float> weights;
     }
 
@@ -35,6 +36,9 @@ public class OptimizeResponseDto {
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class Fund {
         private String fundCode;
+        private String fundName;
+        private String companyName;
+        private double return3m;
         private List<Stock> stocks;
     }
 

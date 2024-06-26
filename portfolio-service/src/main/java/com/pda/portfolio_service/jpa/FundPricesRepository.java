@@ -9,4 +9,6 @@ import java.util.Optional;
 public interface FundPricesRepository extends JpaRepository<FundPrices, FundPricesId> {
 
     List<FundPrices> findByIdFundCodeAndIdDateAfter(String fundCode, Date createdAt);
+
+    List<FundPrices> findByIdFundCodeAndIdDateGreaterThanEqual(String fundCode, Date createdAt);
 }

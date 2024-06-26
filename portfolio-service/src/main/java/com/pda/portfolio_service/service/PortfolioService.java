@@ -883,7 +883,7 @@ public class PortfolioService {
 
 
     //// 리밸런싱 로직
-    public RebalancingData optimizePortfolio(int userId) {
+    public OptimizeResponseDto optimizePortfolio(int userId) {
             // 1. user_portfolios에서 모든 데이터를 가져온다.
             UserPortfolios allPortfolios = userPortfoliosRepository.findByUserId(userId)
                     .orElseThrow(() -> new RuntimeException("펀드를 찾을 수 없습니다."));;
@@ -929,18 +929,28 @@ public class PortfolioService {
 
             // 4. 가져온 펀드 리스트의 펀드 코드와 비중을 정렬한다.
             List<FundProductDto> fundProductDtoList = new ArrayList<>();
+            List<Float> beforeWeight = new ArrayList<>();
+
+            for (int i = 0; i < sortedFundProducts.size(); i++) {
+                beforeWeight.add(sortedFundProducts.get(i).getWeight()/100);
+            }
 
             for (UserPortfoliosFundProducts fundProduct : sortedFundProducts) {
                 FundProductDto dto = new FundProductDto(fundProduct.getId().getFundCode(), fundProduct.getWeight()/100);
                 fundProductDtoList.add(dto);
             }
 
+
 //            // TODO: User id가 이건지 확인
 //            int userId = allPortfolios.get(4).getUserId();
             OptimizeDto optimizeDto = new OptimizeDto(userId, countNonBondFunds, overseasIndexes, fundProductDtoList);
 
             OptimizeResponseDto response = optimizeServiceClient.getOptimizeResult("application/json", optimizeDto);
-//
+
+            OptimizeResponseDto responseOptimize = enrichOptimizeResponse(response);
+            responseOptimize.getResponse().setBeforeWeights(beforeWeight);
+
+
 //            // 만약에 리밸런싱이 되었을 경우 -> 리밸런싱 리포트를 유저에게 전달하여야 한다.
 //            // TODO: 리밸런싱 리포트 DB에 저장
 //            int rebalancingId = 1;
@@ -956,108 +966,108 @@ public class PortfolioService {
 
 
             // 리밸런싱 포트폴리오
-            RebalancingData rebalancingData = new RebalancingData();
-
-
-            // 전 Weight
-            List<Float> beforeWeight = new ArrayList<>();
-
-            for (int i = 0; i < sortedFundProducts.size(); i++) {
-                beforeWeight.add(sortedFundProducts.get(i).getWeight());
-            }
-
-            // 후 Weight
-            List<Float> afterWeight = new ArrayList<>();
-
-            for (int i = 0; i < response.getResponse().getWeights().size(); i++) {
-                float weight = response.getResponse().getWeights().get(i) * 100;
-                float roundedWeight = Math.round(weight * 10) / 10.0f;
-                afterWeight.add(roundedWeight);
-            }
-
-
-
-            // VarianceData 초기화
-            // 이거 넣어줘야함
-            List<RebalancingData.VarianceData> variance = new ArrayList<>();
-
-            for (int i = 0; i < sortedFundProducts.size(); i++) {
-                RebalancingData.WeightData weightData = new RebalancingData.WeightData();
-                weightData.setAfterWeights(afterWeight.get(i));
-                weightData.setBeforeWeights(beforeWeight.get(i));
-
-                List<RebalancingData.WeightData> listWeightData = new ArrayList<>();
-                listWeightData.add(weightData);
-
-                RebalancingData.VarianceData varianceData = new RebalancingData.VarianceData();
-                Map<String, List<RebalancingData.WeightData>> varianceMap = new HashMap<>();
-                varianceMap.put(sortedFundProducts.get(i).getFundName(), listWeightData);
-                varianceData.setVariance(varianceMap);
-
-                variance.add(varianceData);
-            }
-
-        // variance, userId 초기화
-        rebalancingData.setVariance(variance);
-        rebalancingData.setUserId(response.getResponse().getUserId());
-
-        List<RebalancingData.FundData> rebalancingDatas = new ArrayList<>();
-
-
-        for(int i = 0; i < response.getResponse().getFunds().size(); i++) {
-
-            // 펀드 1개의 펀드 코드
-            FundProducts rebalanceFunds =  fundProductsRepository.findById( response.getResponse().getFunds().get(i).getFundCode())
-                    .orElseThrow(() -> new RuntimeException("펀드를 찾을 수 없습니다."));
-
-            RebalancingData.FundInfo fundInfo = new RebalancingData.FundInfo();
-            fundInfo.setFundName( rebalanceFunds.getFundName());
-            fundInfo.setCompanyName(rebalanceFunds.getCompanyName());
-            fundInfo.setReturn3m(rebalanceFunds.getReturn3m());
-
-
-            List<String> stockName = new ArrayList<>();
-            List<String> badNewsTitles = new ArrayList<>();
-            List<String> badNewsUrls = new ArrayList<>();
-            List<String> stockCodes = new ArrayList<>();
-            List<String> rev = new ArrayList<>();;
-            List<String> income = new ArrayList<>();
-
-            List<RebalancingData.StockInfo> stockInfoList = new ArrayList<>();
-            for(int j = 0; j < response.getResponse().getFunds().get(i).getStocks().size(); j++) {
-                stockName.add(response.getResponse().getFunds().get(i).getStocks().get(j).getStockName());
-                badNewsTitles.add(response.getResponse().getFunds().get(i).getStocks().get(j).getBadNewsTitle());
-                badNewsUrls.add(response.getResponse().getFunds().get(i).getStocks().get(j).getBadNewsUrl());
-                stockCodes.add(response.getResponse().getFunds().get(i).getStocks().get(j).getStockCode());
-                rev.add(response.getResponse().getFunds().get(i).getStocks().get(j).getRev());
-                income.add(response.getResponse().getFunds().get(i).getStocks().get(j).getIncome());
-            }
-
-            RebalancingData.StockInfo stockInfo = new RebalancingData.StockInfo();
-            stockInfo.setStockName(stockName);
-            stockInfo.setBadNewsTitles(badNewsTitles);
-            stockInfo.setBadNewsUrls(badNewsUrls);
-            stockInfo.setStockCodes(stockCodes);
-            stockInfo.setRev(rev);
-            stockInfo.setIncome(income);
-
-            stockInfoList.add(stockInfo);
-
-            fundInfo.setStockInfo(stockInfoList);
-
-            List<RebalancingData.FundInfo> fundInfoList = new ArrayList<>();
-            fundInfoList.add(fundInfo);
-
-            Map<String, List<RebalancingData.FundInfo>> fundData = new HashMap<>();
-            fundData.put(response.getResponse().getFunds().get(i).getFundCode(), fundInfoList);
-
-            RebalancingData.FundData fundDatas = new RebalancingData.FundData();
-            fundDatas.setFundData(fundData);
-
-            rebalancingDatas.add(fundDatas);
-        }
-
-        rebalancingData.setRebalancingData(rebalancingDatas);
+//            RebalancingData rebalancingData = new RebalancingData();
+//
+//
+//            // 전 Weight
+//            List<Float> beforeWeight = new ArrayList<>();
+//
+//            for (int i = 0; i < sortedFundProducts.size(); i++) {
+//                beforeWeight.add(sortedFundProducts.get(i).getWeight());
+//            }
+//
+//            // 후 Weight
+//            List<Float> afterWeight = new ArrayList<>();
+//
+//            for (int i = 0; i < response.getResponse().getWeights().size(); i++) {
+//                float weight = response.getResponse().getWeights().get(i) * 100;
+//                float roundedWeight = Math.round(weight * 10) / 10.0f;
+//                afterWeight.add(roundedWeight);
+//            }
+//
+//
+//
+//            // VarianceData 초기화
+//            // 이거 넣어줘야함
+//            List<RebalancingData.VarianceData> variance = new ArrayList<>();
+//
+//            for (int i = 0; i < sortedFundProducts.size(); i++) {
+//                RebalancingData.WeightData weightData = new RebalancingData.WeightData();
+//                weightData.setAfterWeights(afterWeight.get(i));
+//                weightData.setBeforeWeights(beforeWeight.get(i));
+//
+//                List<RebalancingData.WeightData> listWeightData = new ArrayList<>();
+//                listWeightData.add(weightData);
+//
+//                RebalancingData.VarianceData varianceData = new RebalancingData.VarianceData();
+//                Map<String, List<RebalancingData.WeightData>> varianceMap = new HashMap<>();
+//                varianceMap.put(sortedFundProducts.get(i).getFundName(), listWeightData);
+//                varianceData.setVariance(varianceMap);
+//
+//                variance.add(varianceData);
+//            }
+//
+//        // variance, userId 초기화
+//        rebalancingData.setVariance(variance);
+//        rebalancingData.setUserId(response.getResponse().getUserId());
+//
+//        List<RebalancingData.FundData> rebalancingDatas = new ArrayList<>();
+//
+//
+//        for(int i = 0; i < response.getResponse().getFunds().size(); i++) {
+//
+//            // 펀드 1개의 펀드 코드
+//            FundProducts rebalanceFunds =  fundProductsRepository.findById( response.getResponse().getFunds().get(i).getFundCode())
+//                    .orElseThrow(() -> new RuntimeException("펀드를 찾을 수 없습니다."));
+//
+//            RebalancingData.FundInfo fundInfo = new RebalancingData.FundInfo();
+//            fundInfo.setFundName( rebalanceFunds.getFundName());
+//            fundInfo.setCompanyName(rebalanceFunds.getCompanyName());
+//            fundInfo.setReturn3m(rebalanceFunds.getReturn3m());
+//
+//
+//            List<String> stockName = new ArrayList<>();
+//            List<String> badNewsTitles = new ArrayList<>();
+//            List<String> badNewsUrls = new ArrayList<>();
+//            List<String> stockCodes = new ArrayList<>();
+//            List<String> rev = new ArrayList<>();;
+//            List<String> income = new ArrayList<>();
+//
+//            List<RebalancingData.StockInfo> stockInfoList = new ArrayList<>();
+//            for(int j = 0; j < response.getResponse().getFunds().get(i).getStocks().size(); j++) {
+//                stockName.add(response.getResponse().getFunds().get(i).getStocks().get(j).getStockName());
+//                badNewsTitles.add(response.getResponse().getFunds().get(i).getStocks().get(j).getBadNewsTitle());
+//                badNewsUrls.add(response.getResponse().getFunds().get(i).getStocks().get(j).getBadNewsUrl());
+//                stockCodes.add(response.getResponse().getFunds().get(i).getStocks().get(j).getStockCode());
+//                rev.add(response.getResponse().getFunds().get(i).getStocks().get(j).getRev());
+//                income.add(response.getResponse().getFunds().get(i).getStocks().get(j).getIncome());
+//            }
+//
+//            RebalancingData.StockInfo stockInfo = new RebalancingData.StockInfo();
+//            stockInfo.setStockName(stockName);
+//            stockInfo.setBadNewsTitles(badNewsTitles);
+//            stockInfo.setBadNewsUrls(badNewsUrls);
+//            stockInfo.setStockCodes(stockCodes);
+//            stockInfo.setRev(rev);
+//            stockInfo.setIncome(income);
+//
+//            stockInfoList.add(stockInfo);
+//
+//            fundInfo.setStockInfo(stockInfoList);
+//
+//            List<RebalancingData.FundInfo> fundInfoList = new ArrayList<>();
+//            fundInfoList.add(fundInfo);
+//
+//            Map<String, List<RebalancingData.FundInfo>> fundData = new HashMap<>();
+//            fundData.put(response.getResponse().getFunds().get(i).getFundCode(), fundInfoList);
+//
+//            RebalancingData.FundData fundDatas = new RebalancingData.FundData();
+//            fundDatas.setFundData(fundData);
+//
+//            rebalancingDatas.add(fundDatas);
+//        }
+//
+//        rebalancingData.setRebalancingData(rebalancingDatas);
 
 
         List<Float> updatedWeights = response.getResponse().getWeights();
@@ -1081,8 +1091,6 @@ public class PortfolioService {
             }
 
 
-
-        return rebalancingData;
 //            return OptimizeResponseMapper.toCamelCase(response);
 //        for (UserPortfolios portfolio : allPortfolios) {
 //            List<UserPortfoliosFundProducts> fundProducts = userPortfoliosFundProductsRepository.findByIdPortfolioId(portfolio.getId());
@@ -1099,7 +1107,7 @@ public class PortfolioService {
 //
 //            return optimizeServiceClient.getOptimizeResult("application/json", optimizeDto);
 //        }
-
+        return responseOptimize;
     }
 
     public List<Map<Date, Float>> getMyDataPortfoliosRate(int userId) {
@@ -1124,7 +1132,7 @@ public class PortfolioService {
         Map<String, List<FundPrices>> fundPricesMap = new HashMap<>();
 
         for (String fundCode : fundCodeToWeightMap.keySet()) {
-            List<FundPrices> fundPrices = fundPricesRepository.findByIdFundCodeAndIdDateAfter(fundCode, createdAt);
+            List<FundPrices> fundPrices = fundPricesRepository.findByIdFundCodeAndIdDateGreaterThanEqual(fundCode, createdAt);
             fundPricesMap.put(fundCode, fundPrices);
         }
 
@@ -1188,5 +1196,48 @@ public class PortfolioService {
             return new StockIncomeRevResponseDto.StockIncomeRevDto(null, null);
         }
         return result;
+    }
+
+
+
+
+    public OptimizeResponseDto enrichOptimizeResponse(OptimizeResponseDto optimizeResponseDto) {
+        OptimizeResponseDto.Response response = optimizeResponseDto.getResponse();
+
+        List<OptimizeResponseDto.Fund> enrichedFunds = response.getFunds().stream()
+                .map(this::enrichFund)
+                .collect(Collectors.toList());
+
+        OptimizeResponseDto.Response enrichedResponse = new OptimizeResponseDto.Response(
+                enrichedFunds,
+                response.getUserId(),
+                null,
+                response.getWeights()
+        );
+
+        return new OptimizeResponseDto(enrichedResponse);
+    }
+
+    private OptimizeResponseDto.Fund enrichFund(OptimizeResponseDto.Fund fund) {
+        // JpaRepository를 사용하여 추가 정보를 가져옴
+        FundProducts fundEntity = fundProductsRepository.findById(fund.getFundCode())
+                .orElseThrow(() -> new RuntimeException("Fund not found with code: " + fund.getFundCode()));
+
+        fund.setFundName(fundEntity.getFundName());
+        fund.setCompanyName(fundEntity.getCompanyName());
+        fund.setReturn3m(fundEntity.getReturn3m());
+
+        List<OptimizeResponseDto.Stock> enrichedStocks = fund.getStocks().stream()
+                .map(this::enrichStock)
+                .collect(Collectors.toList());
+
+        fund.setStocks(enrichedStocks);
+
+        return fund;
+    }
+
+    private OptimizeResponseDto.Stock enrichStock(OptimizeResponseDto.Stock stock) {
+        // 현재 Stock 객체에 추가적인 정보가 필요하지 않으므로 그대로 반환
+        return stock;
     }
 }
