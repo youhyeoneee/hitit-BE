@@ -35,7 +35,9 @@
 >- 투자 성형 및 노후 종합 진단 API 개발
 >- 리밸런싱 시 알림 기능 개발
 
-#### <user-service>
+<br/>
+
+#### user-service
 
 - `investment_test` : 투자 성향 테스트 클래스들이 포함되어있습니다.
 - `notification` : 사용자에게 보낼 알림 기능 클래스들이 포함되어있습니다.
@@ -43,7 +45,7 @@
 - `user_service` : 로그인 및 회원가입 등의 사용자 관리 기능 클래스들이 포함되어있습니다.
 
 <details>
-<summary> user-service </summary>
+<summary> 구조도 </summary>
 <div markdown="1">
 
 ```
@@ -137,7 +139,9 @@ user_service
 
 </details>
 
-#### <utils>
+<br/>
+
+#### utils
 
 공통적으로 사용될 수 있는 유틸리티 함수들과 예외 처리, 보안, 메시징 등의 기능을 제공합니다.
 
