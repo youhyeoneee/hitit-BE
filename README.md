@@ -10,23 +10,19 @@
 - Redis 
 - AWS EC2 t3.large
 - AWS RDS 
-  
-### 아키텍처
-
-<img src="https://github.com/user-attachments/assets/44519970-5991-4926-8cc5-4da2b5e2da4b">
 
 ### 패키지 구조
 
-마이크로서비스 아키텍처(MSA)를 기반으로 하는 멀티 모듈 프로젝트입니다. <br/>
+>마이크로서비스 아키텍처(MSA)를 기반으로 하는 멀티 모듈 프로젝트입니다. <br/>
 각 모듈은 독립적으로 배포될 수 있으며, 서로 다른 서비스를 제공하여 전체적인 시스템의 기능을 구현합니다. <br/>
+5가지 모듈로 구성되어 있습니다. <br/>
+>> 1. mydata-service
+>> 2. asset-service
+>> 3. portfolio-service
+>> 4. user-service
+>> 5. utils
 
-- mydata-service
-- asset-service
-- user-service
-- portfolio-service
-- utils
-
-의 5가지 모듈로 구성되어 있습니다.  <br/>
+<br/>
 
 제가 주로 담당하여 개발한 부분은 <b>user-service, utils</b> 입니다.
 
@@ -38,6 +34,8 @@
 <br/>
 
 #### user-service
+
+사용자 관련 기능을 제공하는 서비스로, 로그인 및 회원가입, 테스트, 알림 등 다양한 사용자 관련 기능을 포함합니다.
 
 - `investment_test` : 투자 성향 테스트 클래스들이 포함되어있습니다.
 - `notification` : 사용자에게 보낼 알림 기능 클래스들이 포함되어있습니다.
@@ -225,12 +223,15 @@ utils
 ### ERD
 
 - 서비스
-![image](https://github.com/user-attachments/assets/9489b808-ff81-49fa-bc32-a39bd9619b25)
-
+<img src="https://github.com/user-attachments/assets/9489b808-ff81-49fa-bc32-a39bd9619b25" width="70%">
 
 - 마이데이터
-![image](https://github.com/user-attachments/assets/f4bb43ab-cab4-41ae-8b6f-d47c36734cd6)
+<img src="https://github.com/user-attachments/assets/f4bb43ab-cab4-41ae-8b6f-d47c36734cd6" width="70%">
 
+  
+### 아키텍처
+
+<img src="https://github.com/user-attachments/assets/44519970-5991-4926-8cc5-4da2b5e2da4b" width="70%">
 
 ### 회고 
 
